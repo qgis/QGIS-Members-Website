@@ -1,6 +1,6 @@
 #--------- Generic stuff all our Dockerfiles should start with so we get caching ------------
 # Note this base image is based on debian
-FROM python:3.10 as prod
+FROM python:3.12-slim as prod
 MAINTAINER Tim Sutton<tim@kartoza.com>
 
 RUN  export DEBIAN_FRONTEND=noninteractive
@@ -18,8 +18,8 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /root/.npm /root/.cache && \
     rm -rf ~/.cache/pip
-RUN wget https://github.com/jgm/pandoc/releases/download/1.17.1/pandoc-1.17.1-2-amd64.deb
-RUN dpkg -i pandoc-1.17.1-2-amd64.deb && rm pandoc-1.17.1-2-amd64.deb
+RUN wget https://github.com/jgm/pandoc/releases/download/3.2/pandoc-3.2-1-amd64.deb
+RUN dpkg -i pandoc-3.2-1-amd64.deb && rm pandoc-3.2-1-amd64.deb
 
 # Added because of issue with building cryptography.io using pip
 # This flag disabled rust build, but only for this particular version
