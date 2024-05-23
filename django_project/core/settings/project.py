@@ -91,3 +91,7 @@ LOGIN_URL = '/en/accounts/login/'
 
 # The numeric mode (i.e. 0o644) to set newly uploaded files to.
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+
+# Default primary key type
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

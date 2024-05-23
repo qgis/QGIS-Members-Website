@@ -2,7 +2,7 @@
 awesome-slugify~=1.6
 beautifulsoup4~=4.12
 Django~=4.2
-dj-stripe~=2.8
+dj-stripe==2.8.4
 django-allauth~=0.63
 django-braces~=1.15
 # disqus
@@ -31,7 +31,7 @@ django-widget-tweaks~=1.5
 djangorestframework~=3.15
 markdown~=3.6
 Pillow~=10.3
-pinax-notifications~=6.0
+git+https://github.com/Xpirix/pinax-notifications.git
 pinax-templates~=3.0
 pypandoc~=1.13
 # pypandoc is an interface for pandoc converter
