@@ -9,7 +9,7 @@ RUN  dpkg-divert --local --rename --add /sbin/initctl
 
 # Pandoc needed to generate rst dumps, uic compressor needed for django-pipeline
 RUN apt-get update -y && \
-    apt-get -y install python3-gdal python3-geoip sudo curl rpl && \
+    apt-get -y install python3-gdal python3-geoip sudo curl rpl wget && \
     apt-get -y --force-yes install yui-compressor gettext && \
     apt-get -y --purge autoremove make libc-dev musl-dev g++ && \
     apt-get install -y nodejs npm && \
@@ -26,6 +26,7 @@ RUN dpkg -i pandoc-3.2-1-amd64.deb && rm pandoc-3.2-1-amd64.deb
 # In the future, we may have to include rust toolchain in the Dockerfile
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
+RUN apt-get update -y && apt-get -y install git build-essential
 ADD deployment/docker/REQUIREMENTS.txt /REQUIREMENTS.txt
 ADD deployment/docker/uwsgi.conf /uwsgi.conf
 ADD django_project /home/web/django_project
