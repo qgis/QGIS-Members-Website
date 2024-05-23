@@ -4,7 +4,7 @@ import os
 
 from django.db import models
 from django.conf.global_settings import MEDIA_ROOT
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from model_utils import FieldTracker
 

@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from core.settings.contrib import STOP_WORDS
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from changes.models.entry import Entry
 
 logger = logging.getLogger(__name__)

@@ -7,7 +7,7 @@ repository!
 """
 
 import os  # noqa
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from .utils import absolute_path
 from .contrib import *  # noqa
 
@@ -47,6 +47,8 @@ LOCALE_PATHS = (absolute_path('locale'),)
 MIDDLEWARE += [
     # For nav bar generation
     'core.custom_middleware.NavContextMiddleware',
+    # Allauth middleware
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 # Project specific javascript files to be pipelined

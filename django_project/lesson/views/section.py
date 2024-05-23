@@ -13,7 +13,7 @@ from django.views.generic import (
 )
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from braces.views import LoginRequiredMixin
 from pure_pagination.mixins import PaginationMixin

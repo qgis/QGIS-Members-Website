@@ -23,7 +23,7 @@ from django.urls import reverse
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from braces.views import LoginRequiredMixin
 from djstripe.enums import PaymentIntentStatus
 from djstripe.models import Customer, PaymentIntent
@@ -53,7 +53,7 @@ from changes import (
 )
 from helpers.notification import send_notification
 
-stripe.api_key = djstripe_settings.STRIPE_SECRET_KEY
+stripe.api_key = djstripe_settings.DjstripeSettings.STRIPE_SECRET_KEY
 
 
 class CertificateMixin(object):

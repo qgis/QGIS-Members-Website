@@ -12,7 +12,7 @@ from django.views.generic import (
     UpdateView,
 )
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from braces.views import LoginRequiredMixin
 
