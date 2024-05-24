@@ -54,9 +54,9 @@
         </h1>
     </div>
 
-    {% ifequal num_certifyingorganisations 0 %}
+    {% if num_certifyingorganisations == 0 %}
         <h3>No certifying organisations are rejected.</h3>
-    {% endifequal %}
+    {% endif %}
 
     {% for certifyingorganisation in certifyingorganisations %}
         <div class="col-lg-10">

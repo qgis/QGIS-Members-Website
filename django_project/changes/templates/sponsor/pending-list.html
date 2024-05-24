@@ -44,7 +44,7 @@
             {% endif %}
         </h2>
     </div>
-    {% ifequal num_sponsors 0 %}
+    {% if num_sponsors == 0 %}
         {% if unapproved %}
             <h3>All sustaining members are approved.</h3>
         {% else %}
@@ -52,7 +52,7 @@
                     class="btn btn-default btn-mini"
                     href='{% url "sponsor-create" project_slug %}'>create one</a>.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
     {% for sponsor in sponsors %}
         <script>console.debug("{{ sponsor }}");</script>

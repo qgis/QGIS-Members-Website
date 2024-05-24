@@ -60,13 +60,13 @@
         </h1>
     </div>
 
-    {% ifequal num_organisations 0 %}
+    {% if num_organisations == 0 %}
         {% if unapproved %}
             <h3>All organisation are approved.</h3>
         {% else %}
             <h3>No organisation are defined.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
     {% for organisation in organisations %}
         <li class="row order" style="list-style-type: none; margin-top:10px; margin-left: 10px; margin-right: 1px" id="{{ organisation.id }}-{{ organisation.name }}">

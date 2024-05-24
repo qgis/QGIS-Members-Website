@@ -35,7 +35,7 @@
             {% endif %}
         </h1>
     </div>
-    {% ifequal num_sponsorshiplevels 0 %}
+    {% if num_sponsorshiplevels == 0 %}
         {% if unapproved %}
             <h3>All sustaining membership level are approved.</h3>
         {% else %}
@@ -43,7 +43,7 @@
                     class="btn btn-default btn-mini"
                     href='{% url "sponsorshiplevel-create" project_slug %}'>create one</a>.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
     {% for sponsorshiplevel in sponsorshiplevels %}
         <script>console.debug("{{ sponsorshiplevel }}");</script>

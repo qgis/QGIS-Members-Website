@@ -7,11 +7,11 @@
     {% endif %}
     {% for page in page_obj.pages %}
         {% if page %}
-            {% ifequal page page_obj.number %}
+            {% if page == page_obj.number %}
                 <span class="current page">{{ page }}</span>
             {% else %}
                 <a href="?{{ page.querystring }}" class="page">{{ page }}</a>
-            {% endifequal %}
+            {% endif %}
         {% else %}
             ...
         {% endif %}

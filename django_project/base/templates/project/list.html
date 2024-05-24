@@ -89,12 +89,12 @@
         {% endif %}
       </h2>
     </div>
-    {% ifequal num_projects 0 %}
+    {% if num_projects == 0 %}
       <h3>
         No projects are defined, but you can
         <a href="{% url "project-create" %}">create one here</a>.
       </h3>
-    {% endifequal %}
+    {% endif %}
     {% for project in projects %}
       {% include 'project/includes/project-panel.html' %}
     {%  endfor %}
