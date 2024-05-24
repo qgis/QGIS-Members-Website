@@ -1,6 +1,7 @@
 # custom slugify
 awesome-slugify~=1.6
 beautifulsoup4~=4.12
+crispy-bootstrap3~=2024.1
 Django~=4.2
 dj-stripe==2.8.4
 django-allauth~=0.63
