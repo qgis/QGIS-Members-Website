@@ -15,7 +15,8 @@ django-datatables-view~=1.20
 django-embed-video~=1.4
 easy-thumbnails~=2.8
 django-grappelli~=4.0
-django-hashedfilenamestorage~=2.4
+# Update for Django 4, the original package is broken
+git+https://github.com/Xpirix/django-hashedfilenamestorage.git
 django-modeltranslation~=0.18
 django-model-utils~=4.5
 django-pipeline~=3.1
@@ -31,6 +32,7 @@ django-widget-tweaks~=1.5
 djangorestframework~=3.15
 markdown~=3.6
 Pillow~=10.3
+# Update for Django 4, the original package is broken
 git+https://github.com/Xpirix/pinax-notifications.git
 pinax-templates~=3.0
 pypandoc~=1.13
