@@ -229,7 +229,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('worksheet-module-answers-print',
                                            kwargs=self.kwargs_worksheet_full))
         self.assertEqual(response.status_code, 200)
-        self.assertEquals(
+        self.assertEqual(
             response.get('Content-Disposition'),
             'filename=Test Question Answer.pdf'
         )
@@ -247,7 +247,7 @@ class TestViews(TestCase):
             'worksheet-print', kwargs= self.kwargs_worksheet_full
         ) + '?q=1')
         self.assertEqual(response.status_code, 200)
-        self.assertEquals(
+        self.assertEqual(
             response.get('Content-Disposition'),
             'filename=1. Test section print-Test module print.pdf'
         )
@@ -265,7 +265,7 @@ class TestViews(TestCase):
             'worksheet-zip', kwargs=self.kwargs_worksheet_full
         ) + '?q=2')
         self.assertEqual(response.status_code, 200)
-        self.assertEquals(
+        self.assertEqual(
             response.get('Content-Disposition'),
             'attachment; filename=2. Test section zip-Test module zip.zip'
         )
@@ -298,7 +298,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse(
             'worksheet-sampledata', kwargs=self.kwargs_worksheet_full))
         self.assertEqual(response.status_code, 200)
-        self.assertEquals(
+        self.assertEqual(
             response.get('Content-Disposition'),
             'attachment; filename=Test section zip-Test module zip.zip'
         )
@@ -329,7 +329,7 @@ class TestViews(TestCase):
             'download-multiple-worksheets', kwargs=self.kwargs_project
         ) + worksheet_obj)
         self.assertEqual(response.status_code, 200)
-        self.assertEquals(
+        self.assertEqual(
             response.get('Content-Disposition'),
             'attachment; '
             'filename=Test project name multiple zip-worksheet module 1.1.zip'

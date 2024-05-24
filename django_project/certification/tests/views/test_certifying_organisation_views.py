@@ -438,6 +438,6 @@ class TestCertifyingOrganisationView(TestCase):
         call_command('set_status_existing_organisation', stdout=out)
         self.certifying_organisation.refresh_from_db()
         self.pending_certifying_organisation.refresh_from_db()
-        self.assertEquals(self.certifying_organisation.status.name, 'Approved')
-        self.assertEquals(
+        self.assertEqual(self.certifying_organisation.status.name, 'Approved')
+        self.assertEqual(
             self.pending_certifying_organisation.status.name, 'Pending')

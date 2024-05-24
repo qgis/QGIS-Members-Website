@@ -63,7 +63,7 @@ class TestCreditSystems(TestCase):
 
         response = certificate_create.form_valid(form)
         is_paid = form['is_paid'].value()
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Newly created object test
         certificate = \
@@ -71,11 +71,11 @@ class TestCreditSystems(TestCase):
         certificate.is_paid = is_paid
 
         # Test remaining credits in the organisation
-        self.assertEquals(
+        self.assertEqual(
             certificate.course.certifying_organisation.organisation_credits, 7)
 
         # Test status of the certificate
-        self.assertEquals(certificate.is_paid, True)
+        self.assertEqual(certificate.is_paid, True)
 
         # Add another attendee
         course_attendee2 = CourseAttendeeF.create(course=self.course)
@@ -94,17 +94,17 @@ class TestCreditSystems(TestCase):
             )
         response = certificate_create.form_valid(form2)
         is_paid = form2['is_paid'].value()
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Newly created object test
         certificate2 = \
             Certificate.objects.get(attendee=course_attendee2.attendee)
         certificate2.is_paid = is_paid
 
-        self.assertEquals(
+        self.assertEqual(
             certificate2.course.certifying_organisation.organisation_credits,
             4)
-        self.assertEquals(certificate2.is_paid, True)
+        self.assertEqual(certificate2.is_paid, True)
 
     def test_issue_certificate_without_credit(self):
         """Test when the organisation has no credit available."""
@@ -131,14 +131,14 @@ class TestCreditSystems(TestCase):
 
         response = certificate_create.form_valid(form)
         is_paid = form['is_paid'].value()
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Newly created object test
         certificate = \
             Certificate.objects.get(attendee=self.course_attendee.attendee)
         certificate.is_paid = is_paid
 
-        self.assertEquals(
+        self.assertEqual(
             certificate.course.certifying_organisation.organisation_credits,
             -3)
-        self.assertEquals(certificate.is_paid, False)
+        self.assertEqual(certificate.is_paid, False)
