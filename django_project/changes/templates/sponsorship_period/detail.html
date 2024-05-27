@@ -37,11 +37,11 @@
           Start Date : {{ sponsorshipperiod.start_date }}<br/>
           End Date : {{ sponsorshipperiod.end_date }}<br/>
           Amount Paid :
-            {% ifnotequal sponsorshipperiod.amount_sponsored None %}
+            {% if sponsorshipperiod.amount_sponsored != None %}
                 {{ sponsorshipperiod.amount_sponsored }} {{ sponsorshipperiod.currency }}<br/>
             {% else %}
                 n/a
-            {% endifnotequal %}
+            {% endif %}
         {% if sponsorshipperiod.sponsorshiplevel.logo %}
         <img class="img-responsive img-rounded"
              src="{{ sponsorshipperiod.sponsorshiplevel.logo.url }}" width="100" />
