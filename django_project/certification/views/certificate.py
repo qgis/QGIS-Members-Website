@@ -27,7 +27,7 @@ from django.utils.translation import gettext as _
 from braces.views import LoginRequiredMixin
 from djstripe.enums import PaymentIntentStatus
 from djstripe.models import Customer, PaymentIntent
-from djstripe import settings as djstripe_settings
+from djstripe.settings import DjstripeSettings as djstripe_settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.utils import ImageReader
@@ -53,7 +53,7 @@ from changes import (
 )
 from helpers.notification import send_notification
 
-stripe.api_key = djstripe_settings.DjstripeSettings.STRIPE_SECRET_KEY
+stripe.api_key = djstripe_settings.STRIPE_SECRET_KEY
 
 
 class CertificateMixin(object):
