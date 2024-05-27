@@ -460,7 +460,7 @@ class SustainingMemberPeriodCreateView(
             customer=customer.id,
             items=[{"plan": plan_id}],
             billing="charge_automatically",
-            api_key=djstripe.settings.DjstripeSettings.STRIPE_SECRET_KEY,
+            api_key=djstripe.settings.STRIPE_SECRET_KEY,
             **optional
         )
 
@@ -661,7 +661,7 @@ class SustainingMemberPeriodUpdateView(
     def update_subscription(self, subscription, recurring, period_end,
                             metadata=None):
         """Update subscription in stripe"""
-        stripe.api_key = djstripe.settings.DjstripeSettings.STRIPE_SECRET_KEY
+        stripe.api_key = djstripe.settings.STRIPE_SECRET_KEY
         optional = {}
         if not metadata:
             metadata = {}

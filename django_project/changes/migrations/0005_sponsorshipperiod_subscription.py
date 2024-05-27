@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('djstripe', '0012_2_8'),
+        ('djstripe', '0004_2_1'),
         ('changes', '0004_auto_20191217_1139'),
     ]
 

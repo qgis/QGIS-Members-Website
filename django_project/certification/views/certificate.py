@@ -27,7 +27,7 @@ from django.utils.translation import gettext as _
 from braces.views import LoginRequiredMixin
 from djstripe.enums import PaymentIntentStatus
 from djstripe.models import Customer, PaymentIntent
-from djstripe.settings import DjstripeSettings as djstripe_settings
+from djstripe import settings as djstripe_settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.utils import ImageReader
