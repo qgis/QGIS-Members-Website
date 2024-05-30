@@ -130,12 +130,12 @@ class SectionListView(SectionMixin, PaginationMixin, ListView):
 # noinspection PyAttributeOutsideInit
 class SectionDeleteView(
         LoginRequiredMixin,
-        SectionMixin,
         DeleteView):
     """Delete view for Section."""
 
     context_object_name = 'section'
     template_name = 'section/delete.html'
+    model = Section
 
     def get_success_url(self):
         """Define the redirect URL.

@@ -226,7 +226,6 @@ class SponsorshipLevelDetailView(SponsorshipLevelMixin, DetailView):
 # noinspection PyAttributeOutsideInit
 class SponsorshipLevelDeleteView(
         LoginRequiredMixin,
-        SponsorshipLevelMixin,
         DeleteView):
     """Delete view for Sponsorship Level."""
     context_object_name = 'sponsorshiplevel'

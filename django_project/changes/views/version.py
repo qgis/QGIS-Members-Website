@@ -309,7 +309,7 @@ class VersionThumbnailView(VersionMixin, DetailView):
 
 
 # noinspection PyAttributeOutsideInit
-class VersionDeleteView(LoginRequiredMixin, VersionMixin, DeleteView):
+class VersionDeleteView(LoginRequiredMixin, DeleteView):
     """Delete view for Entry."""
     context_object_name = 'version'
     template_name = 'version/delete.html'

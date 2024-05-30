@@ -256,7 +256,7 @@ class BallotUpdateView(LoginRequiredMixin, BallotMixin, UpdateView):
 
 
 # noinspection PyAttributeOutsideInit
-class BallotDeleteView(StaffuserRequiredMixin, BallotMixin, DeleteView):
+class BallotDeleteView(StaffuserRequiredMixin, DeleteView):
     """The view for deleting a Ballot object.
 
     Accepts GET requests, returning a confirmation page and POST requests to
