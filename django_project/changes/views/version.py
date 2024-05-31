@@ -561,7 +561,7 @@ class VersionDownload(CustomStaffuserRequiredMixin, VersionMixin, DetailView):
             **response_kwargs
         )
         # convert the html to rst
-        converted_doc = pypandoc.convert(
+        converted_doc = pypandoc.convert_file(
             document.rendered_content.encode('utf8', 'ignore'),
             'rst', format='html', extra_args=['--no-wrap'])
         converted_doc = converted_doc.replace('/media/images/', 'images/')
@@ -731,7 +731,7 @@ class VersionSponsorDownload(
             **response_kwargs
         )
         # convert the html to html
-        converted_doc = pypandoc.convert(
+        converted_doc = pypandoc.convert_file(
             document.rendered_content.encode(
                 'utf8', 'ignore'), 'html', format='html')
         converted_doc = converted_doc.replace('/media/images/', 'images/')

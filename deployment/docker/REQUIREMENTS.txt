@@ -36,7 +36,6 @@ Pillow~=10.3
 # Update for Django 4, the original package is broken
 git+https://github.com/Xpirix/pinax-notifications.git
 pinax-templates~=3.0
-pypandoc~=1.13
 # pypandoc is an interface for pandoc converter
 pypandoc~=1.13
 psycopg2-binary~=2.9

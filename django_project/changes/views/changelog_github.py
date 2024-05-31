@@ -214,17 +214,22 @@ class FetchCategory(LoginRequiredMixin, APIView):
 
 
 class ImgExtractor(Treeprocessor):
-    def run(self, doc):
+    def __init__(self, md):
+        super().__init__(md)
+        self.markdown = md  # Store the reference to the Markdown instance
+
+    def run(self, root):
         """Find all images and append to markdown.images."""
         self.markdown.images = []
-        for image in doc.findall('.//img'):
+        for image in root.findall('.//img'):
             self.markdown.images.append(image.get('src'))
+        return root
 
 
 class ImgExtExtension(Extension):
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md):
         img_ext = ImgExtractor(md)
-        md.treeprocessors.add('imgext', img_ext, '>inline')
+        md.treeprocessors.register(img_ext, 'imgext', 5)
 
 
 def download_all_referenced_images(request, **kwargs):
