@@ -26,8 +26,6 @@ web:
 	@# This one runs the postgis-backup cron container
 	@# We add --no-recreate so that it does not destroy & recreate the db container
 	@docker-compose up --no-recreate --no-deps -d dbbackups
-	@docker-compose up -d btsync-db
-	@docker-compose up -d btsync-media
 
 permissions:
 	# Probably we want something more granular here....
@@ -214,14 +212,14 @@ dbrestore:
 	@echo "stopping uwsgi container"
 	@docker-compose stop uwsgi
 	@source .env; echo "dropping $$DATABASE_NAME"
-	@docker-compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "dropdb $${DATABASE_NAME}"'
+	-@docker-compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "dropdb --force $${DATABASE_NAME}"'
 	@source .env; echo "creating $$DATABASE_NAME"
-	@docker-compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "createdb -O docker -T template_postgis $${DATABASE_NAME}"'
+	-@docker-compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "createdb -O docker -T template1 $${DATABASE_NAME}"'
 	@source .env; echo "restoring $$DATABASE_NAME"
 	@# Because we pipe from one docker command to another and we are going
 	@# to execute this Make command from a remote server at times, we need to using use interactive mode (-i)
 	@# in the first command and not use terminal (-t) in the second. Please do not change these!
-	@docker-compose exec -e DATABASE_NAME db /bin/bash -c 'pg_restore /backups/latest.dmp | su - postgres -c "psql $${DATABASE_NAME}"'
+	@docker-compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "pg_restore -c /backups/latest.dmp -d gis"'
 	@docker-compose start uwsgi
 	@echo "starting uwsgi container"
 

@@ -109,18 +109,5 @@ services:
       dockerfile: dockerize/docker/Dockerfile
       target: dev
 
-  btsync-db:
-    # BTSync backups for database dumps
-    image: kartoza/btsync
-    volumes:
-      # We mount RW so that we can use remove peer to clean up old backups off the server
-      - db-backups:/web:rw
-
-  btsync-media:
-    # BTSync backups for django media
-    image: kartoza/btsync
-    volumes:
-      # We mount RO as we do not really want peers to change this data
-      - media-data:/web:ro
 
 
