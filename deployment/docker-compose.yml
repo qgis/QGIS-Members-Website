@@ -9,10 +9,6 @@
 volumes:
   postgres-data:
   db-backups:
-  static-data:
-  media-data:
-  reports-data:
-  nginx-conf:
 services:
   smtp:
     image: catatnight/postfix
@@ -50,12 +46,24 @@ services:
       - VIRTUAL_HOST=${VIRTUAL_HOST}
       - VIRTUAL_PORT=${VIRTUAL_PORT}
       - VALID_DOMAIN=${VALID_DOMAIN}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_SUBJECT_PREFIX=${EMAIL_SUBJECT_PREFIX}
+      - MAILDOMAIN=${MAILDOMAIN}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY}
+      - STRIPE_LIVE_PUBLIC_KEY=${STRIPE_LIVE_PUBLIC_KEY}
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET}
+      - SERVER_EMAIL=${SERVER_EMAIL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
     volumes:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw
       - reports-data:/home/web/reports
     links:
       - db:db
+      - smtp:smtp
     restart: unless-stopped
     user: root
     logging:
@@ -77,10 +85,10 @@ services:
       - DUMPPREFIX=${DUMPPREFIX}
       # These are all defaults anyway, but setting explicitly in
       # case we ever want to ever use different credentials
-      - PGUSER=${DATABASE_USERNAME}
-      - PGPASSWORD=${DATABASE_PASSWORD}
-      - PGPORT=5432
-      - PGHOST=${DATABASE_HOST}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASS=${DATABASE_PASSWORD}
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=${DATABASE_HOST}
       - PGDATABASE=${DATABASE_NAME}
     restart: unless-stopped
 
