@@ -10,6 +10,7 @@ import os  # noqa
 from django.utils.translation import gettext_lazy as _
 from .utils import absolute_path
 from .contrib import *  # noqa
+import json
 
 # Project apps
 INSTALLED_APPS += [
@@ -80,11 +81,7 @@ PIPELINE['STYLESHEETS']['project'] = {
     },
 }
 
-VALID_DOMAIN = [
-    'localhost',
-    'changelog.kartoza.com',
-    'staging.changelog.kartoza.com'
-]
+VALID_DOMAIN = json.loads(os.environ.get("VALID_DOMAIN", "[]"))
 
 EMAIL_HOST_USER = 'noreply@kartoza.com'
 LOGIN_URL = '/en/accounts/login/'
