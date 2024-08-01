@@ -38,6 +38,7 @@ from .views import (
     VersionListView,
     VersionUpdateView,
     VersionDownload,
+    VersionDownloadMd,
     VersionDownloadGnu,
     VersionSponsorDownload,
 
@@ -166,6 +167,9 @@ urlpatterns = [
     url(r'^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/download/$',
         view=VersionDownload.as_view(),
         name='version-download'),
+    url(r'^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/md/$',
+        view=VersionDownloadMd.as_view(),
+        name='version-download-md'),
     url(r'^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/gnu/$',
         view=VersionDownloadGnu.as_view(),
         name='version-download-gnu'),
