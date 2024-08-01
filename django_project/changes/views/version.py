@@ -560,10 +560,11 @@ class VersionDownload(CustomStaffuserRequiredMixin, VersionMixin, DetailView):
             context=context,
             **response_kwargs
         )
+
         # convert the html to rst
-        converted_doc = pypandoc.convert_file(
+        converted_doc = pypandoc.convert_text(
             document.rendered_content.encode('utf8', 'ignore'),
-            'rst', format='html', extra_args=['--no-wrap'])
+            'rst', format='html', extra_args=['--wrap=none'])
         converted_doc = converted_doc.replace('/media/images/', 'images/')
 
         # prepare the ZIP file
@@ -700,9 +701,9 @@ class VersionDownloadMd(VersionMixin, DetailView):
         )
 
         # convert the html to markdown
-        converted_doc = pypandoc.convert(
+        converted_doc = pypandoc.convert_text(
             document.rendered_content.encode('utf8', 'ignore'),
-            'md', format='html', extra_args=['--no-wrap'])
+            'md', format='html', extra_args=['--wrap=none'])
         converted_doc = converted_doc.replace('/media/images/', 'images/')
 
         # prepare the ZIP file
@@ -908,7 +909,7 @@ class VersionSponsorDownload(
             **response_kwargs
         )
         # convert the html to html
-        converted_doc = pypandoc.convert_file(
+        converted_doc = pypandoc.convert_text(
             document.rendered_content.encode(
                 'utf8', 'ignore'), 'html', format='html')
         converted_doc = converted_doc.replace('/media/images/', 'images/')
