@@ -70,10 +70,10 @@ jobs:
             type=gha,scope=prod
           cache-to: type=gha,scope=prod
 
-      - name: Run docker-compose services
+      - name: Run docker compose services
         working-directory: deployment
         run: |
-          echo "Override docker-compose for testing purposes"
+          echo "Override docker compose for testing purposes"
           cp .env.example .env
           cp docker-compose.test.yml docker-compose.override.yml
           make up
@@ -84,7 +84,7 @@ jobs:
       - name: Run Coverage test
         working-directory: deployment
         run: |
-          cat << EOF | docker-compose exec -T devweb bash
+          cat << EOF | docker compose exec -T devweb bash
           python manage.py makemigrations
           python manage.py migrate
           python manage.py collectstatic --noinput --verbosity 0
