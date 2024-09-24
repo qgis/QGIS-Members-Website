@@ -9,6 +9,10 @@
 volumes:
   postgres-data:
   db-backups:
+  static-data:
+  media-data:
+  reports-data:
+  nginx-conf:
 services:
   smtp:
     image: catatnight/postfix
