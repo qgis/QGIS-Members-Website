@@ -73,7 +73,7 @@ services:
       - reports-data:/home/web/reports
     links:
       - db:db
-      - smtp:smtp
+      # - smtp:smtp
     restart: unless-stopped
     user: root
     logging:
