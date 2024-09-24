@@ -91,7 +91,7 @@ jobs:
           coverage run manage.py test
           coverage xml
           EOF
-          docker cp projecta_devweb_1:/home/web/django_project/coverage.xml ../coverage.xml
+          docker cp projecta-devweb-1:/home/web/django_project/coverage.xml ../coverage.xml
 
       # - name: Upload coverage to codecov
       #   uses: codecov/codecov-action@v2
