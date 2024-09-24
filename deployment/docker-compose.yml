@@ -14,14 +14,14 @@ volumes:
   reports-data:
   nginx-conf:
 services:
-  smtp:
-    image: catatnight/postfix
-    hostname: postfix
-    environment:
-      # You could change this to something more suitable
-      - maildomain=kartoza.com
-      - smtp_user=noreply:docker
-    restart: unless-stopped
+  # smtp:
+  #   image: catatnight/postfix
+  #   hostname: postfix
+  #   environment:
+  #     # You could change this to something more suitable
+  #     - maildomain=kartoza.com
+  #     - smtp_user=noreply:docker
+  #   restart: unless-stopped
 
   db:
     image: kartoza/postgis:16-3.4
