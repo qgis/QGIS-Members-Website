@@ -48,3 +48,4 @@ Unidecode~=0.4
 WeasyPrint~=62.1
 xhtml2pdf~=0.2
 sentry-sdk~=2.2
+setuptools~=75.1
