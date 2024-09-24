@@ -40,15 +40,11 @@ services:
       target: prod
     volumes:
       - ../django_project:/home/web/django_project
-      - ${MEDIA_VOLUME}:/home/web/media:rw
-      - ${STATIC_VOLUME}:/home/web/static:rw
       - ./logs:/var/log
 
   web:
     volumes:
       - ./logs:/var/log/nginx
-      - ${MEDIA_VOLUME}:/home/web/media:ro
-      - ${STATIC_VOLUME}:/home/web/static:ro
     ports:
       - "${HTTP_PORT}:8080"
       - "${HTTPS_PORT}:443"
@@ -61,8 +57,6 @@ services:
       target: dev
     volumes:
       - ../django_project:/home/web/django_project
-      - ${MEDIA_VOLUME}:/home/web/media:rw
-      - ${STATIC_VOLUME}:/home/web/static:rw
       - ./logs:/var/log
     ports:
       - "${TEST_HTTP_PORT}:8080"
