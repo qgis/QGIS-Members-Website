@@ -354,7 +354,7 @@ def generate_pdf(
     page.drawCentredString(
         center, 400, '%s %s' % (
             attendee.firstname,
-            attendee.surname))
+            attendee.surname if attendee.surname else ''))
     page.setFont('Noto-Regular', 16)
     page.drawCentredString(
         center, 370, wording)
@@ -605,7 +605,7 @@ def email_all_attendees(request, **kwargs):
             # Send email to each attendee with the link to his certificate.
             data = {
                 'firstname': attendee.firstname,
-                'lastname': attendee.surname,
+                'lastname': attendee.surname if attendee.surname else '',
                 'coursetype': course.course_type,
                 'start_date': course.start_date.strftime('%d %B %Y'),
                 'end_date': course.end_date.strftime('%d %B %Y'),

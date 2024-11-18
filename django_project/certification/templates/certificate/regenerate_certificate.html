@@ -18,7 +18,7 @@
                         <span>Course</span></div>
                     <div class="col-lg-10">
                         <span>{{ id }}</span><br/>
-                        <span>{{ attendee.firstname }} {{ attendee.surname }}</span><br/>
+                        <span>{{ attendee.firstname }} {{ attendee.surname |default_if_none:"" }}</span><br/>
                         <span>{{ course.certifying_organisation.project }} - {{ course.course_type.name }} ({{ course.start_date }} to {{ course.end_date }})</span></div>
                 </div>
             </div>
