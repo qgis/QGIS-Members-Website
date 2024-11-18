@@ -15,7 +15,6 @@ from .views import (
     CertifyingOrganisationJson,
     ApproveCertifyingOrganisationView,
     reject_certifying_organisation,
-    RejectedCertifyingOrganisationListView,
 
     # Course Type.
     CourseTypeCreateView,
@@ -129,10 +128,6 @@ urlpatterns = [
               '(?P<slug>[\w-]+)/$',
         view=UpdateStatusOrganisation.as_view(),
         name='certifyingorganisation-update-status'),
-    url(regex='^(?P<project_slug>[\w-]+)/'
-              'certifyingorganisation/rejected-list/$',
-        view=RejectedCertifyingOrganisationListView.as_view(),
-        name='certifyingorganisation-rejected-list'),
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/list/$',
         view=CertifyingOrganisationListView.as_view(),
         name='certifyingorganisation-list'),
