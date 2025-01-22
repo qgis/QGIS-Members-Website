@@ -13,8 +13,8 @@ from certification.tests.model_factories import (
     CertificateTypeF,
     ProjectCertificateTypeF,
     CourseF,
-    CourseConvenerF, 
-    AttendeeF, 
+    CourseConvenerF,
+    AttendeeF,
     CertificateF,
     CourseAttendeeF
 )
