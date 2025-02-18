@@ -131,7 +131,7 @@ def generate_certificate_pdf(
     page.drawString(
         margin_left, (margin_bottom - 20),
         'You can verify this certificate by visiting '
-        'http://{}/en/{}/organisationcertificate/{}/.'
+        'https://{}/en/{}/organisationcertificate/{}/.'
         .format(current_site, project.slug, certificate.certificateID))
 
     # Close the PDF object cleanly.

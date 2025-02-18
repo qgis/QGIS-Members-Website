@@ -428,7 +428,7 @@ def generate_pdf(
     page.drawString(
         margin_left, (margin_bottom - 20),
         'You can verify this certificate by visiting '
-        'http://{}/en/{}/certificate/{}/.'
+        'https://{}/en/{}/certificate/{}/.'
         ''.format(current_site, project.slug, certificate.certificateID))
 
     # Close the PDF object cleanly.
@@ -633,7 +633,7 @@ def email_all_attendees(request, **kwargs):
                 'Certifying organisation: {organisation}\n\n'
                 'You may print the certificate '
                 'by visiting:\n'
-                'http://{domain}/en/{project_slug}/certifyingorganisation/'
+                'https://{domain}/en/{project_slug}/certifyingorganisation/'
                 '{organisation_slug}/course/'
                 '{course_slug}/print/{pk}/\n\n'
                 'Sincerely,\n{convener_firstname} {convener_lastname}'
