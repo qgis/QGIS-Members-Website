@@ -58,6 +58,3 @@ services:
     volumes:
       - ../django_project:/home/web/django_project
       - ./logs:/var/log
-    ports:
-      - "${TEST_HTTP_PORT}:8080"
-      - "${SSH_PORT}:22"

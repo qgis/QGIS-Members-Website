@@ -202,3 +202,5 @@ if SENTRY_DSN and SENTRY_DSN != "":
         # of transactions for performance monitoring.
         traces_sample_rate=SENTRY_RATE,
     )
+
+STRIPE_API_VERSION = os.environ.get("STRIPE_API_VERSION", "2025-01-27")

@@ -67,6 +67,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_RATE=${SENTRY_RATE}
+      - STRIPE_API_VERSION=${STRIPE_API_VERSION}
     volumes:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw
@@ -127,6 +128,8 @@ services:
       context: ${PWD}/../
       dockerfile: dockerize/docker/Dockerfile
       target: dev
+    ports:
+      - "62202:8080"
 
 
 
