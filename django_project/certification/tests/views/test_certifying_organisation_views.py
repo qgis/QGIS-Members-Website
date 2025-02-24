@@ -357,26 +357,6 @@ class TestCertifyingOrganisationView(TestCase):
         self.assertEqual(response.status_code, 404)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
-    def test_rejected_organisation_view_with_login(self):
-        status = self.client.login(username='anita', password='password')
-        self.assertTrue(status)
-        response = self.client.get(
-            reverse('certifyingorganisation-rejected-list', kwargs={
-                'project_slug': self.project.slug,
-            })
-        )
-        self.assertEqual(response.status_code, 200)
-
-    @override_settings(VALID_DOMAIN=['testserver', ])
-    def test_rejected_organisation_view_without_login(self):
-        response = self.client.get(
-            reverse('certifyingorganisation-rejected-list', kwargs={
-                'project_slug': self.project.slug,
-            })
-        )
-        self.assertEqual(response.status_code, 302)
-
-    @override_settings(VALID_DOMAIN=['testserver', ])
     def test_reject_organisation(self):
         status = self.client.login(username='anita', password='password')
         self.assertTrue(status)

@@ -31,7 +31,10 @@
                 <th>Attendee</th>
                 </tr>
                 {% for key, value in certificates.items %}
-                    <tr><td>{{ value.certificateID }}</td><td>{{ key.firstname }} {{ key.surname }}</td></tr>
+                    <tr>
+                        <td>{{ value.certificateID}}</td>
+                        <td>{{ key.firstname}} {{ key.surname|default_if_none:"" }}</td>
+                    </tr>
                 {% endfor %}
                 </table>
                 </div>

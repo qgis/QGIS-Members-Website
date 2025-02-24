@@ -55,8 +55,8 @@ class Attendee(models.Model):
     surname = models.CharField(
         help_text=_('Surname of the attendee.'),
         max_length=200,
-        null=False,
-        blank=False
+        null=True,
+        blank=True
     )
 
     email = models.CharField(
@@ -96,7 +96,8 @@ class Attendee(models.Model):
         return '%s %s' % (self.firstname, self.surname)
 
     def __str__(self):
-        return '%s %s' % (self.firstname, self.surname)
+        surname = self.surname if self.surname else ''
+        return '%s %s' % (self.firstname, surname)
 
     def get_absolute_url(self):
         """Return URL to attendee detail page.

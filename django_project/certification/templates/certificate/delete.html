@@ -41,7 +41,7 @@
         <div class="row">
             <div class="col-lg-8" style="font-size: 12pt">
                 <span class="col-lg-3">Course</span><span class="col-lg-9">: {{ certificate.course.course_type.name }} ({{ certificate.course.start_date }} to {{ certificate.course.end_date }})<br/></span>
-                <span class="col-lg-3">Attendee</span><span class="col-lg-9">: {{ certificate.attendee.firstname }} {{ certificate.attendee.surname }}<br/></span>
+                <span class="col-lg-3">Attendee</span><span class="col-lg-9">: {{ certificate.attendee.firstname }} {{ certificate.attendee.surname|default_if_none:"" }}<br/></span>
             </div>
         </div>
         </div>
