@@ -36,7 +36,7 @@
             {% endif %}
         </h1>
     </div>
-    {% ifequal num_sponsorshipperiods 0 %}
+    {% if num_sponsorshipperiods == 0 %}
         {% if unapproved %}
             <h3>All sustaining membership period are approved.</h3>
         {% else %}
@@ -44,7 +44,7 @@
                     class="btn btn-default btn-mini"
                     href='{% url "sponsorshipperiod-create" project_slug %}'>create one</a>.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
 
     <div class="container" style="margin-top: -18px !important;">

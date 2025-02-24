@@ -233,7 +233,7 @@ class CommitteeUpdateView(LoginRequiredMixin, CommitteeMixin, UpdateView):
 
 
 # noinspection PyAttributeOutsideInit
-class CommitteeDeleteView(StaffuserRequiredMixin, CommitteeMixin, DeleteView):
+class CommitteeDeleteView(StaffuserRequiredMixin, DeleteView):
     """
     The view for deleting a Committee
     """

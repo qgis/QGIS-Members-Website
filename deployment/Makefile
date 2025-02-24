@@ -119,8 +119,6 @@ kill:
 	@echo "Killing in production mode"
 	@echo "------------------------------------------------------------------"
 	@docker compose kill
-	@docker compose kill btsync-db
-	@docker compose kill btsync-media
 
 rm: dbbackup rm-only
 
@@ -212,14 +210,14 @@ dbrestore:
 	@echo "stopping uwsgi container"
 	@docker compose stop uwsgi
 	@source .env; echo "dropping $$DATABASE_NAME"
-	@docker compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "dropdb $${DATABASE_NAME}"'
+	-@docker compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "dropdb --force $${DATABASE_NAME}"'
 	@source .env; echo "creating $$DATABASE_NAME"
-	@docker compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "createdb -O docker -T template_postgis $${DATABASE_NAME}"'
+	-@docker compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "createdb -O docker -T template1 $${DATABASE_NAME}"'
 	@source .env; echo "restoring $$DATABASE_NAME"
 	@# Because we pipe from one docker command to another and we are going
 	@# to execute this Make command from a remote server at times, we need to using use interactive mode (-i)
 	@# in the first command and not use terminal (-t) in the second. Please do not change these!
-	@docker compose exec -e DATABASE_NAME db /bin/bash -c 'pg_restore /backups/latest.dmp | su - postgres -c "psql $${DATABASE_NAME}"'
+	-@docker compose exec -e DATABASE_NAME db bash -c 'su - postgres -c "pg_restore -c /backups/latest.dmp -d gis"'
 	@docker compose start uwsgi
 	@echo "starting uwsgi container"
 
@@ -265,8 +263,6 @@ mediasync:
 	@echo "------------------------------------------------------------------"
 	@rsync -av --progress changelog.kartoza.com:/home/projecta/deployment/media/ media
 	@rsync -av --progress changelog.kartoza.com:/home/projecta/django_project/core/settings/secret.py ../django_project/core/settings/
-	@rsync -av --progress changelog.kartoza.com:/home/projecta/deployment/btsync-db.env btsync-db.env.PRODUCTION
-	@rsync -av --progress changelog.kartoza.com:/home/projecta/deployment/btsync-media.env btsync-media.env.PRODUCTION
 
 dbsync:
 	@echo

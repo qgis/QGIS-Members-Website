@@ -163,7 +163,7 @@ class ProjectDetailView(ProjectMixin, DetailView):
         return obj
 
 
-class ProjectDeleteView(LoginRequiredMixin, ProjectMixin, DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, DeleteView):
     context_object_name = 'project'
     template_name = 'project/delete.html'
 

@@ -3,7 +3,7 @@
 """Curriculum model definitions for lesson apps."""
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lesson.models.curriculum import Curriculum
 from lesson.models.worksheet import Worksheet

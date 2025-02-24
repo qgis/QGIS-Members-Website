@@ -35,11 +35,11 @@
             </div>
         </h1>
     </div>
-    {%  ifequal num_versions 0 %}
+    {% if num_versions == 0 %}
         <h3>No versions are defined.</h3>
     {% else %}
         {% for version in versions %}
             {% include 'version/includes/version-list-detail.html' %}
         {%  endfor %}
-    {%  endifequal %}
+    {%  endif %}
 {% endblock %}

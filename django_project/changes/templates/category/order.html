@@ -27,9 +27,9 @@
             </div>
         </h1>
     </div>
-    {% ifequal num_categories 0 %}
+    {% if num_categories == 0 %}
         <h3>No categories are defined, but you can</h3>
-    {% endifequal %}
+    {% endif %}
     <ul id="sortable" data-url="{% url "category-submit-order" project_slug %}">
     {% for category in categories %}
         <li class="row order" style="margin-top:6px;" id="{{ category.id }}-{{ category.name }}" >

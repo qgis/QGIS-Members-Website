@@ -217,7 +217,7 @@ class TestVersionCRUD(TestCase):
             description=u'New description',
             release_date=datetime(2016, 6, 6),
         )
-        self.assertEquals(model.formatted_release_date(), '6 June, 2016')
+        self.assertEqual(model.formatted_release_date(), '6 June, 2016')
 
     def test_Version_delete(self):
         """

@@ -9,7 +9,7 @@ from .sponsorship_period import SponsorshipPeriod
 from core.settings.contrib import STOP_WORDS
 from django.conf.global_settings import MEDIA_ROOT
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from ..utils.custom_slugfield import CustomSlugField
 

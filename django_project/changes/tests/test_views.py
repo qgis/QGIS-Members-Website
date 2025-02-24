@@ -756,7 +756,7 @@ class TestVersionViews(TestCase):
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
-    @mock.patch('pypandoc.convert', side_effect=mocked_convert)
+    @mock.patch('pypandoc.convert_text', side_effect=mocked_convert)
     def test_VersionDownload_login(self, mocked_convert):
         self.client.login(username='timlinux', password='password')
         other_project = ProjectF.create(name='testproject2')
@@ -774,7 +774,7 @@ class TestVersionViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
-    @mock.patch('pypandoc.convert', side_effect=mocked_convert)
+    @mock.patch('pypandoc.convert_text', side_effect=mocked_convert)
     def test_VersionDownloadMd(self, mocked_convert):
         other_project = ProjectF.create(name='testproject2')
         version_same_name_from_other_project = VersionF.create(
@@ -791,7 +791,7 @@ class TestVersionViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
-    @mock.patch('pypandoc.convert', side_effect=mocked_convert)
+    @mock.patch('pypandoc.convert_text', side_effect=mocked_convert)
     def test_VersionDownload_login_notfound(self, mocked_convert):
         self.client.login(username='timlinux', password='password')
         response = self.client.get(reverse('version-download', kwargs={

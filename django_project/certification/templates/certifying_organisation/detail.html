@@ -572,7 +572,7 @@
 
     <div class="menu-wrapper menu-wrapper-body" style="padding: 25px">
     <tr><td>
-    {% ifequal num_course 0 %}
+    {% if num_course == 0 %}
     <div class="menu-details">
     <table>
     <tr><td>
@@ -672,7 +672,7 @@
     {%  endfor %}
 
     </table>
-    {% endifequal %}
+    {% endif %}
     </div>
     </div>
 
@@ -709,11 +709,11 @@
     <div class="menu-details">
     <table>
     <tr><td>
-    {% ifequal num_trainingcenter 0 %}
+    {% if num_trainingcenter == 0 %}
         <h5>No training center are defined, but you can <a
                     class="btn btn-default btn-mini"
                     href='{% url "trainingcenter-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>register one</a>.</h5>
-    {% endifequal %}
+    {% endif %}
     </td></tr>
 
     {% for trainingcenter in trainingcenters %}
@@ -777,11 +777,11 @@
     <div class="menu-details">
     <table>
     <tr><td>
-    {% ifequal num_coursetype 0 %}
+    {% if num_coursetype == 0 %}
         <h5>No course types are defined, but you can <a
                     class="btn btn-default btn-mini"
                     href='{% url 'coursetype-create' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>create one</a>.</h5>
-    {% endifequal %}
+    {% endif %}
     </td></tr>
 
     {% for coursetype in coursetypes %}
@@ -842,11 +842,11 @@
     <div class="menu-details">
     <table>
     <tr><td>
-    {% ifequal num_courseconvener 0 %}
+    {% if num_courseconvener == 0 %}
         <h5>No course convener are defined, but you can <a
                     class="btn btn-default btn-mini"
                     href='{% url "courseconvener-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>register one</a>.</h5>
-    {% endifequal %}
+    {% endif %}
     </td></tr>
 
     {% for courseconvener in courseconveners %}

@@ -2,7 +2,7 @@
 """Models for changelog entries."""
 from django.urls import reverse
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import os
 import logging
 from core.settings.contrib import STOP_WORDS

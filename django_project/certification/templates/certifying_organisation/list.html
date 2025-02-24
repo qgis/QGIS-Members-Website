@@ -73,13 +73,13 @@
         </h1>
     </div>
 
-    {% ifequal num_certifyingorganisations 0 %}
+    {% if num_certifyingorganisations == 0 %}
         {% if unapproved %}
             <h3>All certifying organisation are approved.</h3>
         {% else %}
             <h3>No certifying organisation are defined.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
     {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with approved=True %}
 

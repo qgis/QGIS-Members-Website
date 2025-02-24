@@ -41,7 +41,7 @@ class EntryDetailView(EntryMixin, DetailView):
 
 
 # noinspection PyAttributeOutsideInit
-class EntryDeleteView(LoginRequiredMixin, EntryMixin, DeleteView):
+class EntryDeleteView(LoginRequiredMixin, DeleteView):
     """Delete view for Entry."""
     context_object_name = 'entry'
     template_name = 'entry/delete.html'
