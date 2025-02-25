@@ -1,6 +1,9 @@
 {% load pipeline %}
 {% load static %}
 {% load lesson_tags %}
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'main' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

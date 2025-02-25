@@ -39,6 +39,15 @@ EXPOSE 8080
 
 #USER www-data
 
+# Install NodeJS and webpack
+RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget && \
+    wget --no-check-certificate https://deb.nodesource.com/setup_22.x -O /tmp/node.sh && bash /tmp/node.sh && \
+    apt-get -qq update && apt-get -qq install -y nodejs build-essential
+
+WORKDIR /home/web/django_project
+COPY django_project/package.json /home/web/django_project/package.json
+RUN npm install -g npm@11.1.0 && npm install -g webpack@5.98.0 && npm install -g webpack-cli@6.0.1 && npm install
+
 WORKDIR /home/web/django_project
 CMD ["uwsgi", "--ini", "/uwsgi.conf"]
 

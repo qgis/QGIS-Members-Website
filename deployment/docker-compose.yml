@@ -72,6 +72,7 @@ services:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw
       - reports-data:/home/web/reports
+    command: bash -c "npm run build && uwsgi --ini /uwsgi.conf"
     links:
       - db:db
       # - smtp:smtp
@@ -126,10 +127,21 @@ services:
     <<: *uwsgi-common
     build:
       context: ${PWD}/../
-      dockerfile: dockerize/docker/Dockerfile
+      dockerfile: deployment/docker/Dockerfile
       target: dev
     ports:
       - "62202:8080"
 
+  webpack:
+    build:
+      context: ${PWD}/../
+      dockerfile: deployment/docker/Dockerfile
+      target: dev
+    working_dir: /home/web/django_project
+    command: npm start
+    volumes:
+      - ../django_project:/home/web/django_project
+      - static-data:/home/web/static:rw
+      - ${MEDIA_VOLUME}:/home/web/media:rw
 
 

@@ -310,7 +310,7 @@ devweb: db
 	@echo "------------------------------------------------------------------"
 	@echo "Running in DEVELOPMENT mode"
 	@echo "------------------------------------------------------------------"
-	@docker compose up --no-deps -d devweb
+	@docker compose up --no-deps -d devweb webpack
 
 devweb-runserver: devweb
 	@echo
