@@ -1,0 +1,26 @@
+<div class="box mb-0 context-container" id="context">
+  <div class="container">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'home' %}"></a>
+                <span class="icon">
+                    <i class="fas fa-home"></i>
+                </span>
+            </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="top-navbar">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div id="top-navbar" class="navbar-menu">
+            <div class="navbar-start">
+                {% include 'includes/base-auth-nav-left.html' %}
+            </div>
+            <div class="navbar-end">
+                {% include 'includes/right-nav.html' %}
+            </div>
+        </div>
+    </nav>
+  </div>
+</div>
