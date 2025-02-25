@@ -122,10 +122,10 @@ Now set these options:
 
 * **Name:** Django Server
 * **Host:** 0.0.0.0
-* **Port:** (use the http port specified in the docker-compose.yml file, e.g. 8080)
-* **Run browser** If checked, it will open the url after you click run. You should be able to access the running projecta on 0.0.0.0:61202 (the port that mapped to 8080)
+* **Port:** (use the http port specified in the docker-compose.yml file, e.g. 8000)
+* **Run browser** If checked, it will open the url after you click run. You should be able to access the running projecta on 0.0.0.0:61202 (the port that mapped to 8000)
 * **Additional options:** ``--settings=core.settings.dev_docker``
-* **Run browser:** Optionally set this to your IP address (MacOS/Linux) or your specific IP address (Windows) followed by the port forward address for port 8080 specified in your ``docker-compose.yml`` file. For example: ``http://0.0.0.0:61202``.
+* **Run browser:** Optionally set this to your IP address (MacOS/Linux) or your specific IP address (Windows) followed by the port forward address for port 8000 specified in your ``docker-compose.yml`` file. For example: ``http://0.0.0.0:62202``.
 * **Environment vars:** Leave as default unless you need to add something to the env
 * **Python interpreter:** Ensure it is set you your remote interpreter (should be
   set to that by default)

@@ -129,6 +129,6 @@ deployment/docker/projecta.tar.gz
 
 # Webpack
 node_modules
-django_project/static/bundles
+django_project/base/static/bundles
 django_project/package-lock.json
 django_project/webpack-stats.json

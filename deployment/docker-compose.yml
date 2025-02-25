@@ -67,7 +67,6 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_RATE=${SENTRY_RATE}
-      - STRIPE_API_VERSION=${STRIPE_API_VERSION}
     volumes:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw
@@ -130,7 +129,7 @@ services:
       dockerfile: deployment/docker/Dockerfile
       target: dev
     ports:
-      - "62202:8080"
+      - "62202:8000"
 
   webpack:
     build:

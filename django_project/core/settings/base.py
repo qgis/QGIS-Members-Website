@@ -204,7 +204,7 @@ if SENTRY_DSN and SENTRY_DSN != "":
         traces_sample_rate=SENTRY_RATE,
     )
 
-STRIPE_API_VERSION = os.environ.get("STRIPE_API_VERSION", "2025-01-27")
+STRIPE_API_VERSION = '2019-09-09'
 
 SITE_ROOT = os.path.dirname(BASE_DIR)
 

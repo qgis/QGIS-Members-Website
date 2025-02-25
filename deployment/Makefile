@@ -317,7 +317,7 @@ devweb-runserver: devweb
 	@echo "------------------------------------------------------------------"
 	@echo "Running in DEVELOPMENT mode"
 	@echo "------------------------------------------------------------------"
-	@docker compose exec devweb python manage.py runserver 0.0.0.0:8080
+	@docker compose exec devweb python manage.py runserver 0.0.0.0:8000
 
 test-local: devweb flake8 coverage
 

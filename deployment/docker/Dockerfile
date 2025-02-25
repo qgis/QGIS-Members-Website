@@ -78,8 +78,8 @@ ADD deployment/docker/bashrc /root/.bashrc
 # Open ports as needed
 # --------------------------------------------------------
 
-# Open port 8080 as we will be running our django dev server on
-EXPOSE 8080
+# Open port 8000 as we will be running our django dev server on
+EXPOSE 8000
 # Open port 22 as we will be using a remote interpreter from pycharm
 EXPOSE 22
 
