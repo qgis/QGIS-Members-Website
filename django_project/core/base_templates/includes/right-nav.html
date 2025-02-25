@@ -1,34 +1,35 @@
 {% load i18n %}
 {% load static %}
 {% if user.is_authenticated %}
-    <div class="navbar-item">
-        <i class="icon-wrench"></i>
-        <a href="https://github.com/kartoza/projecta/issues" target="_blank" data-toggle="modal">
-            Report an issue
-        </a>
-    </div>
+    <a 
+    href="https://github.com/kartoza/projecta/issues" 
+    target="_blank" data-toggle="modal"
+    class="navbar-item has-text-weight-semibold is-size-7"
+    >
+        Report an issue
+    </a>
 {% endif %}
 {% if user.is_authenticated and has_pending_sponsor_lvl or has_pending_sponsor_period or has_pending_organisations or has_pending_sustaining_members %}
     {% if user.is_authenticated %}
-        <div class="navbar-item has-dropdown is-hoverable">
-            <a href="#" class="navbar-link">
+        <div class="navbar-item has-dropdown is-hoverable p-0">
+            <a href="#" class="navbar-link has-text-weight-semibold is-size-7">
                 Pending Approval
             </a>
             <div class="navbar-dropdown">
                 {% if not the_project %}
-                    <a href='{% url "pending-project-list" %}' class="navbar-item">Projects</a>
+                    <a href='{% url "pending-project-list" %}' class="navbar-item has-text-weight-semibold is-size-7">Projects</a>
                 {% else %}
                     {% if has_pending_sponsor_lvl %}
-                        <a href='{% url "pending-sponsorshiplevel-list" the_project.slug %}' class="navbar-item">Sustaining Member Level</a>
+                        <a href='{% url "pending-sponsorshiplevel-list" the_project.slug %}' class="navbar-item has-text-weight-semibold is-size-7">Sustaining Member Level</a>
                     {% endif %}
                     {% if has_pending_sponsor_period %}
-                        <a href='{% url "pending-sponsorshipperiod-list" the_project.slug %}' class="navbar-item">Sustaining Member Period</a>
+                        <a href='{% url "pending-sponsorshipperiod-list" the_project.slug %}' class="navbar-item has-text-weight-semibold is-size-7">Sustaining Member Period</a>
                     {% endif %}
                     {% if has_pending_sustaining_members %}
-                        <a href='{% url 'pending-sponsor-list' the_project.slug %}' class="navbar-item">Sustaining Members</a>
+                        <a href='{% url 'pending-sponsor-list' the_project.slug %}' class="navbar-item has-text-weight-semibold is-size-7">Sustaining Members</a>
                     {% endif %}
                     {% if has_pending_organisations %}
-                        <a href='{% url "pending-certifyingorganisation-list" the_project.slug %}' class="navbar-item">Certifying Organisations</a>
+                        <a href='{% url "pending-certifyingorganisation-list" the_project.slug %}' class="navbar-item has-text-weight-semibold is-size-7">Certifying Organisations</a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -39,45 +40,45 @@
 {% get_current_language as LANGUAGE_CODE %}
 {% get_available_languages as LANGUAGES %}
 {% get_language_info_list for LANGUAGES as languages %}
-<div class="navbar-item has-dropdown is-hoverable">
-    <a href="#" class="navbar-link"></a>
+<div class="navbar-item has-dropdown is-hoverable p-0">
+    <a href="#" class="navbar-link has-text-weight-semibold is-size-7">
         {% static "img/language_flags/" as img_path %}
         {% for language_header in languages %}
             {% if language_header.code == LANGUAGE_CODE %}
-                <span><img src="{{ img_path }}{{ language_header.code }}.png" style="height: 13pt; margin-bottom: 3pt;">
-                <span>  {{ language_header.name|capfirst }}</span></span>
+                <img src="{{ img_path }}{{ language_header.code }}.png" style="height: 13pt;" class="mr-1">
+                <span>  {{ language_header.name|capfirst }}</span>
             {% endif %}
         {% endfor %}
     </a>
     <div class="navbar-dropdown">
         {% for language in languages %}
-            <a href="/{{ language.code }}{{ request.get_full_path|slice:'3:' }}" class="navbar-item {% if language.code == LANGUAGE_CODE %}is-active{% endif %}" lang="{{ language.code }}"></a>
-                <img src="{{ img_path }}{{ language.code }}.png" style="height: 13pt; margin-bottom: 3pt;">
+            <a href="/{{ language.code }}{{ request.get_full_path|slice:'3:' }}" class="navbar-item has-text-weight-semibold is-size-7" lang="{{ language.code }}">
+                <img src="{{ img_path }}{{ language.code }}.png" style="height: 13pt;" class="mr-1">
                 {{ language.name|capfirst }}
             </a>
         {% endfor %}
     </div>
 </div>
-<div class="navbar-item has-dropdown is-hoverable">
-    <a href="#" class="navbar-link">
+<div class="navbar-item has-dropdown is-hoverable p-0">
+    <a href="#" class="navbar-link has-text-weight-semibold is-size-7">
         {% if user.is_authenticated %}
-            <span>{{ user.get_full_name|default:user.username }}</span>
+            {{ user.get_full_name|default:user.username }}
         {% else %}
-            <span>Account</span>
+            Account
         {% endif %}
     </a>
     <div class="navbar-dropdown">
         {% if user.is_authenticated %}
-            <a href='{% url "user-profile" %}' class="navbar-item">Profile Page</a>
+            <a href='{% url "user-profile" %}' class="navbar-item has-text-weight-semibold is-size-7">Profile Page</a>
             {% if user.is_staff %}
-                <a href="{% url 'admin:index' %}" class="navbar-item">Admin Site</a>
+                <a href="{% url 'admin:index' %}" class="navbar-item has-text-weight-semibold is-size-7">Admin Site</a>
             {% endif %}
-            <a href='{% url "socialaccount_connections" %}' class="navbar-item">Account Connections</a>
-            <a href='{% url "account_email" %}' class="navbar-item">Account Emails</a>
-            <a href='{% url "account_logout" %}' class="navbar-item">Log Out</a>
+            <a href='{% url "socialaccount_connections" %}' class="navbar-item has-text-weight-semibold is-size-7">Account Connections</a>
+            <a href='{% url "account_email" %}' class="navbar-item has-text-weight-semibold is-size-7">Account Emails</a>
+            <a href='{% url "account_logout" %}' class="navbar-item has-text-weight-semibold is-size-7">Log Out</a>
         {% else %}
-            <a href='{% url "account_login" %}' class="navbar-item">Log In</a>
-            <a href='{% url "account_signup" %}' class="navbar-item">Sign Up</a>
+            <a href='{% url "account_login" %}' class="navbar-item has-text-weight-semibold is-size-7">Log In</a>
+            <a href='{% url "account_signup" %}' class="navbar-item has-text-weight-semibold is-size-7">Sign Up</a>
         {% endif %}
     </div>
 </div>

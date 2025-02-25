@@ -66,21 +66,6 @@ PIPELINE['JAVASCRIPT']['project'] = {
     'output_filename': 'js/project.js',
 }
 
-# Project specific css files to be pipelined
-# For third party libs like bootstrap should go in contrib.py
-PIPELINE['STYLESHEETS']['project'] = {
-    'source_filenames': (
-        'css/changelog.css',
-        'css/form.css',
-        'css/fonts.css',
-        'css/base.css',
-    ),
-    'output_filename': 'css/project.css',
-    'extra_context': {
-        'media': 'screen,projection',
-    },
-}
-
 VALID_DOMAIN = json.loads(os.environ.get("VALID_DOMAIN", "[]"))
 
 EMAIL_HOST_USER = 'noreply@kartoza.com'
