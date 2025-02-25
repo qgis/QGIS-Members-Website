@@ -5,7 +5,7 @@
 {% render_bundle 'main' %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="has-navbar-fixed-top">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,65 +60,65 @@
         location-prefix="https://qgis.org"
     ></qg-top-nav>
     {% include 'layouts/header.html' %}
-<div id="container" class="container">
-    {% if user.is_authenticated %}
-        <div class="modal fade" id="issue-modal"><!-- Modal -->
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"
-                                aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Report an issue</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form id="issue-form" class="form-horizontal" style="padding: 20px 20px;">
-                            <div class="form-group">
-                                <label for="issue-title">Title</label>
-                                <input class="form-control"
-                                       type="text"
-                                       id="issue-title">
-                                <label for="issue-description">Description</label>
-
-                          <textarea class="form-control"
-                                    id="issue-description"
-                                    rows="3"
-                                    cols="10"></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default"
-                                data-dismiss="modal">
-                            Close
-                        </button>
-                        <button id="issue-submit-button" class="btn btn-primary"
-                                onclick="window.submitIssue()">
-                            Submit an issue
-                        </button>
-                    </div>
+    <section class="section">
+        <div class="container content">
+            <div class="columns is-multiline is-centered">
+                <div class="column is-3">
+                    {% block leftbar %}
+                        {% block menu %}&nbsp;{% endblock %}
+                    {% endblock %}
                 </div>
-                <!-- /.modal-content -->
+                <div class="content column is-9">
+                    {% if user.is_authenticated %}
+                        <div class="modal fade" id="issue-modal"><!-- Modal -->
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal"
+                                                aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title">Report an issue</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="issue-form" class="form-horizontal" style="padding: 20px 20px;">
+                                            <div class="form-group">
+                                                <label for="issue-title">Title</label>
+                                                <input class="form-control"
+                                                       type="text"
+                                                       id="issue-title">
+                                                <label for="issue-description">Description</label>
+                
+                                          <textarea class="form-control"
+                                                    id="issue-description"
+                                                    rows="3"
+                                                    cols="10"></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button id="issue-submit-button" class="btn btn-primary"
+                                                onclick="window.submitIssue()">
+                                            Submit an issue
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
+                    {% endif %} {#  user authenticated #}
+
+                    {% block content %}
+                    {% endblock %}
+
+                </div>
             </div>
-            <!-- /.modal-dialog -->
-        </div><!-- /.modal -->
-    {% endif %} {#  user authenticated #}
-    <div class="body-content">
-        {% block content %}{% endblock content %}
-    </div>
-    <nav class="navbar navbar-default navbar-fixed-bottom center"
-         role="navigation">
-        <p class="text-center" style="padding-top: 8px">
-            This application was created by <a href="http://kartoza.com">
-            Kartoza (Pty) Ltd.
-            <img src="{% static "img/kartoza.png" %}" alt="Linfiniti"/>
-        </a>
-            <a href="https://github.com/kartoza/projecta">
-                Available on GitHub!
-            </a>
-            <span>Version: {% version_tag %}</span>
-        </p>
-    </nav>
-</div>
+        </div>
+    </section>
+    {% include 'layouts/footer.html' %}
 
 <!-- Creates the bootstrap modal where the thumbnaiul image will appear -->
 <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
