@@ -30,7 +30,17 @@ class CategoryForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.project = kwargs.pop('project')
-        form_title = 'New Category in %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Category in {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Category {kwargs["instance"].name}'
+                '</h2>'
+            )
         layout = Layout(
             Fieldset(
                 form_title,
@@ -41,7 +51,13 @@ class CategoryForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(CategoryForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(CategoryForm, self).save(commit=False)
@@ -81,7 +97,17 @@ class VersionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'New Version for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Version in {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Version {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -95,7 +121,13 @@ class VersionForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(VersionForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(VersionForm, self).save(commit=False)
@@ -128,10 +160,17 @@ class EntryForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         self.version = kwargs.pop('version')
         self.project = kwargs.pop('project')
-        form_title = 'New Entry in %s %s' % (
-            self.project.name,
-            self.version.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Entry in {self.project.name} {self.version.name}'
+            '</h2>'
         )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Entry {kwargs["instance"].title}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -152,7 +191,13 @@ class EntryForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(EntryForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2'
+            )
+        )
         self.fields['title'].label = 'Feature Title'
         # Need to add required=False explicitly for these because
         # even though they are declared as not required in the model,
@@ -204,7 +249,17 @@ class SponsorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'New Sponsor for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Sponsor for {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Sponsor {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -226,7 +281,13 @@ class SponsorForm(forms.ModelForm):
         super(SponsorForm, self).__init__(*args, **kwargs)
         self.fields['project'].initial = self.project
         self.fields['project'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(SponsorForm, self).save(commit=False)
@@ -251,7 +312,17 @@ class SponsorshipLevelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'Sponsorship Level Form for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'Sponsorship Level Form for {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Sponsorship Level {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -265,7 +336,13 @@ class SponsorshipLevelForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(SponsorshipLevelForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(SponsorshipLevelForm, self).save(commit=False)
@@ -292,7 +369,17 @@ class SponsorshipPeriodForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'Sponsorship Period Form for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'Sponsorship Period Form for {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Sponsorship Period {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -317,7 +404,13 @@ class SponsorshipPeriodForm(forms.ModelForm):
         self.fields['sponsorship_level'].queryset = \
             SponsorshipLevel.objects.filter(
                 project=self.project, approved=True).order_by('name')
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(SponsorshipPeriodForm, self).save(commit=False)

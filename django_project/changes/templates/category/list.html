@@ -13,22 +13,23 @@
 
 {% block content %}
     <div class="page-header">
-        <h1 class="title is-4 has-text-grey">
+        <h2 class="title is-4">
             Categories
             {% if user.is_authenticated %}
                 <div class="buttons is-pulled-right">
-                    <a class="button is-small is-light"
+                    <a class="button is-success"
                        href='{% url "category-create" project_slug %}'
                        title="Create New Category">
-                        <span class="icon is-small">
+                        <span class="icon">
                             <i class="fas fa-plus"></i>
                         </span>
+                        <span>New Category</span>
                     </a>
                     {% if user.is_staff or user in the_project.changelog_managers.all or user == the_project.owner %}
-                        <a class="button is-small is-light"
+                        <a class="button is-light"
                             href='{% url "category-order" project_slug %}'
                             title="Order Categories">
-                            <span class="icon is-small">
+                            <span class="icon">
                                 <i class="fas fa-sort"></i>
                             </span>
                         </a>
@@ -41,12 +42,12 @@
                     order not saved
                 </span>
             {% endif %}
-        </h1>
+        </h2>
     </div>
 
     {% if num_categories == 0 %}
-        <h3 class="subtitle is-5">No categories are defined, but you can <a
-                class="button is-small is-light"
+        <h3 class="subtitle is-5">No categories are defined, but you can 
+            <a class="button is-small is-light"
                 href='{% url "category-create" project_slug %}'>
             create one</a>.
         </h3>
@@ -57,40 +58,44 @@
     {% else %}
         <ul>
     {% endif %}
-
-    {% for category in categories %}
-        <li style="margin-top:10px;" id="{{ category.id }}-{{ category.name }}">
-            <div class="columns">
-                <div class="column is-10">
-                    <h4 class="title is-5">{{ category.name }}</h4>
-                </div>
-                <div class="column is-2">
-                    <div class="buttons is-pulled-right">
-                        <a class="button is-small is-light"
-                           href='{% url "category-delete" project_slug=category.project.slug slug=category.slug %}'>
-                            <span class="icon is-small">
-                                <i class="fas fa-minus"></i>
-                            </span>
-                        </a>
-                        <a class="button is-small is-light"
-                           href='{% url "category-update" project_slug=category.project.slug slug=category.slug %}'>
-                            <span class="icon is-small">
-                                <i class="fas fa-pencil-alt"></i>
-                            </span>
-                        </a>
-                        <a class="button is-small is-light"
-                           href='{% url "category-detail" project_slug=category.project.slug slug=category.slug %}'>
-                            <span class="icon is-small">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </li>
-    {%  endfor %}
-
+    
     </ul>
-    <hr />
+    <div>
+        <table class="table is-fullwidth is-hoverable">
+            <thead>
+                <tr>
+                    <th class="has-text-left">Category</th>
+                    <th class="has-text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>
+                        <a href='{% url "category-detail" project_slug=category.project.slug slug=category.slug %}'>
+                            {{ category.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <div class="buttons is-pulled-right">
+                            <a class="button is-small is-light is-primary3"
+                                href='{% url "category-update" project_slug=category.project.slug slug=category.slug %}'>
+                                <span class="icon is-small">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </span>
+                            </a>
+                            <a class="button is-small is-danger is-light"
+                                href='{% url "category-delete" project_slug=category.project.slug slug=category.slug %}'>
+                                <span class="icon is-small">
+                                    <i class="fas fa-minus"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
