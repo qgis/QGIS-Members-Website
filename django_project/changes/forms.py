@@ -55,7 +55,7 @@ class CategoryForm(forms.ModelForm):
             Submit(
                 'submit',
                 'Submit',
-                css_class='button is-success pt-2'
+                css_class='button is-success pt-2 mt-5'
             )
         )
 
@@ -125,7 +125,7 @@ class VersionForm(forms.ModelForm):
             Submit(
                 'submit',
                 'Submit',
-                css_class='button is-success pt-2'
+                css_class='button is-success pt-2 mt-5'
             )
         )
 
@@ -195,7 +195,7 @@ class EntryForm(forms.ModelForm):
             Submit(
                 'submit',
                 'Submit',
-                css_class='button is-success pt-2'
+                css_class='button is-success pt-2 mt-5'
             )
         )
         self.fields['title'].label = 'Feature Title'
@@ -285,7 +285,7 @@ class SponsorForm(forms.ModelForm):
             Submit(
                 'submit',
                 'Submit',
-                css_class='button is-success pt-2'
+                css_class='button is-success pt-2 mt-5'
             )
         )
 
@@ -340,7 +340,7 @@ class SponsorshipLevelForm(forms.ModelForm):
             Submit(
                 'submit',
                 'Submit',
-                css_class='button is-success pt-2'
+                css_class='button is-success pt-2 mt-5'
             )
         )
 
@@ -408,7 +408,7 @@ class SponsorshipPeriodForm(forms.ModelForm):
             Submit(
                 'submit',
                 'Submit',
-                css_class='button is-success pt-2'
+                css_class='button is-success pt-2 mt-5'
             )
         )
 

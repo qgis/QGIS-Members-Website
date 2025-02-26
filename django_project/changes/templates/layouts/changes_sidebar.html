@@ -1,0 +1,66 @@
+{% load static %}
+<nav id="sidebar" class="sidebar">
+  <ul class="content-wrapper">
+    <li>
+      <div class="has-child">
+        <a onclick="toggleSubMenu('categories')">
+          <i class="fas fa-list mr-3"></i>
+          Categories
+        </a>
+        <span onclick="toggleSubMenu('categories')" class="drop-arrow">
+          <img src="{% static "images/arrow.svg" %}"/>
+        </span>
+      </div>
+      <ul id="categories" class="collapsed">
+        {% for row in version.categories %} 
+          {% if row.entries %}
+            <li class="has-child" data-category-id="{{ row.category.id }}">
+            <a href="#category-{{ row.category.id }}"> 
+              {{ row.category.name }} 
+            </a>
+          </li>
+          {% endif %}
+          {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  function rotateArrow(e) {
+    e.previousElementSibling.querySelector('img').classList.toggle('rotated');
+  }
+
+  function toggleSubMenu(listId) {
+    console.log(listId)
+    let e = document.getElementById(listId);
+    e.classList.toggle('unfolded');
+    rotateArrow(e);
+  }
+
+  function toggleMenu() {
+    document.getElementById('sidebar').classList.toggle('visible');
+    document.getElementById('hamburger-btn').classList.toggle('open');
+  }
+  // expand active section
+  document.querySelectorAll('li.is-active,li:has(.is-active)').forEach(li => {
+    if (e = li.querySelector('ul')) {
+      e.classList.toggle('unfolded');
+    }
+  });
+  // Add is-active class to the element with class has-child if its id matches the URL fragment
+  $(window).on('hashchange', function() {
+    let hash = window.location.hash.substring(1); // Remove the '#' from the hash
+    $('.has-child').each(function() {
+      let category = "category-" + $(this).data('category-id');
+      if (category === hash) {
+        $(this).addClass('is-active');
+      } else {
+        $(this).removeClass('is-active');
+      }
+    });
+  });
+
+  // Trigger the hashchange event on page load to handle the initial URL fragment
+  $(window).trigger('hashchange');
+</script>
