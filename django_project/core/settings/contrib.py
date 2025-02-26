@@ -13,7 +13,7 @@ INSTALLED_APPS += [
     'modeltranslation',
     'raven.contrib.django.raven_compat',  # enable Raven plugin
     'crispy_forms',
-    'crispy_bootstrap3',
+    'crispy_bulma',
     'widget_tweaks',  # lets us add some bootstrap css to form elements
     'easy_thumbnails',
     'reversion',
@@ -50,7 +50,9 @@ STOP_WORDS = (
     'this', 'that', 'to',
 )
 
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
+
+CRISPY_TEMPLATE_PACK = "bulma"
 
 # Easy-thumbnails options
 THUMBNAIL_SUBDIR = 'thumbnails'

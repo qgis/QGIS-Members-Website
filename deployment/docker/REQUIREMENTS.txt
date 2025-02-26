@@ -1,7 +1,11 @@
 # custom slugify
 awesome-slugify~=1.6
 beautifulsoup4~=4.12
-crispy-bootstrap3~=2024.1
+
+# The current last release version of crispy-bulma is broken, so we use the last commit
+# crispy-bulma~=0.11
+git+https://github.com/ckrybus/crispy-bulma.git@2e9abb0
+
 Django~=4.2
 git+https://github.com/Xpirix/dj-stripe.git@django4_update
 django-allauth~=0.63
