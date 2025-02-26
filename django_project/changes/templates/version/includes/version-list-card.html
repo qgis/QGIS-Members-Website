@@ -1,0 +1,69 @@
+{% load thumbnail static custom_markup %}
+<div class="
+column
+is-medium     
+is-half-tablet
+is-half-desktop
+is-one-quarter-widescreen
+is-one-third-fullhd">
+    <div 
+        class="
+            card 
+            is-flex 
+            is-flex-direction-column 
+            is-justify-content-space-between
+        "
+        >
+    
+        <div class="card-image">
+            <figure class="image m-0">
+                <img src="{% thumbnail version.image_file 150x90 crop %}" alt="Version image" width="100%" />
+            </figure>
+        </div>
+
+        <div class="card-content is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%;">
+            <div class="media mb-0">
+                <div class="media-content is-flex is-align-items-baseline" style="gap: 10px;">
+                    <p class="title is-5">
+                        <a href="{% url 'version-detail' project_slug=version.project.slug slug=version.slug %}">
+                            {{ version.name }}
+                        </a>
+                    </p>
+                    {% if version.release_date %}
+                        <p class="subtitle is-6 is-italic">
+                            released <strong><em>{{ version.release_date }}</em></strong>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="content mb-0 has-text-justified">
+                <p>{{ version.description|base_markdown|truncatewords:20 }}</p>
+            </div>
+            <p style="height: 100%;"></p>
+        </div>
+        <footer class="card-footer">
+            <a class="card-footer-item" href="{% url 'version-detail' project_slug=version.project.slug slug=version.slug %}">
+                <span class="icon">
+                    <i class="fas fa-eye"></i>
+                </span>
+                <span>View</span>
+            </a>
+            {% if user_can_edit %}
+                <a class="card-footer-item" href='{% url "version-update" project_slug=version.project.slug slug=version.slug %}'>
+                <span class="icon">
+                    <i class="fas fa-pencil-alt"></i>
+                </span>
+                <span>Edit</span>
+                </a>
+            {% endif %}
+            {% if user_can_delete %}
+                <a class="card-footer-item has-text-danger" href='{% url "version-delete" project_slug=version.project.slug slug=version.slug %}'>
+                <span class="icon">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>Delete</span>
+                </a>
+            {% endif %}
+        </footer>
+    </div>
+</div>
