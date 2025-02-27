@@ -1,0 +1,17 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.associations": {
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**/*.htm": "django-html",
+    "**/static/**/*.js": "javascript"
+  },
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+  "python.analysis.typeCheckingMode": "basic",
+  "editor.defaultFormatter": "ms-python.black-formatter",
+  "editor.quickSuggestions": {
+    "strings": true
+  }
+}

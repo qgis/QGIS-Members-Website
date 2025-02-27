@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@creativebulma/bulma-tooltip": "^1.2.0",
     "css-loader": "^7.1.2",
     "mini-css-extract-plugin": "^2.9.2",
     "sass": "^1.85.1",

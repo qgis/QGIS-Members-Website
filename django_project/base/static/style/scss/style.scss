@@ -1,6 +1,7 @@
 @charset "utf-8";
 @import "custom.bulma.scss";
 @import "sustaining_members.scss";
+@import "../../../../node_modules/@creativebulma/bulma-tooltip/src/sass/index.sass";
 
 body {
   color: $text-primary1;
@@ -52,6 +53,10 @@ strong {
 
 th {
   font-weight: 500;
+}
+
+.content h3 {
+  font-weight: 400;
 }
 
 p {
@@ -331,4 +336,9 @@ a.is-active > span {
   }
 .choices__list--dropdown, .choices__list[aria-expanded] {
   z-index: 10 !important;
+}
+
+/* Dont underline links in blocks */
+.notification a:not(.button):not(.dropdown-item) {
+  text-decoration: none;
 }
