@@ -19,11 +19,7 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}
-    <div class="field is-grouped mt-5">
-       <div class="control">
-          <button type="submit" class="button is-success" id="submit-save">Submit</button>
-       </div>
-    </div>
+    <button type="submit" class="button is-success mt-5" id="submit-save">Submit</button>
 </form>
 
 <script>
