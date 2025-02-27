@@ -7,41 +7,24 @@
     <script type="text/javascript" src="/static/js/jsi18n.js"></script>
 {% endblock %}
 
-{% block css_head %}
-    {{ form.media }}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-{% endblock %}
 
 {% block extra_head %}
 <script type="text/javascript" src="{% static 'js/jquery.formset.min.js' %}"></script>
-    <style>
-        .form-group {
-            font-size: 12pt;
-        }
-        .form-group input {
-            height: 40px;
-            font-size: 12pt;
-        }
-    </style>
 {% endblock %}
 
 
 {% block content %}
-<section id="forms">
-<div class='container'>
 
-    <h2 class="text-muted">Become a Sustaining Member</h2>
-    <hr/>
-    <form method="post" enctype="multipart/form-data">
-         {% csrf_token %}
-         {{ form|crispy }}
-        <div class="vertical-space"></div>
-        <div class="form-actions">
-            <input type="submit" name="submit" value="Submit" class="btn btn-primary" id="submit-save">
-        </div>
-    </form>
-</div>
-</section>
+<h1 class="title mt-0">Become a Sustaining Member</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="field is-grouped mt-5">
+       <div class="control">
+          <button type="submit" class="button is-success" id="submit-save">Submit</button>
+       </div>
+    </div>
+</form>
 
 <script>
 
