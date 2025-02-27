@@ -55,17 +55,9 @@
       <div class="
       is-parent column
       is-medium     
-      {% if level == 'flagship' %}
-      is-half
-      {% elif level == 'large' %}
-      is-one-third
-      {% elif level == 'medium' %}
-      is-one-quarter
-      {% elif level == 'small' %}
-      is-one-fifth
-      {% endif %}"
+      is-one-fifth"
       > 
-        <article class="is-child box notification fund-{{ level }}">
+        <article class="is-child box notification past">
           <a href="{{ sponsor.sponsor.sponsor_url }}">
             <figure>
                 <img class="is-rounded"
@@ -81,15 +73,6 @@
             </article>
           </a>
           <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
-            {% if sponsor.current_sponsor %}
-              {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all or user == sponsor.sponsor.author %}
-                <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                  data-tooltip="Edit"
-                  href='{% url "sponsor-update" project_slug=sponsor.project.slug slug=sponsor.slug %}'>
-                  <span class="icon"><i class="fas fa-pencil-alt"></i></span>
-                </a>
-              {% endif %}
-            {% endif %}
             <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
               data-tooltip="View"
               href='{% url "sponsor-detail" project_slug=sponsor.project.slug slug=sponsor.slug %}'>

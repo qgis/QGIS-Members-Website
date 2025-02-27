@@ -136,25 +136,7 @@
         <hr/>
         <h2 class="subtitle">List of Past Sustaining Members</h2>
     {% endif %}
-
-    <h3 class="subtitle">
-      Flagship
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=False level="flagship" %}
-
-    <h3 class="subtitle">
-      Large
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=False level="large" %}
-
-    <h3 class="subtitle">
-      Medium
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=False level="medium" %}
-    
-    <h3 class="subtitle">
-      Small
-    </h3>
+  
     {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=False level="small" %}
 {% comment %} 
     <hr>
