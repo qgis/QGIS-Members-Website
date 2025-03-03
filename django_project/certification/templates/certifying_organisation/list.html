@@ -12,86 +12,85 @@
 {% endblock page_title %}
 
 {% block content %}
-    <style>
-        .order:hover {
-            background-color: #F9F9F9;
-        }
-    </style>
-
     <div class="page-header">
-        <h1 class="text-muted">
+        <h2 class="title is-4">
             {% if unapproved %}Unapproved {% endif %}
             Certifying Organisations
-
-                <div class="pull-right btn-group">
-                    <a class="btn btn-primary btn-mini tooltip-toggle"
-                       href='{% url "certifyingorganisation-create" project_slug %}'
-                       data-title="Sign Up for Certification!">
-                        Sign Up
-                    </a>
-                    <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "feed-training-center-project" project_slug %}' target="_blank"
-                       data-title="Feed for List of All Training Centers">
+            <div class="buttons is-pulled-right">
+                <a class="button is-success"
+                   href='{% url "certifyingorganisation-create" project_slug %}'
+                   title="Sign Up for Certification!">
+                    <span class="icon">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span>Sign Up</span>
+                </a>
+                <a class="button is-light"
+                   href='{% url "feed-training-center-project" project_slug %}' target="_blank"
+                   title="Feed for List of All Training Centers">
+                    <span class="icon">
                         <i class="fa fa-rss-square"></i>
-                    </a>
-                    <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "feed-upcoming-project-course" project_slug %}' target="_blank"
-                       data-title="Feed for List of All Upcoming Courses">
+                    </span>
+                </a>
+                <a class="button is-light"
+                   href='{% url "feed-upcoming-project-course" project_slug %}' target="_blank"
+                   title="Feed for List of All Upcoming Courses">
+                    <span class="icon">
                         <i class="fa fa-rss"></i>
+                    </span>
+                </a>
+                <a class="button is-light"
+                   href='{% url "feed-past-project-course" project_slug %}' target="_blank"
+                   title="Feed for List of All Past Courses">
+                    <span class="icon">
+                        <i class="fa fa-rss" style="color: grey"></i>
+                    </span>
+                </a>
+                {% if user.is_staff or user == the_project.owner or user in the_project.certification_managers.all %}
+                    <a class="button is-light"
+                       href='{% url "certifyingorganisation-create" project_slug %}'
+                       title="Create New Certifying Organisation">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
                     </a>
-                    <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                           href='{% url "feed-past-project-course" project_slug %}' target="_blank"
-                           data-title="Feed for List of All Past Courses">
-                            <i class="fa fa-rss" style="color: grey"></i>
+                    {% if not unapproved %}
+                        <a class="button is-light"
+                           href='{% url "pending-certifyingorganisation-list" project_slug %}'
+                           title="View Pending Certifying Organisations">
+                            <span class="icon">
+                                <i class="fas fa-clock"></i>
+                            </span>
                         </a>
-                    {% if user.is_staff or user == the_project.owner or user in the_project.certification_managers.all %}
-                        <a class="btn btn-default btn-mini tooltip-toggle"
-                           href='{% url "certifyingorganisation-create" project_slug %}'
-                           data-title="Create New Certifying Organisation">
-                            {% show_button_icon "add" %}
+                    {% else %}
+                        <a class="button is-light"
+                           href='{% url "certifyingorganisation-list" project_slug %}'
+                           title="View Certifying Organisations">
+                            <span class="icon">
+                                <i class="fas fa-list"></i>
+                            </span>
                         </a>
-                        {% if not unapproved %}
-                            <a class="btn btn-default btn-mini tooltip-toggle"
-                               href='{% url "pending-certifyingorganisation-list" project_slug %}'
-                               data-title="View Pending Certifying Organisations">
-                                <span class="glyphicon glyphicon-time"></span>
-                            </a>
-                        {% else %}
-                            <a class="btn btn-default btn-mini tooltip-toggle"
-                               href='{% url "certifyingorganisation-list" project_slug %}'
-                               data-title="View Certifying Organisations">
-                                <span class="glyphicon glyphicon-th-list"></span>
-                            </a>
-                        {% endif %}
                     {% endif %}
-                    <a class="btn btn-default btn-mini tooltip-toggle"
-                       href='{% url 'about' the_project.slug %}'
-                       data-title="About Certification">
-                        <i class="glyphicon glyphicon-info-sign"></i>
-                    </a>
-                </div>
-        </h1>
+                {% endif %}
+                <a class="button is-light"
+                   href='{% url 'about' the_project.slug %}'
+                   title="About Certification">
+                    <span class="icon">
+                        <i class="fas fa-info-circle"></i>
+                    </span>
+                </a>
+            </div>
+        </h2>
     </div>
 
     {% if num_certifyingorganisations == 0 %}
         {% if unapproved %}
-            <h3>All certifying organisation are approved.</h3>
+            <h3 class="subtitle is-5">All certifying organisations are approved.</h3>
         {% else %}
-            <h3>No certifying organisation are defined.</h3>
+            <h3 class="subtitle is-5">No certifying organisations are defined.</h3>
         {% endif %}
     {% endif %}
 
     {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with approved=True %}
-
-    <script>
-        $('.btn-delete').hover(
-            function (){
-                $(this).removeClass('btn-default').addClass('btn-danger')
-            },
-            function (){
-                $(this).removeClass('btn-danger').addClass('btn-default')
-            }
-        )
-    </script>
 
 {% endblock %}
