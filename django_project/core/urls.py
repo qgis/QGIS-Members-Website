@@ -10,6 +10,8 @@ from django.conf.urls.static import static
 from django.http import HttpResponseServerError
 from django.template import loader
 from .views import general_flatpage, index_view
+from django.urls import path
+from .views import UserAutocomplete
 
 admin.autodiscover()
 handler404 = 'base.views.error_views.custom_404'
@@ -68,6 +70,10 @@ if 'rosetta' in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r'^rosetta/', include('rosetta.urls')),
     ]
+
+urlpatterns += [
+    path("autocomplete/users/", UserAutocomplete.as_view(), name="user-autocomplete"),
+]
 
 if settings.DEBUG:
     urlpatterns += static(
