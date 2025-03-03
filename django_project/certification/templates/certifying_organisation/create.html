@@ -4,19 +4,10 @@
 
 {% block js_head %}
     <script type="text/javascript" src="/static/js/jsi18n.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/grappelli/jquery/ui/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/static/grappelli/js/grappelli.js"></script>
-    <script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
-    <script type="text/javascript" src="/static/admin/js/SelectFilter2.js"></script>
 {% endblock %}
 
 {% block css_head %}
     {{ form.media }}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css" rel="stylesheet" type="text/css" media="screen, projection" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 {% endblock css_head %}
 
 {% block page_title %}
@@ -30,36 +21,35 @@
          margin-bottom: 10px;
      }
     </style>
-
     <section id="forms">
         <div class='container'>
             {% csrf_token %}
             {% crispy form %}
             <div class="checklist-container">
                 {% for checklist in available_checklist %}
-                     <hr/>
-                    <div class="inline-form">
-                        <div class="form-label">{{ checklist.question }}</div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="checklist-{{ checklist.id }}"
-                                   id="yes-{{ checklist.id }}" value="yes">
-                            <label class="form-check-label" for="yes-{{ checklist.id }}">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="checklist-{{ checklist.id }}"
-                                   id="no-{{ checklist.id }}" value="no">
-                            <label class="form-check-label" for="no-{{ checklist.id }}">No</label>
+                    <hr/>
+                    <div class="field">
+                        <label class="label">{{ checklist.question }}</label>
+                        <div class="control">
+                            <label class="radio">
+                                <input type="radio" name="checklist-{{ checklist.id }}" id="yes-{{ checklist.id }}" value="yes">
+                                Yes
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="checklist-{{ checklist.id }}" id="no-{{ checklist.id }}" value="no">
+                                No
+                            </label>
                         </div>
                     </div>
                     {% if checklist.show_text_box %}
-                        <div>
-                            <textarea class="form-control" name="textarea-{{ checklist.id }}"
-                                      rows="3"></textarea>
+                        <div class="field">
+                            <div class="control">
+                                <textarea class="textarea" name="textarea-{{ checklist.id }}" rows="3"></textarea>
+                            </div>
                         </div>
                     {% endif %}
-
                     {% if checklist.help_text %}
-                        <div class="help-block">{{ checklist.help_text }}</div>
+                        <p class="help">{{ checklist.help_text }}</p>
                     {% endif %}
                 {% endfor %}
             </div>

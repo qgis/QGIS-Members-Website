@@ -14,7 +14,7 @@ from crispy_forms.layout import (
 )
 from .models import (
     Project, ProjectScreenshot, Domain, Organisation, ProjectFlatpage)
-from certification.forms import CustomSelectMultipleWidget
+from certification.forms import MultiSelectWidget
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,12 @@ class ProjectForm(forms.ModelForm):
 
     certification_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
-        required=False,
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),        required=False,
         help_text=_(
             'Managers of the certification app in this project. '
             'They will receive email notification about organisation and have'
@@ -58,7 +62,12 @@ class ProjectForm(forms.ModelForm):
 
     changelog_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
         required=False,
         help_text=_(
             'Managers of the changelog in this project. '
@@ -69,7 +78,12 @@ class ProjectForm(forms.ModelForm):
     sponsorship_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
         label='Sustaining member managers',
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
         required=False,
         help_text=_(
             'Managers of the sustaining member in this project. '
@@ -79,7 +93,12 @@ class ProjectForm(forms.ModelForm):
 
     lesson_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
         required=False,
         help_text=_(
             'Managers of the lesson app in this project. '

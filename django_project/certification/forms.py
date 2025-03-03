@@ -19,6 +19,8 @@ from crispy_forms.layout import (
     Submit,
     Field,
 )
+from crispy_bulma.widgets import FileUploadInput
+
 from .models import (
     CertifyingOrganisation,
     CertificateType,
@@ -32,21 +34,23 @@ from .models import (
     CertifyingOrganisationCertificate, Checklist, OrganisationChecklist
 )
 
-
-class CustomSelectMultipleWidget(widgets.FilteredSelectMultiple):
-
-    class Media:
-        css = {'all': ['/static/css/custom-widget.css',
-                       '/static/grappelli/jquery/ui/jquery-ui.min.css',
-                       '/static/grappelli/stylesheets/screen.css']}
+class MultiSelectWidget(forms.Widget):
+    template_name = 'widgets/multiselect.html'
 
 
 class CertifyingOrganisationForm(forms.ModelForm):
 
     organisation_owners = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
     )
+
+    logo = forms.ImageField(widget=FileUploadInput)
 
     # noinspection PyClassicStyleClass.
     class Meta:
@@ -70,9 +74,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
         form_title = kwargs.pop('form_title', None)
         show_owner_message = kwargs.pop('show_owner_message', None)
         if not form_title:
-            form_title = (
-                'New Certifying Organisation for %s' % self.project
-            )
+            form_title = f'<h1>New Certifying Organisation for {self.project} </h1>'
         self.helper = FormHelper()
         self.helper.include_media = False
         layout = Layout(
@@ -82,11 +84,11 @@ class CertifyingOrganisationForm(forms.ModelForm):
                 Field('organisation_email', css_class='form-control'),
                 Field('url', css_class='form-control'),
                 Field('address', css_class='form-control'),
-                Field('country', css_class='form-control chosen-select'),
+                Field('country', css_class='form-control'),
                 Field('organisation_phone', css_class='form-control'),
                 Field('logo', css_class='form-control'),
                 Field('owner_message', css_class='form-control'),
-                Field('organisation_owners', css_class='form-control'),
+                Field('organisation_owners'),
                 Field('project', css_class='form-control'),
                 css_id='project-form')
         )
@@ -95,7 +97,12 @@ class CertifyingOrganisationForm(forms.ModelForm):
         super(CertifyingOrganisationForm, self).__init__(*args, **kwargs)
         self.fields['organisation_owners'].label_from_instance = \
             lambda obj: "%s <%s>" % (obj.get_full_name(), obj)
-        self.fields['organisation_owners'].initial = [self.user]
+        self.fields['organisation_owners'].initial = json.dumps([
+            {
+            'value': self.user.pk,
+            'display': f"{self.user.username} <{self.user.email}>"
+            }
+        ])
         self.fields['project'].initial = self.project
         self.fields['project'].widget = forms.HiddenInput()
         if show_owner_message:
@@ -107,7 +114,13 @@ class CertifyingOrganisationForm(forms.ModelForm):
             self.fields['owner_message'].widget = (
                 forms.HiddenInput()
             )
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(CertifyingOrganisationForm, self).save(commit=False)
@@ -189,8 +202,7 @@ class CourseTypeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = \
-            'New Course Type for %s' % self.certifying_organisation.name
+        form_title = f'<h1>New Course Type for {self.certifying_organisation.name}</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -236,8 +248,7 @@ class CourseConvenerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = 'New Course Convener for %s' % \
-                     self.certifying_organisation.name
+        form_title = f'<h1>New Course Convener for {self.certifying_organisation.name}</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -324,8 +335,7 @@ class TrainingCenterForm(geoforms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = 'New Training Center for %s' % \
-                     self.certifying_organisation.name
+        form_title = f'<h1>New Training Center for {self.certifying_organisation.name}</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -385,7 +395,7 @@ class CourseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = 'New Course for %s' % self.certifying_organisation.name
+        form_title = f'<h1>New Course for {self.certifying_organisation.name}</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -445,7 +455,7 @@ class CourseAttendeeForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         self.course = kwargs.pop('course')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = 'Add Course Attendee'
+        form_title = '<h1>Add Course Attendee</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -490,7 +500,7 @@ class AttendeeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = 'Add Attendee'
+        form_title = '<h1>Add Attendee</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -530,7 +540,7 @@ class UpdateAttendeeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.certifying_organisation = kwargs.pop('certifying_organisation')
-        form_title = 'Update Attendee'
+        form_title = '<h1>Update Attendee</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
