@@ -18,6 +18,12 @@ mark {
   color: $text-primary2;
 }
 
+.pagination-list {
+  li + li {
+    margin-top: 0;
+  }
+}
+
 .box-content {
   background: $white;
   border-radius: 10px;

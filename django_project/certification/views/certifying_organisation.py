@@ -823,9 +823,9 @@ class CertifyingOrganisationJson(BaseDatatableView):
         elif column == 'country_name':
             return escape('{0}'.format(row.country.name))
         elif column == 'creation_date':
-            return escape('{0}'.format(row.creation_date))
+            return escape('{0}'.format(row.creation_date.strftime('%d/%m/%Y')))
         elif column == 'update_date':
-            return escape('{0}'.format(row.update_date))
+            return escape('{0}'.format(row.update_date.strftime('%d/%m/%Y')))
         elif column == 'can_approve':
             return (
                 not row.approved and self.request.user.is_staff or

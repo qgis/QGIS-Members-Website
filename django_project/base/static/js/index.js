@@ -1,5 +1,8 @@
 require("../style/scss/style.scss");
 
+import 'datatables.net';
+import 'datatables.net-dt';
+
 document.addEventListener("DOMContentLoaded", () => {
   // Get all "navbar-burger" elements
   const $navbarBurgers = Array.prototype.slice.call(

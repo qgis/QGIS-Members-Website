@@ -1,6 +1,6 @@
 const path = require('path');
 const BundleTracker = require('webpack-bundle-tracker');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 
 const mode = process.argv.indexOf("production") !== -1 ? "production" : "development";
@@ -14,8 +14,8 @@ let plugins = [
   new webpack.ProvidePlugin({
     $: 'jquery',
     jQuery: 'jquery',
-    'window.jQuery': 'jquery'
-  })
+    'window.jQuery': 'jquery',
+  }),
 ];
 
 if (mode === 'development') {
@@ -28,26 +28,55 @@ module.exports = {
   entry: './base/static/js/index',
   output: {
     path: path.resolve('./base/static/bundles'),
-    filename: "[name].[contenthash].js"
+    filename: "[name].[contenthash].js",
   },
   plugins: plugins,
   module: {
     rules: [
+      // Expose jQuery globally
+      {
+        test: require.resolve('jquery'),
+        loader: 'expose-loader',
+        options: {
+          exposes: ['$', 'jQuery'],
+        },
+      },
+      // Expose DataTables globally
+      {
+        test: require.resolve('datatables.net'),
+        loader: 'expose-loader',
+        options: {
+          exposes: ['DataTable'],
+        },
+      },
+      // Expose Moment.js globally
+      {
+        test: require.resolve('moment'),
+        loader: 'expose-loader',
+        options: {
+          exposes: ['moment'],
+        },
+      },
+      // CSS and SCSS rules
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
       {
         test: /\.scss$/,
         use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader'
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
             },
-            {
-              loader: 'sass-loader',
-              options: {
-                sourceMap: true
-              }
-            }
-          ]
-      }
+          },
+        ],
+      },
     ],
   },
   stats: {
