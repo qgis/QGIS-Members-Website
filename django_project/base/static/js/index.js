@@ -2,6 +2,8 @@ require("../style/scss/style.scss");
 
 import 'datatables.net';
 import 'datatables.net-dt';
+import 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 document.addEventListener("DOMContentLoaded", () => {
   // Get all "navbar-burger" elements

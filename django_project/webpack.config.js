@@ -16,6 +16,9 @@ let plugins = [
     jQuery: 'jquery',
     'window.jQuery': 'jquery',
   }),
+  new webpack.ProvidePlugin({
+    Leaflet: 'leaflet',
+  }),
 ];
 
 if (mode === 'development') {
@@ -55,6 +58,14 @@ module.exports = {
         loader: 'expose-loader',
         options: {
           exposes: ['moment'],
+        },
+      },
+      // Expose Leaflet globally
+      {
+        test: require.resolve('leaflet'),
+        loader: 'expose-loader',
+        options: {
+          exposes: ['Leaflet'],
         },
       },
       // CSS and SCSS rules
