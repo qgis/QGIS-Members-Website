@@ -34,7 +34,7 @@ from .models import (
     CertifyingOrganisationCertificate, Checklist, OrganisationChecklist
 )
 
-class MultiSelectWidget(forms.Widget):
+class MultiSelectWidget(forms.SelectMultiple):
     template_name = 'widgets/multiselect.html'
 
 
@@ -42,12 +42,11 @@ class CertifyingOrganisationForm(forms.ModelForm):
 
     organisation_owners = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=MultiSelectWidget(
-            attrs={
-                'get_list_url': '/autocomplete/users/',
-                'color_style': 'is-success',
-            }
-        ),
+        widget=MultiSelectWidget(attrs={
+            'get_list_url': '/autocomplete/users/',
+            'get_item_url': '/get_user_by_pk/',
+            'color_style': 'is-success',
+        }),
     )
 
     logo = forms.ImageField(widget=FileUploadInput)
@@ -88,7 +87,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
                 Field('organisation_phone', css_class='form-control'),
                 Field('logo', css_class='form-control'),
                 Field('owner_message', css_class='form-control'),
-                Field('organisation_owners'),
+                Field('organisation_owners',css_class='is-fullwidth'),
                 Field('project', css_class='form-control'),
                 css_id='project-form')
         )
@@ -97,12 +96,7 @@ class CertifyingOrganisationForm(forms.ModelForm):
         super(CertifyingOrganisationForm, self).__init__(*args, **kwargs)
         self.fields['organisation_owners'].label_from_instance = \
             lambda obj: "%s <%s>" % (obj.get_full_name(), obj)
-        self.fields['organisation_owners'].initial = json.dumps([
-            {
-            'value': self.user.pk,
-            'display': f"{self.user.username} <{self.user.email}>"
-            }
-        ])
+        self.fields['organisation_owners'].initial = [self.user]
         self.fields['project'].initial = self.project
         self.fields['project'].widget = forms.HiddenInput()
         if show_owner_message:

@@ -1,20 +1,27 @@
 {% load static %}
-<div class="field">
-  <label class="label">{{ widget.attrs.label }}</label>
-  <div class="control input is-block is-fullwidth" style="height: fit-content;">
-    <div id="selected-items" class="items mb-0"></div>
-    <input type="hidden" name="{{ widget.name }}" id="{{ widget.attrs.id }}">
-    <input 
-      id="item-input" 
-      type="text" 
-      class="input p-0" 
-      style="border: none; box-shadow: none;"
-      placeholder="Type to search..." 
-    />
-  </div>
-  <div class="control">
-    <div id="item-suggestions" class="dropdown-content is-hidden"></div>
-  </div>
+<style>
+  .is-multiple {
+    width: 100%;
+  }
+  .tag {
+    font-size: 11pt;
+  }
+</style>
+<div class="is-hidden">
+  {% include "django/forms/widgets/select.html" %}
+</div>
+<div class="control input is-block is-fullwidth" style="height: fit-content;">
+  <div id="selected-items" class="items mb-0"></div>
+  <input 
+    id="item-input" 
+    type="text" 
+    class="input p-0" 
+    style="border: none; box-shadow: none;"
+    placeholder="Type to search..." 
+  />
+</div>
+<div class="control">
+  <div id="item-suggestions" class="dropdown-content is-hidden"></div>
 </div>
 
 <script type="text/javascript">
@@ -25,11 +32,12 @@
     const selectedItems = $('#selected-items');
 
     // Initialize selected items if hidden input has values
-    const initialItems = JSON.parse('{{ widget.value|escapejs }}');
-    initialItems.forEach(item => {
-      addItem(item);
-    });
-
+    const initialItems = hiddenInput.val()
+    if (initialItems) {
+      initialItems.forEach(itemId => {
+        addItem(itemId);
+      });  
+    }
     itemInput.on('input', function () {
       const query = itemInput.val();
 
@@ -45,7 +53,7 @@
             suggestions.forEach(suggestion => {
               const itemElement = $('<a class="dropdown-item"></a>').addClass('dropdown-item').text(suggestion.display);
               itemElement.on('click', function () {
-                addItem(suggestion);
+                addItem(suggestion.value);
               });
               suggestionBox.append(itemElement);
             });
@@ -64,36 +72,44 @@
       }
     });
 
-    function addItem(suggestion) {
+    function addItem(itemId) {
+  
       // Check if item already exists
-      if (selectedItems.children().toArray().some(item => $(item).attr('id').toString() === suggestion.value.toString())) return;
+      if (selectedItems.children().toArray().some(item => $(item).attr('id').toString() === itemId.toString())) return;
 
-      // Add item to selected items
-      const itemEl = $('<span></span>')
-      .addClass('tag {{ widget.attrs.color_style }} m-1')
-      .text(suggestion.display)
-      .attr('id', suggestion.value);
-
-      const deleteBtn = $('<button></button>').addClass('delete is-small');
-      deleteBtn.on('click', function () {
-        itemEl.remove();
-        updateHiddenInput();
+      $.ajax({
+        url: `{{ widget.attrs.get_item_url }}${itemId}/`,
+        method: 'GET',
+        success: function (fetchedItem) {
+          // Add item to selected items
+          const itemEl = $('<span></span>')
+          .addClass('tag {{ widget.attrs.color_style }} m-1')
+          .text(fetchedItem.display)
+          .attr('id', fetchedItem.value);
+    
+          const deleteBtn = $('<button></button>').addClass('delete is-small');
+          deleteBtn.on('click', function () {
+            itemEl.remove();
+            updateHiddenInput();
+          });
+    
+          itemEl.append(deleteBtn);
+          selectedItems.append(itemEl);
+    
+          // Clear suggestions and input
+          suggestionBox.addClass('is-hidden');
+          itemInput.val('');
+    
+          // Update hidden input
+          updateHiddenInput();
+          
+        }
       });
-
-      itemEl.append(deleteBtn);
-      selectedItems.append(itemEl);
-
-      // Clear suggestions and input
-      suggestionBox.addClass('is-hidden');
-      itemInput.val('');
-
-      // Update hidden input
-      updateHiddenInput();
     }
 
     function updateHiddenInput() {
-      const items = selectedItems.children().toArray().map(item => $(item).attr('id'));
-      hiddenInput.val(JSON.stringify(items));
+      const items = selectedItems.children().toArray().map(item => Number($(item).attr('id')));
+      hiddenInput.val(items);
     }
   });
 </script>

@@ -96,3 +96,8 @@ class UserAutocomplete(LoginRequiredMixin, View):
         users = User.objects.filter(username__icontains=query)[:20]  # Limit results for performance
         results = [{"value": user.pk, "display": f"{user.username} <{user.email}>"} for user in users]
         return JsonResponse(results, safe=False)
+
+class GetUserByPk(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        return JsonResponse({"value": user.pk, "display": f"{user.username} <{user.email}>"})

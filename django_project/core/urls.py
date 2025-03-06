@@ -11,7 +11,7 @@ from django.http import HttpResponseServerError
 from django.template import loader
 from .views import general_flatpage, index_view
 from django.urls import path
-from .views import UserAutocomplete
+from .views import UserAutocomplete, GetUserByPk
 
 admin.autodiscover()
 handler404 = 'base.views.error_views.custom_404'
@@ -73,6 +73,7 @@ if 'rosetta' in settings.INSTALLED_APPS:
 
 urlpatterns += [
     path("autocomplete/users/", UserAutocomplete.as_view(), name="user-autocomplete"),
+    path("get_user_by_pk/<int:pk>/", GetUserByPk.as_view(), name="get-user-by-pk"),
 ]
 
 if settings.DEBUG:
