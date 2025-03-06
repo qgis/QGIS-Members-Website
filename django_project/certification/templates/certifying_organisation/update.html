@@ -11,18 +11,10 @@
         let grappelli = {};
     </script>
     <script type="text/javascript" src="/static/js/jsi18n.js"></script>
-    <script type="text/javascript" src="/static/grappelli/jquery/jquery.min.js"></script>
-    <script src="/static/grappelli/jquery/jquery-migrate-3.0.1.min.js" type="text/javascript"></script>
-    <script type="text/javascript" src="/static/grappelli/jquery/ui/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/static/grappelli/js/grappelli.min.js"></script>
 {% endblock %}
 
 {% block css_head %}
     {{ form.media }}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css" rel="stylesheet" type="text/css" media="screen, projection" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 {% endblock css_head %}
 
 {% block page_title %}
@@ -33,7 +25,9 @@
 
     <style>
      legend {
-         margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
      }
 
      .selector {
@@ -61,10 +55,20 @@
     </section>
 
     <script>
-     $('legend').append('<div class="pull-right"><a href={% url "about" the_project.slug %} class="glyphicon glyphicon-info-sign tooltip-toggle about-icon"'+
-                  'style="font-size: 14pt; padding: 7px; color: #7F7F98; display: inline-block; vertical-align: middle"'+
-                  'data-title="About"></a></div>')
-    $('#div_id_name').prepend('<div class="info-text">Click the <span class="glyphicon glyphicon-info-sign"></span> icon for details on how the certification programme works.</div>')
+    $(document).ready(function() {
+        $('legend').each(function() {
+            var div = $('<div>');
+            div.html('<a href="{% url "about" the_project.slug %}" class="icon button is-light" title="About"><i class="fas fa-info-circle"></i></a>');
+            $(this).append(div);
+        });
+
+        var nameDiv = $('#div_id_name');
+        if (nameDiv.length) {
+            var infoText = $('<div>', { class: 'notification is-primary3 is-light' });
+            infoText.html('Click the <span class="icon"><i class="fas fa-info-circle"></i></span> icon for details on how the certification programme works.');
+            nameDiv.prepend(infoText);
+        }
+    });
     </script>
 
 {% endblock %}

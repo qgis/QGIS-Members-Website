@@ -727,7 +727,7 @@ class CertifyingOrganisationUpdateView(
         kwargs.update({
             'user': self.request.user,
             'project': self.project,
-            'form_title': 'Update Certifying Organisation',
+            'form_title': '<h1>Update Certifying Organisation</h1>',
             'show_owner_message': show_owner_message
         })
         return kwargs
