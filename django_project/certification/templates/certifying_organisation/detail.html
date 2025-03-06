@@ -329,27 +329,59 @@
     <div class="columns">
         <div class="column is-half">
             <div class="content">
-                <p><strong>Organisation name:</strong> {{ certifyingorganisation.name }}</p>
-                <p><strong>Address:</strong> {{ certifyingorganisation.address }}</p>
-                <p><strong>Country:</strong> {{ certifyingorganisation.country.name }}</p>
-                <p><strong>Email:</strong> {{ certifyingorganisation.organisation_email }}</p>
-                <p><strong>Phone:</strong> {{ certifyingorganisation.organisation_phone }}</p>
-                <p><strong>Organisation owners:</strong>
-                    {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
-                        {% if organisation_owners.first_name %}
-                            {{ organisation_owners.first_name }} {{ organisation_owners.last_name }}{{ ", " }}
-                        {% else %}
-                            {{ organisation_owners }}{{ ", " }}
-                        {% endif %}
-                    {% endfor %}
-                </p>
-                <p><strong>Organisation URL:</strong>
-                    {% if certifyingorganisation.url %}
-                        <a href='{{ certifyingorganisation.url }}'>{{ certifyingorganisation.url }}</a>
-                    {% else %}
-                        -
-                    {% endif %}
-                </p>
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">Organisation Details</p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">Name:</div>
+                                <div class="column">{{ certifyingorganisation.name }}</div>
+                            </div>
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">Address:</div>
+                                <div class="column">{{ certifyingorganisation.address }}</div>
+                            </div>
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">Country:</div>
+                                <div class="column">{{ certifyingorganisation.country.name }}</div>
+                            </div>
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">Email:</div>
+                                <div class="column">
+                                    <a href="mailto:{{ certifyingorganisation.organisation_email }}" style="word-wrap: break-word;">{{ certifyingorganisation.organisation_email }}</a>
+                                </div>
+                            </div>
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">Phone:</div>
+                                <div class="column">{{ certifyingorganisation.organisation_phone }}</div>
+                            </div>
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">Owners:</div>
+                                <div class="column">
+                                    {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
+                                        {% if organisation_owners.first_name %}
+                                            {{ organisation_owners.first_name }} {{ organisation_owners.last_name }}{{ ", " }}
+                                        {% else %}
+                                            {{ organisation_owners }}{{ ", " }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="columns">
+                                <div class="column is-one-third has-text-weight-medium">URL:</div>
+                                <div class="column">
+                                    {% if certifyingorganisation.url %}
+                                        <a href='{{ certifyingorganisation.url }}' style="word-wrap: break-word;">{{ certifyingorganisation.url }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <hr/>
                 <div>
                     {% for question in submitted_checklist %}
@@ -608,7 +640,7 @@
                                                 {{ course.course_convener.user }}
                                             {% endif %}
                                         </td>
-                                        <td class="has-text-right">
+                                        <td class="has-text-right" style="width: 152px;">
                                             <div class="buttons are-small is-justify-content-flex-end">
                                                 {% if user_can_delete or user == course.course_convener.user %}
                                                     <a class="button is-danger is-light"
