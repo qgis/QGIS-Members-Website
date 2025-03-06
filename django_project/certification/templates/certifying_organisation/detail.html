@@ -303,12 +303,12 @@
             </a>
             {% endif %}
             {% if user_can_delete %}
-                <a class="button is-danger has-tooltip-arrow has-tooltip-bottom icon"
+                <a class="button is-danger is-light has-tooltip-arrow has-tooltip-bottom icon"
                    href='{% url "certifyingorganisation-delete" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
                    data-tooltip="Delete {{ certifyingorganisation.name }}">
                     <i class="fas fa-trash"></i>
                 </a>
-                <a class="button is-info has-tooltip-arrow has-tooltip-bottom icon"
+                <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
                    href='{% url "certifyingorganisation-update" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
                    data-tooltip="Edit {{ certifyingorganisation.name }}">
                     <i class="fas fa-pencil-alt"></i>
