@@ -172,7 +172,7 @@
             $rejectionModal.find('input[name="rejected-sustaining-member-id"]').val(id);
             $rejectionModal.find('input[name="rejected-sustaining-member-project-slug"]').val(projectSlug);
 
-            $rejectionModal.modal('show');
+            $rejectionModal.addClass('is-active');
         });
 
         $rejectionModal.on('show.bs.modal', function() {

@@ -129,139 +129,146 @@
         </div>
     {% endif %}
     <!-- Modal -->
-    <div class="modal fade" id="rejectionModal" role="dialog">
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><b>Rejection Form</b></h4>
-                </div>
-                <div class="modal-body">
-                    <p>You are going to reject this organisation below:</p>
-                    <ul>
-                        <li><span>Organisation: </span><span class="rejection-form-info" id="rejected-organisation-name"></span></li>
-                        <li><span>Country: </span><span class="rejection-form-info" id="rejected-organisation-country"></span></li>
-                    </ul>
-                    <form id="rejectionForm" role="form">
-                        <label>Please indicate your reason of this rejection.</label><br>
-                        <input name="status" class="input" value="Rejected, because ">
-                        <input name="rejected-organisation-slug" hidden>
-                        <input name="rejected-organisation-project-slug" hidden>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="button is-light" onclick="closeRejectionForm()">Cancel</button>
-                    <button type="button" class="button is-success" onclick="submitRejectionForm()">Submit</button>
-                </div>
-            </div>
-
+    <div class="modal" id="rejectionModal" role="dialog">
+        <div class="modal-background"></div>
+        <!-- Modal content-->
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title"><b>Rejection Form</b></p>
+                <button class="delete" aria-label="close" onclick="closeRejectionForm()"></button>
+            </header>
+            <section class="modal-card-body">
+                <p>You are going to reject this organisation below:</p>
+                <ul>
+                    <li><span>Organisation: </span><span class="rejection-form-info" id="rejected-organisation-name"></span></li>
+                    <li><span>Country: </span><span class="rejection-form-info" id="rejected-organisation-country"></span></li>
+                </ul>
+                <form id="rejectionForm" role="form">
+                    <div class="field">
+                        <label class="label">Please indicate your reason for this rejection.</label>
+                        <div class="control">
+                            <input name="status" class="input" value="Rejected, because ">
+                        </div>
+                    </div>
+                    <input name="rejected-organisation-slug" type="hidden">
+                    <input name="rejected-organisation-project-slug" type="hidden">
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-light" onclick="closeRejectionForm()">Cancel</button>
+                <button class="button is-success" onclick="submitRejectionForm()">Submit</button>
+            </footer>
+        </div>
+    </div>
+    <div class="modal" id="updateStatusModal" role="dialog">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title"><b>Update Status Form</b></p>
+                <button class="delete" aria-label="close" onclick="closeUpdateStatusForm()"></button>
+            </header>
+            <section class="modal-card-body">
+                <p>You are going to update the status of this organisation below:</p>
+                <ul>
+                    <li><span>Organisation: </span><span class="status-form-info" id="status-organisation-name"></span></li>
+                    <li><span>Country: </span><span class="status-form-info" id="status-organisation-country"></span></li>
+                </ul>
+                <form id="updateStatusForm" role="form">
+                    <div class="field">
+                        <label class="label">Status:</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="update-status"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Remarks:</label>
+                        <div class="control">
+                            <input name="update-remarks" class="input">
+                        </div>
+                    </div>
+                    <input name="status-organisation-slug" type="hidden">
+                    <input name="status-organisation-project-slug" type="hidden">
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-light" onclick="closeUpdateStatusForm()">Cancel</button>
+                <button class="button is-success" onclick="submitUpdateStatusForm()">Submit</button>
+            </footer>
         </div>
     </div>
 
-    <div class="modal fade" id="updateStatusModal" role="dialog">
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><b>Update Status Form</b></h4>
-                </div>
-                <div class="modal-body">
-                    <p>You are going to update the status of this organisation below:</p>
-                    <ul>
-                        <li><span>Organisation: </span><span class="status-form-info" id="status-organisation-name"></span></li>
-                        <li><span>Country: </span><span class="status-form-info" id="status-organisation-country"></span></li>
-                    </ul>
-                    <form id="updateStatusForm" role="form">
-                        <label>Status:</label><br>
-                        <div class="select">
-                            <select name="update-status">
-                            </select>
-                        </div><br/>
-                        <label>Remarks:</label><br>
-                        <input name="update-remarks" class="input">
-                        <input name="status-organisation-slug" hidden>
-                        <input name="status-organisation-project-slug" hidden>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="button is-light" onclick="closeUpdateStatusForm()">Cancel</button>
-                    <button type="button" class="button is-success" onclick="submitUpdateStatusForm()">Submit</button>
-                </div>
-            </div>
-
+    <div class="modal" id="inviteReviewerModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title"><b>Invite External Reviewer</b></p>
+                <button class="delete" aria-label="close" onclick="closeInviteExternalReviewer()"></button>
+            </header>
+            <section class="modal-card-body">
+                <div id="ie-badge" class="tag is-success" style="margin-bottom: 10px; display: none"></div>
+                <form id="inviteExternalReviewerForm" role="form">
+                    <div class="field">
+                        <label class="label">Name:</label>
+                        <div class="control">
+                            <input name="reviewer-name" class="input">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Email:</label>
+                        <div class="control">
+                            <input name="reviewer-email" class="input">
+                        </div>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-light" onclick="closeInviteExternalReviewer()">Cancel</button>
+                <button id="btn-submit-invite" class="button is-success" onclick="submitInviteExternalReviewer(this)">Submit</button>
+            </footer>
         </div>
     </div>
-
-    <div class="modal fade" id="inviteReviewerModal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><b>Invite External Reviewer</b></h4>
-                </div>
-                <div class="modal-body">
-                    <div id="ie-badge" class="tag is-success" style="margin-bottom: 10px;display: none"></div>
-                    <form id="inviteExternalReviewerForm" role="form">
-                        <label>Name:</label><br/>
-                        <input name="reviewer-name" class="input">
-                        <br/>
-                        <label>Email:</label><br>
-                        <input name="reviewer-email" class="input">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="button is-light" onclick="closeInviteExternalReviewer()">Cancel</button>
-                    <button id="btn-submit-invite" type="button" class="button is-success" onclick="submitInviteExternalReviewer(this)">Submit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="checklistModal" role="dialog">
-        <div class="modal-dialog">
+    <div class="modal" id="checklistModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
             <!-- Modal content -->
             <form method="post" id="checklistForm" action="{% url "update-checklist-reviewer" project_slug=project_slug slug=certifyingorganisation.slug %}">
                 {% csrf_token %}
                 <input type="hidden" name="organisation" value="{{ certifyingorganisation.id }}"/>
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title"><b>Checklist</b></h4>
-                        <div class="modal-body">
-                            {% for checklist in available_checklist %}
-                                <hr/>
-                                <div class="field">
-                                    <label class="label">{% if checklist.organisation_checklist.0.checklist_question %}{{ checklist.organisation_checklist.0.checklist_question }}{% else %}{{ checklist.question }}{% endif %}</label>
-                                    <div class="control">
-                                        <label class="radio">
-                                            <input type="radio" name="checklist-{{ checklist.id  }}" id="yes-{{ checklist.id }}" {% if checklist.organisation_checklist.0.checked %}checked{% endif %} value="yes">
-                                            Yes
-                                        </label>
-                                        <label class="radio">
-                                            <input type="radio" name="checklist-{{ checklist.id  }}" id="no-{{ checklist.id }}" {% if not checklist.organisation_checklist.0.checked %}checked{% endif %} value="no">
-                                            No
-                                        </label>
-                                    </div>
-                                </div>
-                                {% if checklist.show_text_box %}
-                                <div class="field">
-                                    <div class="control">
-                                        <textarea class="textarea" name="textarea-{{ checklist.id }}" rows="3">{{ checklist.organisation_checklist.0.text_box_content }}</textarea>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
+                <header class="modal-card-head">
+                    <p class="modal-card-title"><b>Checklist</b></p>
+                    <button class="delete" aria-label="close" onclick="closeChecklistModal()"></button>
+                </header>
+                <section class="modal-card-body">
+                    {% for checklist in available_checklist %}
+                        <hr/>
+                        <div class="field">
+                            <label class="label">{% if checklist.organisation_checklist.0.checklist_question %}{{ checklist.organisation_checklist.0.checklist_question }}{% else %}{{ checklist.question }}{% endif %}</label>
+                            <div class="control">
+                                <label class="radio">
+                                    <input type="radio" name="checklist-{{ checklist.id  }}" id="yes-{{ checklist.id }}" {% if checklist.organisation_checklist.0.checked %}checked{% endif %} value="yes">
+                                    Yes
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="checklist-{{ checklist.id  }}" id="no-{{ checklist.id }}" {% if not checklist.organisation_checklist.0.checked %}checked{% endif %} value="no">
+                                    No
+                                </label>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="button is-light" onclick="closeChecklistModal()">Cancel</button>
-                            <button type="button" class="button is-success" onclick="submitChecklistForm()">Submit</button>
+                        {% if checklist.show_text_box %}
+                        <div class="field">
+                            <div class="control">
+                                <textarea class="textarea" name="textarea-{{ checklist.id }}" rows="3">{{ checklist.organisation_checklist.0.text_box_content }}</textarea>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                        {% endif %}
+                    {% endfor %}
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="button" class="button is-light" onclick="closeChecklistModal()">Cancel</button>
+                    <button type="button" class="button is-success" onclick="submitChecklistForm()">Submit</button>
+                </footer>
             </form>
         </div>
     </div>
@@ -823,12 +830,12 @@
         $('.btn-invite').click(function () {
             document.forms['inviteExternalReviewerForm'].reset();
             $('#ie-badge').hide();
-            $('#inviteReviewerModal').modal('show')
+            $('#inviteReviewerModal').addClass('is-active')
         });
 
         function closeInviteExternalReviewer() {
             document.forms['inviteExternalReviewerForm'].reset();
-            $('#inviteReviewerModal').modal('hide')
+            $('#inviteReviewerModal').removeClass('is-active')
         }
 
         $('#inviteReviewerModal').submit(function (e) {
@@ -909,15 +916,15 @@
         function closeRejectionForm() {
             $('.rejection-form-info').html('');
             document.forms['rejectionForm'].reset();
-            $('#rejectionModal').modal('hide')
+            $('#rejectionModal').removeClass('is-active')
         }
         function closeUpdateStatusForm() {
             $('.status-form-info').html('');
             document.forms['updateStatusForm'].reset();
-            $('#updateStatusModal').modal('hide')
+            $('#updateStatusModal').removeClass('is-active')
         }
         function closeChecklistModal() {
-            $('#checklistModal').modal('hide')
+            $('#checklistModal').removeClass('is-active')
         }
 
         function submitChecklistForm() {
@@ -967,11 +974,11 @@
             $('#rejected-organisation-country').html($(this).attr('organisation_country'));
             $('[name=rejected-organisation-slug]').val($(this).attr('organisation_slug'));
             $('[name=rejected-organisation-project-slug]').val($(this).attr('organisation_project_slug'));
-            $('#rejectionModal').modal('show')
+            $('#rejectionModal').addClass('is-active')
         });
 
         $('.btn-checklist-form').click(function () {
-            $('#checklistModal').modal('show');
+            $('#checklistModal').addClass('is-active');
         });
 
 
@@ -1004,7 +1011,7 @@
             $('[name=status-organisation-slug]').val($(this).attr('organisation_slug'));
             $('[name=status-organisation-project-slug]').val(project_slug);
             $('[name=update-remarks]').val($(this).attr('organisation_remarks') !== 'None' ? $(this).attr('organisation_remarks') : '');
-            $('#updateStatusModal').modal('show')
+            $('#updateStatusModal').addClass('is-active');
         });
 
         $('.btn-delete').hover(
