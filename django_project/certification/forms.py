@@ -371,6 +371,7 @@ class TrainingCenterForm(geoforms.ModelForm):
 class CourseForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass.
+    template_certificate = forms.ImageField(widget=FileUploadInput)
     class Meta:
         model = Course
         fields = (

@@ -349,6 +349,9 @@ a.is-active > span {
   text-decoration: none;
 }
 
-.card-header{
-  box-shadow: 0 0.02em 0.25em rgba($scheme-invert, 0.1) !important;
+.card {
+  color: inherit !important;
+  .card-header{
+    box-shadow: 0 0.02em 0.25em rgba($scheme-invert, 0.1) !important;
+  }
 }

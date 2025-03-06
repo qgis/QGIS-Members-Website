@@ -306,7 +306,7 @@
                 <a class="button is-danger has-tooltip-arrow has-tooltip-bottom icon"
                    href='{% url "certifyingorganisation-delete" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
                    data-tooltip="Delete {{ certifyingorganisation.name }}">
-                    <i class="fas fa-minus"></i>
+                    <i class="fas fa-trash"></i>
                 </a>
                 <a class="button is-info has-tooltip-arrow has-tooltip-bottom icon"
                    href='{% url "certifyingorganisation-update" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
@@ -647,7 +647,7 @@
                                                        href='{% url "course-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
                                                        title="Delete">
                                                         <span class="icon is-small">
-                                                            <i class="fas fa-minus"></i>
+                                                            <i class="fas fa-trash"></i>
                                                         </span>
                                                     </a>
                                                     <a class="button is-light"
@@ -719,7 +719,7 @@
                                                    href='{% url "trainingcenter-delete" project_slug=trainingcenter.certifying_organisation.project.slug organisation_slug=trainingcenter.certifying_organisation.slug slug=trainingcenter.slug %}'
                                                    title="Delete {{ trainingcenter.name }}">
                                                     <span class="icon is-small">
-                                                        <i class="fas fa-minus"></i>
+                                                        <i class="fas fa-trash"></i>
                                                     </span>
                                                 </a>
                                                 <a class="button is-light"
@@ -780,7 +780,7 @@
                                                    href='{% url "coursetype-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
                                                    title="Delete {{ coursetype.name }}">
                                                     <span class="icon is-small">
-                                                        <i class="fas fa-minus"></i>
+                                                        <i class="fas fa-trash"></i>
                                                     </span>
                                                 </a>
                                                 <a class="button is-light"
