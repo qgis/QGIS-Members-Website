@@ -13,14 +13,11 @@
 {% endblock page_title %}
 
 {% block js_head %}
-    <link rel="stylesheet" type="text/css"
-          href="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.2.rc.2/leaflet.css"/>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.2.rc.2/leaflet.js"></script>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/organisation_detail.css' %}">
     <script>
         var map;
         var lat;
         var long;
+        
 
         $(document).ready(function () {
              $.getJSON('{{ STATIC_URL }}/static/json/geo.json', function (json) {
@@ -34,9 +31,9 @@
                 long = geo_obj[0].properties.LON;
 
                 // Add map
-                $('#map').css({'height': 400, 'width': 800});
-                map = L.map('map').setView([lat, long], 4);
-                L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                $('#map').css({'height': 400, 'width': "100%"});
+                map = Leaflet.map('map').setView([lat, long], 4);
+                Leaflet.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
                     attribution:  '&copy; <a href="http://www.openstreetmap.org/copyright">'+
                                     'OpenStreetMap</a>, Tiles courtesy of '+
                                     '<a href="http://hot.openstreetmap.org/" target="_blank">'+
@@ -48,7 +45,7 @@
              });
 
             function addMarkers() {
-            var green_icon = L.icon({
+            var green_icon = Leaflet.icon({
                             iconUrl: '/static/img/marker_green.png',
                             iconSize:     [30, 40],
                             iconAnchor:   [14, 39],
@@ -56,7 +53,7 @@
                         });
 
             {% for training_center in trainingcenters %}
-                var marker = L.marker(
+                var marker = Leaflet.marker(
                    [{{ training_center.location.y }}, {{ training_center.location.x }}],{
                         icon: green_icon
                     }
@@ -65,9 +62,9 @@
             }
 
             function addLegend() {
-                var legend = L.control({position: 'bottomleft'});
+                var legend = Leaflet.control({position: 'bottomleft'});
                 legend.onAdd = function (map) {
-                    var div = L.DomUtil.create('div', 'info legend');
+                    var div = Leaflet.DomUtil.create('div', 'info legend');
                     div.innerHTML = '<img src="/static/img/marker_green.png" height=20px><span> Training center</span>';
                 return div;
                 };
@@ -84,16 +81,6 @@
         .about-link:hover {
             color: darkblue !important;
             text-decoration: none !important;
-        }
-        .btn-disabled, .btn-disabled:hover {
-            color: #d3d3d3
-        }
-        .timeline {
-            margin-top: 20px;
-            margin-left: 10px;
-        }
-        .timeline .time {
-            font-weight: bold;
         }
 
         .timeline ul, .timeline li {
@@ -141,7 +128,6 @@
             {% endfor %}
         </div>
     {% endif %}
-
     <!-- Modal -->
     <div class="modal fade" id="rejectionModal" role="dialog">
         <div class="modal-dialog">
@@ -160,14 +146,14 @@
                     </ul>
                     <form id="rejectionForm" role="form">
                         <label>Please indicate your reason of this rejection.</label><br>
-                        <input name="status" class="form-control" value="Rejected, because ">
+                        <input name="status" class="input" value="Rejected, because ">
                         <input name="rejected-organisation-slug" hidden>
                         <input name="rejected-organisation-project-slug" hidden>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" onclick="closeRejectionForm()">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="submitRejectionForm()">Submit</button>
+                    <button type="button" class="button is-light" onclick="closeRejectionForm()">Cancel</button>
+                    <button type="button" class="button is-success" onclick="submitRejectionForm()">Submit</button>
                 </div>
             </div>
 
@@ -191,17 +177,19 @@
                     </ul>
                     <form id="updateStatusForm" role="form">
                         <label>Status:</label><br>
-                        <select name="update-status" class="form-control">
-                        </select><br/>
+                        <div class="select">
+                            <select name="update-status">
+                            </select>
+                        </div><br/>
                         <label>Remarks:</label><br>
-                        <input name="update-remarks" class="form-control">
+                        <input name="update-remarks" class="input">
                         <input name="status-organisation-slug" hidden>
                         <input name="status-organisation-project-slug" hidden>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" onclick="closeUpdateStatusForm()">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="submitUpdateStatusForm()">Submit</button>
+                    <button type="button" class="button is-light" onclick="closeUpdateStatusForm()">Cancel</button>
+                    <button type="button" class="button is-success" onclick="submitUpdateStatusForm()">Submit</button>
                 </div>
             </div>
 
@@ -216,18 +204,18 @@
                     <h4 class="modal-title"><b>Invite External Reviewer</b></h4>
                 </div>
                 <div class="modal-body">
-                    <div id="ie-badge" class="badge badge-success" style="margin-bottom: 10px;display: none"></div>
+                    <div id="ie-badge" class="tag is-success" style="margin-bottom: 10px;display: none"></div>
                     <form id="inviteExternalReviewerForm" role="form">
                         <label>Name:</label><br/>
-                        <input name="reviewer-name" class="form-control">
+                        <input name="reviewer-name" class="input">
                         <br/>
                         <label>Email:</label><br>
-                        <input name="reviewer-email" class="form-control">
+                        <input name="reviewer-email" class="input">
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" onclick="closeInviteExternalReviewer()">Cancel</button>
-                    <button id="btn-submit-invite" type="button" class="btn btn-primary" onclick="submitInviteExternalReviewer(this)">Submit</button>
+                    <button type="button" class="button is-light" onclick="closeInviteExternalReviewer()">Cancel</button>
+                    <button id="btn-submit-invite" type="button" class="button is-success" onclick="submitInviteExternalReviewer(this)">Submit</button>
                 </div>
             </div>
         </div>
@@ -246,28 +234,31 @@
                         <div class="modal-body">
                             {% for checklist in available_checklist %}
                                 <hr/>
-                                <div class="inline-form">
-                                    <div class="form-label">{% if checklist.organisation_checklist.0.checklist_question %}{{ checklist.organisation_checklist.0.checklist_question }}{% else %}{{ checklist.question }}{% endif %}</div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="checklist-{{ checklist.id  }}" id="yes-{{ checklist.id }}" {% if checklist.organisation_checklist.0.checked %}checked{% endif %} value="yes">
-                                        <label class="form-check-label" for="yes-{{ checklist.id }}" >Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="checklist-{{ checklist.id  }}" id="no-{{ checklist.id }}"
-                                               {% if not checklist.organisation_checklist.0.checked %}checked{% endif %} value="no">
-                                        <label class="form-check-label" for="no-{{ checklist.id }}">No</label>
+                                <div class="field">
+                                    <label class="label">{% if checklist.organisation_checklist.0.checklist_question %}{{ checklist.organisation_checklist.0.checklist_question }}{% else %}{{ checklist.question }}{% endif %}</label>
+                                    <div class="control">
+                                        <label class="radio">
+                                            <input type="radio" name="checklist-{{ checklist.id  }}" id="yes-{{ checklist.id }}" {% if checklist.organisation_checklist.0.checked %}checked{% endif %} value="yes">
+                                            Yes
+                                        </label>
+                                        <label class="radio">
+                                            <input type="radio" name="checklist-{{ checklist.id  }}" id="no-{{ checklist.id }}" {% if not checklist.organisation_checklist.0.checked %}checked{% endif %} value="no">
+                                            No
+                                        </label>
                                     </div>
                                 </div>
                                 {% if checklist.show_text_box %}
-                                <div>
-                                    <textarea class="form-control" name="textarea-{{ checklist.id }}" rows="3">{{ checklist.organisation_checklist.0.text_box_content }}</textarea>
+                                <div class="field">
+                                    <div class="control">
+                                        <textarea class="textarea" name="textarea-{{ checklist.id }}" rows="3">{{ checklist.organisation_checklist.0.text_box_content }}</textarea>
+                                    </div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" onclick="closeChecklistModal()">Cancel</button>
-                            <button type="button" class="btn btn-primary" onclick="submitChecklistForm()">Submit</button>
+                            <button type="button" class="button is-light" onclick="closeChecklistModal()">Cancel</button>
+                            <button type="button" class="button is-success" onclick="submitChecklistForm()">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -275,586 +266,536 @@
         </div>
     </div>
     <!-- End modal -->
-
-    <div class="row" style="display: flex">
-        <div class="col-lg-8">
-            <h1>{{ certifyingorganisation.name }}</h1><br/>
+    <div class="columns is-vcentered">
+        <div class="column">
+            <h1 class="title">{{ certifyingorganisation.name }}</h1>
         </div>
 
         {# Only organisation owners or staff can edit #}
-        <div class="col-lg-4 tools-container">
-
-            <div class="pull-right">
-            <a class="glyphicon glyphicon-info-sign tooltip-toggle about-link"
-               style="font-size: 14pt; padding: 7px; color: #D3D3D3; display: inline-block; vertical-align: middle"
-               data-title="About Certification"
-               href="{% url 'about' certifyingorganisation.project.slug %}"
-            ></a>
-
-
-            <div class="btn-group">
-                {% if certifyingorganisation.approved %}
-                <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "feed-training-center" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
-                       data-title="GeoJSON Feed for List of Training Center">
-                        <i class="fa fa-rss-square"></i>
-                    </a>
-                <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "feed-upcoming-course" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
-                       data-title="Feed for List of Upcoming Courses">
-                        <i class="fa fa-rss"></i>
-                    </a>
-                <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "feed-past-course" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
-                       data-title="Feed for List of Past Courses">
-                        <i class="fa fa-rss" style="color: grey"></i>
-                    </a>
-                {% endif %}
-                {% if user_can_delete %}
-                    <a class="btn btn-default btn-mini btn-delete tooltip-toggle"
-                       href='{% url "certifyingorganisation-delete" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
-                       data-title="Delete {{ certifyingorganisation.name }}">
-                        <span class="glyphicon glyphicon-minus"></span>
-                    </a>
-                    <a class="btn btn-default btn-mini tooltip-toggle"
-                       href='{% url "certifyingorganisation-update" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
-                       data-title="Edit {{ certifyingorganisation.name }}">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </a>
-                {% endif %}
-                 <a class="btn btn-default btn-mini tooltip-toggle"
-                    href='{% if certifyingorganisation.approved %}
-                            {% url "certifyingorganisation-list" certifyingorganisation.project.slug %}
-                          {% else %}
-                            {% url "pending-certifyingorganisation-list" certifyingorganisation.project.slug %}?ready={% if certifyingorganisation.status.name == 'Pending' %}false{% else %}true{% endif %}
-                          {% endif %}'
-                    data-title="Back">
-                     <span class="glyphicon glyphicon-arrow-left"></span>
-                 </a>
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container row">
-    <div class="details col-lg-6 col-md-6 col-sm-12" style="margin-bottom: 20px">
-        <div class="content-container">
-            <div class="title">Organisation name</div>
-            <div class="content">{{ certifyingorganisation.name }}</div>
-        </div>
-        <div class="content-container">
-            <div class="title">Address</div>
-            <div class="content">{{ certifyingorganisation.address }}</div>
-        </div>
-        <div class="content-container">
-            <div class="title">Country</div>
-            <div class="content">{{ certifyingorganisation.country.name }}</div>
-        </div>
-        <div class="content-container">
-            <div class="title">Email</div>
-            <div class="content">{{ certifyingorganisation.organisation_email }}</div>
-        </div>
-        <div class="content-container">
-            <div class="title">Phone</div>
-            <div class="content">{{ certifyingorganisation.organisation_phone }}</div>
-        </div>
-        <div class="content-container">
-            <div class="title">Organisation owners</div>
-            <div class="content">
-                {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
-                    {% if organisation_owners.first_name %}
-                        {{ organisation_owners.first_name }}
-                        {{ organisation_owners.last_name }}{{ ", " }}
-                    {% else %}
-                        {{ organisation_owners }}{{ ", " }}
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-        <div class="content-container">
-            <div class="title">Organisation URL</div>
-            <div class="content">
-                {% if certifyingorganisation.url %}
-                <a href='{{ certifyingorganisation.url }}' style="font-size: 10pt;">
-                    {{ certifyingorganisation.url }}</a>
-                {% else %}
-                -
-                {% endif %}
-            </div>
-        </div>
-        <hr/>
-        <div class="content-container">
-            {% for question in submitted_checklist %}
-                {% if question.checklist_target == 'organization_owner' %}
-                    <div>
-                        {{ question.checklist_question }} :
-                            {% if question.checked %}
-                                <i class="fa fa-check-circle" aria-hidden="true" style="color: green"></i>
-                            {% else %}
-                                <i class="fa fa-times-circle" aria-hidden="true" style="color: red"></i>
-                            {% endif %}
-                    </div>
-                    {% if question.text_box_content %}
-                        <div>{{ question.text_box_content | base_markdown }}</div>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        </div>
-    </div>
-    {% if certifyingorganisation.approved %}
-    <div class="col-lg-6 ">
-
-        {% if user_can_create %}
-        <div class="panel-wrap col-lg-12">
-            <a href="{% url "top-up" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}" class="btn btn-success top-up-btn">
-                Top up credits <i class="glyphicon glyphicon-shopping-cart"></i>
+        <div class="column buttons has-text-right">
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon about-link"
+               data-tooltip="About Certification"
+               href="{% url 'about' certifyingorganisation.project.slug %}">
+                <i class="fas fa-info-circle"></i>
             </a>
-            {% if certifyingorganisation.organisation_credits <= 0 %}
-            <div class="insufficient-credit">Your credits is insufficient to issue more certificates, please top up.</div>
+            {% if certifyingorganisation.approved %}
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
+               href='{% url "feed-training-center" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
+               data-tooltip="GeoJSON Feed for List of Training Center">
+                <i class="fas fa-rss-square"></i>
+            </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
+               href='{% url "feed-upcoming-course" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
+               data-tooltip="Feed for List of Upcoming Courses">
+                <i class="fas fa-rss"></i>
+            </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
+               href='{% url "feed-past-course" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
+               data-tooltip="Feed for List of Past Courses">
+                <i class="fas fa-rss"></i>
+            </a>
             {% endif %}
-            <h4 class="panel-heading">Credits
-            </h4>
-            {% if certifyingorganisation.organisation_credits >= certifyingorganisation.project.certificate_credit %}
-            <h3 class="panel-body tooltip-toggle"
-                data-title="Available credits to issue certificate"
-                data-placement="left"
-            >{{ certifyingorganisation.organisation_credits }}
-            </h3>
-            {% else %}
-            <h3 class="panel-body tooltip-toggle"
-                data-title="Your credits is insufficient to issue more certificates, please top up"
-                data-placement="left"
-                style="color: indianred; "
-            >{{ certifyingorganisation.organisation_credits }}
-            </h3>
+            {% if user_can_delete %}
+                <a class="button is-danger has-tooltip-arrow has-tooltip-bottom icon"
+                   href='{% url "certifyingorganisation-delete" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
+                   data-tooltip="Delete {{ certifyingorganisation.name }}">
+                    <i class="fas fa-minus"></i>
+                </a>
+                <a class="button is-info has-tooltip-arrow has-tooltip-bottom icon"
+                   href='{% url "certifyingorganisation-update" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
+                   data-tooltip="Edit {{ certifyingorganisation.name }}">
+                    <i class="fas fa-pencil-alt"></i>
+                </a>
             {% endif %}
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
+               href='{% if certifyingorganisation.approved %}
+                        {% url "certifyingorganisation-list" certifyingorganisation.project.slug %}
+                      {% else %}
+                        {% url "pending-certifyingorganisation-list" certifyingorganisation.project.slug %}?ready={% if certifyingorganisation.status.name == 'Pending' %}false{% else %}true{% endif %}
+                      {% endif %}'
+               data-tooltip="Back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
         </div>
-        {% endif %}
-
-        <div class="col-lg-12">
-            <h4 class="panel-heading" style="padding-left:0; padding-right: 0">
-                Training Centers</h4>
-            <h3 class="panel-body">{{ num_trainingcenter }}</h3>
-        </div>
-
-        <div class="col-lg-12">
-            <h4 class="panel-heading">Attendees</h4>
-            <h3 class="panel-body">{{ num_attendees }}</h3>
-        </div>
-
     </div>
-    {% else %}
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <div class="org-status">
-                <div class="content-container">
-                    <div class="title">Status</div>
-                    <div class="content">{% if certifyingorganisation.status %}{{ certifyingorganisation.status }}{% else %}-{% endif %}</div>
+
+    <div class="columns">
+        <div class="column is-half">
+            <div class="content">
+                <p><strong>Organisation name:</strong> {{ certifyingorganisation.name }}</p>
+                <p><strong>Address:</strong> {{ certifyingorganisation.address }}</p>
+                <p><strong>Country:</strong> {{ certifyingorganisation.country.name }}</p>
+                <p><strong>Email:</strong> {{ certifyingorganisation.organisation_email }}</p>
+                <p><strong>Phone:</strong> {{ certifyingorganisation.organisation_phone }}</p>
+                <p><strong>Organisation owners:</strong>
+                    {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
+                        {% if organisation_owners.first_name %}
+                            {{ organisation_owners.first_name }} {{ organisation_owners.last_name }}{{ ", " }}
+                        {% else %}
+                            {{ organisation_owners }}{{ ", " }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Organisation URL:</strong>
+                    {% if certifyingorganisation.url %}
+                        <a href='{{ certifyingorganisation.url }}'>{{ certifyingorganisation.url }}</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </p>
+                <hr/>
+                <div>
+                    {% for question in submitted_checklist %}
+                        {% if question.checklist_target == 'organization_owner' %}
+                            <p>{{ question.checklist_question }}:
+                                {% if question.checked %}
+                                    <i class="fas fa-check-circle has-text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle has-text-danger"></i>
+                                {% endif %}
+                            </p>
+                            {% if question.text_box_content %}
+                                <p>{{ question.text_box_content | base_markdown }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                <div class="content-container">
-                    <div class="title">Remarks</div>
-                    <div class="content">{% if certifyingorganisation.remarks %}{{ certifyingorganisation.remarks }}{% else %}-{% endif %}</div>
-                </div>
-                <div class="content-container">
-                    <div class="title">External Reviewers</div>
-                    <div class="content">
-                        <ul id="list-external-reviewer">
-                            {% for external_reviewer in external_reviewers %}
-                                <li>{% if external_reviewer.name %}<strong>{{ external_reviewer.name }}</strong> - {% endif %}{{ external_reviewer.email }}</li>
-                            {% endfor %}
-                        </ul>
+            </div>
+        </div>
+        {% if certifyingorganisation.approved %}
+            <div class="column is-half">
+
+                {% if user_can_create %}
+                <div class="card mb-5">
+                    <header class="card-header">
+                        <p class="card-header-title mb-0">
+                            Credits
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <div>
+                                {% if certifyingorganisation.organisation_credits >= certifyingorganisation.project.certificate_credit %}
+                                    <h3 class="has-tooltip-multiline has-tooltip-arrow has-text-centered" data-tooltip="Available credits to issue certificate">
+                                        {{ certifyingorganisation.organisation_credits }}
+                                    </h3>
+                                {% else %}
+                                    <h3 class="has-tooltip-multiline has-tooltip-arrow has-text-centered" data-tooltip="Your credits are insufficient to issue more certificates, please top up" style="color: indianred;">
+                                        {{ certifyingorganisation.organisation_credits }}
+                                    </h3>
+                                {% endif %}
+                            </div>
+                            {% if certifyingorganisation.organisation_credits <= 0 %}
+                                <div class="notification is-danger is-light">Your credits are insufficient to issue more certificates, please top up.</div>
+                            {% endif %}
+                            <a href="{% url "top-up" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}" class="button is-success is-flex is-align-items-center">
+                                <span>Top up credits</span>
+                                <span class="icon is-small">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </span>
+                            </a>
+                        </div>
                     </div>
+                </div>
+                {% endif %}
+
+                <div class="card mb-5">
+                    <header class="card-header">
+                        <p class="card-header-title mb-0">
+                            Training Centers
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <h3 class="has-text-centered">{{ num_trainingcenter }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-5">
+                    <header class="card-header">
+                        <p class="card-header-title mb-0">
+                            Attendees
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <h3 class="has-text-centered">{{ num_attendees }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        {% else %}
+            <div class="column is-half">
+                <div class="card mb-5">
+                <header class="card-header">
+                    <p class="card-header-title mb-0">Status</p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                    {% if certifyingorganisation.status %}{{ certifyingorganisation.status }}{% else %}-{% endif %}
+                    </div>
+                </div>
+                </div>
+                <div class="card mb-5">
+                <header class="card-header">
+                    <p class="card-header-title mb-0">Remarks</p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                    {% if certifyingorganisation.remarks %}{{ certifyingorganisation.remarks }}{% else %}-{% endif %}
+                    </div>
+                </div>
+                </div>
+                <div class="card mb-5">
+                <header class="card-header">
+                    <p class="card-header-title mb-0">External Reviewers</p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                    <ul id="list-external-reviewer">
+                        {% for external_reviewer in external_reviewers %}
+                        <li>{% if external_reviewer.name %}<strong>{{ external_reviewer.name }}</strong> - {% endif %}{{ external_reviewer.email }}</li>
+                        {% endfor %}
+                    </ul>
+                    </div>
+                </div>
                 </div>
                 {% if user_can_update_status %}
-                    <a class="btn btn-default {% if checked_checklist == available_checklist|length %}btn-success{% else %}btn-warning{% endif %} btn-checklist-form">
-                        <i class="fa fa-list" aria-hidden="true"></i> {{ checked_checklist }}/{{ available_checklist|length }} Checklist</a>
+                <div class="buttons">
+                    <a class="button {% if checked_checklist == available_checklist|length %}is-success is-light{% else %}is-warning{% endif %} btn-checklist-form">
+                        <span class="icon">
+                            <i class="fa fa-list" aria-hidden="true"></i>
+                        </span>
+                        <span>{{ checked_checklist }}/{{ available_checklist|length }} Checklist</span>
+                    </a>
                     {% if 'approved' not in available_status %}
-                    <a class="btn btn-success btn-mini btn-approved tooltip-toggle"
-                       href='{% url "certifyingorganisation-approve" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
-                       data-title="Approve {{ certifyingorganisation.name }}">
-                        <span class="glyphicon glyphicon-thumbs-up"></span> Approve
+                    <a class="button is-success btn-mini btn-approved has-tooltip-arrow has-tooltip-bottom"
+                    href='{% url "certifyingorganisation-approve" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
+                    data-tooltip="Approve {{ certifyingorganisation.name }}">
+                        <span class="icon">
+                            <i class="fas fa-thumbs-up"></i>
+                        </span>
+                        <span>Approve</span>
                     </a>
                     {% endif %}
                     {% if 'rejected' not in available_status %}
-                    <a class="btn btn-danger btn-mini tooltip-toggle btn-reject"
-                       organisation_name="{{ certifyingorganisation.name }}"
-                       organisation_country="{{ certifyingorganisation.country.name }}"
-                       organisation_slug="{{ certifyingorganisation.slug }}"
-                       organisation_project_slug="{{ certifyingorganisation.project.slug }}"
-                       data-title="Reject {{ certifyingorganisation.name }}">
-                        <span class="glyphicon glyphicon-thumbs-down"></span> Reject
+                    <a class="button is-danger btn-mini has-tooltip-arrow has-tooltip-bottom btn-reject"
+                    organisation_name="{{ certifyingorganisation.name }}"
+                    organisation_country="{{ certifyingorganisation.country.name }}"
+                    organisation_slug="{{ certifyingorganisation.slug }}"
+                    organisation_project_slug="{{ certifyingorganisation.project.slug }}"
+                    data-tooltip="Reject {{ certifyingorganisation.name }}">
+                        <span class="icon">
+                            <i class="fas fa-thumbs-down"></i>
+                        </span>
+                        <span>Reject</span>
                     </a>
                     {% endif %}
-                    <a class="btn btn-default btn-mini btn-update-status tooltip-toggle"
-                        href='#'
-                        organisation_name="{{ certifyingorganisation.name }}"
-                        organisation_country="{{ certifyingorganisation.country.name }}"
-                        organisation_slug="{{ certifyingorganisation.slug }}"
-                        organisation_project_slug="{{ certifyingorganisation.project.slug }}"
-                        organisation_status="{{ certifyingorganisation.status.id }}"
-                        organisation_remarks="{{ certifyingorganisation.remarks }}"
-                        data-title="Update {{ certifyingorganisation.name }}">
-                            Update status
+                    <a class="button btn-mini btn-update-status has-tooltip-arrow has-tooltip-bottom"
+                    href='#'
+                    organisation_name="{{ certifyingorganisation.name }}"
+                    organisation_country="{{ certifyingorganisation.country.name }}"
+                    organisation_slug="{{ certifyingorganisation.slug }}"
+                    organisation_project_slug="{{ certifyingorganisation.project.slug }}"
+                    organisation_status="{{ certifyingorganisation.status.id }}"
+                    organisation_remarks="{{ certifyingorganisation.remarks }}"
+                    data-tooltip="Update {{ certifyingorganisation.name }}">
+                        Update status
                     </a>
+                </div>
                 {% endif %}
                 {% if user_can_invite_external_reviewer %}
-                     <a class="btn btn-default btn-mini btn-invite tooltip-toggle"
-                        href='#'
-                        data-org-slug="{{ certifyingorganisation.project.slug }}"
-                        data-title="Invite External Reviewer">
-                            Invite External Reviewer
-                    </a>
+                <a class="button btn-mini btn-invite has-tooltip-arrow has-tooltip-bottom"
+                href='#'
+                data-org-slug="{{ certifyingorganisation.project.slug }}"
+                data-tooltip="Invite External Reviewer">
+                    Invite External Reviewer
+                </a>
                 {% endif %}
-            </div>
-
-            <div class="timeline">
+                <div class="timeline">
                 <ul>
                     {% for history_data in history %}
                     <li>
-                        <div class="time">{{ history_data.history_date }}</div>
+                        <div class="has-text-weight-semibold">{{ history_data.history_date }}</div>
                         <p>
                         {% if history_data.history_change_reason %}
                             {{ history_data.history_change_reason }}
                         {% else %}
                             {% if history_data.history_type == '+' %}
-                                Created {% else %}
-                                Updated {% endif %} by {{ history_data.history_user }}
+                            Created {% else %}
+                            Updated {% endif %} by {{ history_data.history_user }}
                         {% endif %}
                         </p>
                     </li>
                     {% endfor %}
                 </ul>
+                </div>
             </div>
-
-        </div>
-    {% endif %}
+        {% endif %}
 
     </div>
 
     {% if certifyingorganisation.approved %}
     <div class="course-details">
-    <div class="menu-wrapper menu-wrapper-head">
-    <table>
-    <tr>
-        <th>
-        <h2 class="custom-heading">Courses</h2>
-        </th>
-
-        <td>
-        {% if user_can_create %}
-            <div class="button1 button-action" style="margin-top: -25px; margin-bottom: 20px;">
-            <div class="btn-group pull-right">
-            <a class="btn btn-default btn-sm tooltip-toggle"
-               href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'
-               data-title="Create New Course">
-                {% show_button_icon "add" %}
-            </a>
-            </div>
-            </div>
-        {% else %}
-            {% for courseconvener in courseconveners %}
-                {% if user == courseconvener.user %}
-                        <div class="button1 button-action" style="margin-top: -25px; margin-bottom: 20px;">
-                        <div class="btn-group pull-right">
-                            <a class="btn btn-default btn-sm tooltip-toggle"
-                                href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'
-                                data-title="Create New Course Convener">
-                                {% show_button_icon "add" %}
-                            </a>
-                        </div>
-                        </div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-        </td>
-    </tr>
-    </table>
-    </div>
-
-    <div class="menu-wrapper menu-wrapper-body" style="padding: 25px">
-    <tr><td>
-    {% if num_course == 0 %}
-    <div class="menu-details">
-    <table>
-    <tr><td>
-        <h5>No courses are defined, but you can <a
-            class="btn btn-default btn-mini"
-            href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'>create one</a>.</h5>
-    </td></tr>
-    </table>
-    </div>
-    {% else %}
-
-
-    <table class="course table-striped" style="width: 100%;">
-    <tr>
-        <th style="width: 25%">Course Name</th>
-        <th style="width: 20%">Date</th>
-        <th style="width: 15%">Training Center</th>
-        <th style="width: 10%;">Course Language</th>
-        <th style="width: 10%;">Course Convener</th>
-        <th class="button-action" style="width: 10%; text-align: right; padding-right: 0">Actions</th>
-
-    </tr>
-
-    {% for course in courses %}
-        <tr style="list-style-type: none; margin-left: 20px; margin-top: 10px;">
-        <td id="{{ course.id }}-{{ course.name }}">
-                {{ course.course_type.name }}
-        </td>
-        <td>
-            {{ course.start_date }} to {{ course.end_date }}
-        </td>
-        <td id="{{ course.id }}-{{ course.training_center.name }}">
-                {{ course.training_center.name }}
-        </td>
-        <td>
-            {{ course.language }}
-        </td>
-        <td id="{{ course.id }}-{{ course.course_convener.user }}">
-            {% if course.course_convener.user.first_name %}
-                {{ course.course_convener.user.first_name }} {{ course.course_convener.user.last_name }}
-            {% else %}
-                {{ course.course_convener.user }}
-            {% endif %}
-        </td>
-        {% if user_can_delete %}
-        <td style="padding-right: 0">
-             <div class="btn-group pull-right button-action">
-                <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                   href='{% url "course-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                   data-title="Delete">
-                    <span class="glyphicon glyphicon-minus"></span>
-                </a>
-                <a class="btn btn-default btn-xs tooltip-toggle"
-                   href='{% url "course-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                   data-title="Edit">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </a>
-                 <a class="btn btn-default btn-xs btn-view tooltip-toggle"
-                    href='{% url 'course-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                    data-title="View">
-                    <span class="glyphicon glyphicon-eye-open"></span>
-                </a>
-            </div>
-        </td>
-        {% elif user == course.course_convener.user %}
-            <td style="padding-right: 0">
-                <div class="btn-group pull-right button-action">
-                    <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                        href='{% url "course-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                        data-title="Delete">
-                        <span class="glyphicon glyphicon-minus"></span>
-                    </a>
-                    <a class="btn btn-default btn-xs tooltip-toggle"
-                        href='{% url "course-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                        data-title="Edit">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </a>
-                    <a class="btn btn-default btn-xs btn-view tooltip-toggle"
-                        href='{% url 'course-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                        data-title="View">
-                        <span class="glyphicon glyphicon-eye-open"></span>
-                    </a>
-                </div>
-            </td>
-        {% else %}
-            <td style="padding-right: 0">
-                <div class="btn-group pull-right button-action">
-                    <a class="btn btn-default btn-xs btn-view tooltip-toggle"
-                        href='{% url 'course-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
-                        data-title="View">
-                        <span class="glyphicon glyphicon-eye-open"></span>
-                    </a>
-                </div>
-            </td>
-        {% endif %}
-        </tr>
-    {%  endfor %}
-
-    </table>
-    {% endif %}
-    </div>
-    </div>
-
-    <div class="map-wrapper" style="horiz-align: center;">
-        <div id="map"></div>
-    </div>
-
-    <div class="panel-to-wrap col-md-4">
-    <div class="menu-wrapper menu-wrapper-head">
-    <table style="width: 100%;">
-
-    <tr style="margin-top: 0">
-    <th style="margin-top: 0;">
-        <h2 class="custom-heading">Training Centers</h2>
-    </th>
-        {% if user_can_create %}
-        <td>
-            <div class="button1 button-action" style="margin-top: -30px; margin-bottom: 20px;">
-            <div class="btn-group pull-right">
-            <a class="btn btn-default btn-sm tooltip-toggle"
-               href='{% url "trainingcenter-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
-               data-title="Create New Training Center">
-                {% show_button_icon "add" %}
-            </a>
-            </div>
-        </div>
-        </td>
-        {% endif %}
-    </tr>
-    </table>
-    </div>
-
-    <div class="menu-wrapper menu-wrapper-body">
-    <div class="menu-details">
-    <table>
-    <tr><td>
-    {% if num_trainingcenter == 0 %}
-        <h5>No training center are defined, but you can <a
-                    class="btn btn-default btn-mini"
-                    href='{% url "trainingcenter-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>register one</a>.</h5>
-    {% endif %}
-    </td></tr>
-
-    {% for trainingcenter in trainingcenters %}
-        <tr style="border-bottom: 1px solid #e9e9e9;">
-        <td class="list"><div class="col-lg-10">
-                <a href="{% url 'trainingcenter-detail' certifyingorganisation.project.slug certifyingorganisation.slug trainingcenter.slug %}">
-                    {{ trainingcenter.name }}</a>
-        </div></td>
-
-        <td class="button">
-        {% if user in certifyingorganisation.organisation_owners.all or user.is_staff or user == project.owner or user in certifyingorganisation.project.certification_manager.all %}
-        <div>
-            <div class="btn-group button-action">
-                <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                   href='{% url "trainingcenter-delete" project_slug=trainingcenter.certifying_organisation.project.slug organisation_slug=trainingcenter.certifying_organisation.slug slug=trainingcenter.slug %}'
-                   data-title="Delete {{ trainingcenter.name }}">
-                    <span class="glyphicon glyphicon-minus"></span>
-                </a>
-                <a class="btn btn-default btn-xs tooltip-toggle"
-                   href='{% url "trainingcenter-update" project_slug=trainingcenter.certifying_organisation.project.slug organisation_slug=trainingcenter.certifying_organisation.slug slug=trainingcenter.slug %}'
-                   data-title="Edit {{ trainingcenter.name }}">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </a>
-            </div>
-        </div>
-        {% endif %}
-        </td>
-        </tr>
-    {%  endfor %}
-    </table>
-    </div>
-    </div>
-    </div>
-
-    <div class="panel-to-wrap col-md-4">
-    <div class="menu-wrapper menu-wrapper-head">
-    <table style="width: 100%;">
-    <tr>
-        <th >
-        <h2 class="custom-heading">Course Types</h2>
-        </th>
-
-        <td>
-        {% if user_can_create %}
-        <div class="button1 button-action" style="margin-top: -30px; margin-bottom: 20px;">
-            <div class="btn-group pull-right">
-            <a class="btn btn-default btn-sm tooltip-toggle"
-               href='{% url 'coursetype-create' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
-               data-title="Create New Course Type">
-                {% show_button_icon "add" %}
-            </a>
-            </div>
-        </div>
-        {% endif %}
-        </td>
-    </tr>
-    </table>
-    </div>
-
-    <div class="menu-wrapper menu-wrapper-body">
-    <div class="menu-details">
-    <table>
-    <tr><td>
-    {% if num_coursetype == 0 %}
-        <h5>No course types are defined, but you can <a
-                    class="btn btn-default btn-mini"
-                    href='{% url 'coursetype-create' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>create one</a>.</h5>
-    {% endif %}
-    </td></tr>
-
-    {% for coursetype in coursetypes %}
-        <tr style="border-bottom: 1px solid #e9e9e9;">
-            <td class="list">
-                <a href="{% url 'coursetype-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}">
-                    {{ coursetype.name }}</a>
-            </td>
-
-            {% if user_can_delete %}
-                <td width="20%">
-                    <div class="btn-group pull-right button-action">
-                        <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                           href='{% url "coursetype-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
-                           data-title="Delete {{ coursetype.name }}">
-                            <span class="glyphicon glyphicon-minus"></span>
+        <div class="card mb-5">
+            <header class="card-header">
+                <p class="card-header-title mb-0">
+                    Courses
+                </p>
+                <div class="card-header-icon">
+                    {% if user_can_create %}
+                        <a class="button is-success"
+                           href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'
+                           title="Create New Course">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
                         </a>
-                        <a class="btn btn-default btn-xs tooltip-toggle"
-                           href='{% url "coursetype-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
-                           data-title="Edit {{ coursetype.name }}">
-                            <span class="glyphicon glyphicon-pencil"></span>
+                    {% else %}
+                        {% for courseconvener in courseconveners %}
+                            {% if user == courseconvener.user %}
+                                <a class="button is-success is-small"
+                                   href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'
+                                   title="Create New Course Convener">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    {% if num_course == 0 %}
+                        <div class="notification is-warning is-light">
+                            <p>No courses are defined, but you can <a class="button is-link is-small"
+                                href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'>create one</a>.</p>
+                        </div>
+                    {% else %}
+                        <table class="table is-hoverable is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Course Name</th>
+                                    <th>Date</th>
+                                    <th>Training Center</th>
+                                    <th>Course Language</th>
+                                    <th>Course Convener</th>
+                                    <th class="has-text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                    <tr>
+                                        <td>{{ course.course_type.name }}</td>
+                                        <td>{{ course.start_date }} to {{ course.end_date }}</td>
+                                        <td>{{ course.training_center.name }}</td>
+                                        <td>{{ course.language }}</td>
+                                        <td>
+                                            {% if course.course_convener.user.first_name %}
+                                                {{ course.course_convener.user.first_name }} {{ course.course_convener.user.last_name }}
+                                            {% else %}
+                                                {{ course.course_convener.user }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="has-text-right">
+                                            <div class="buttons are-small is-justify-content-flex-end">
+                                                {% if user_can_delete or user == course.course_convener.user %}
+                                                    <a class="button is-danger is-light"
+                                                       href='{% url "course-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
+                                                       title="Delete">
+                                                        <span class="icon is-small">
+                                                            <i class="fas fa-minus"></i>
+                                                        </span>
+                                                    </a>
+                                                    <a class="button is-light"
+                                                       href='{% url "course-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
+                                                       title="Edit">
+                                                        <span class="icon is-small">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </span>
+                                                    </a>
+                                                {% endif %}
+                                                <a class="button is-light"
+                                                   href='{% url 'course-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=course.slug %}'
+                                                   title="View">
+                                                    <span class="icon is-small">
+                                                        <i class="fas fa-eye"></i>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-5">
+            <header class="card-header">
+                <p class="card-header-title mb-0">
+                    Training Centers
+                </p>
+                <div class="card-header-icon">
+                    {% if user_can_create %}
+                        <a class="button is-success"
+                           href='{% url "trainingcenter-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
+                           title="Create New Training Center">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
                         </a>
+                    {% endif %}
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="map-wrapper" style="horiz-align: center;">
+                        <div id="map"></div>
                     </div>
-                </td>
-            {% endif %}
-        </tr>
-    {%  endfor %}
-    </table>
-    </div>
-    </div>
-    </div>
-
-    <div class="panel-to-wrap col-md-4">
-    <div class="menu-wrapper menu-wrapper-head">
-    <table>
-    <tr>
-    <th>
-        <h2 class="custom-heading">Course Conveners</h2>
-    </th>
-    <td>
-        {% if user_can_create %}
-        <div class="button1 button-action" style="margin-top: -30px; margin-bottom: 20px">
-            <div class="btn-group pull-right">
-            <a class="btn btn-default btn-sm tooltip-toggle"
-               href='{% url "courseconvener-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
-               data-title="Create New Course Convener">
-                {% show_button_icon "add" %}
-            </a>
+                    {% if num_trainingcenter == 0 %}
+                        <div class="notification is-warning">
+                            <p>No training centers are defined, but you can <a class="button is-link is-small"
+                                href='{% url "trainingcenter-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>register one</a>.</p>
+                        </div>
+                    {% else %}
+                        <table class="table is-fullwidth">
+                            {% for trainingcenter in trainingcenters %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'trainingcenter-detail' certifyingorganisation.project.slug certifyingorganisation.slug trainingcenter.slug %}">
+                                            {{ trainingcenter.name }}
+                                        </a>
+                                    </td>
+                                    <td class="has-text-right">
+                                        {% if user in certifyingorganisation.organisation_owners.all or user.is_staff or user == project.owner or user in certifyingorganisation.project.certification_manager.all %}
+                                            <div class="buttons are-small is-justify-content-flex-end">
+                                                <a class="button is-danger is-light"
+                                                   href='{% url "trainingcenter-delete" project_slug=trainingcenter.certifying_organisation.project.slug organisation_slug=trainingcenter.certifying_organisation.slug slug=trainingcenter.slug %}'
+                                                   title="Delete {{ trainingcenter.name }}">
+                                                    <span class="icon is-small">
+                                                        <i class="fas fa-minus"></i>
+                                                    </span>
+                                                </a>
+                                                <a class="button is-light"
+                                                   href='{% url "trainingcenter-update" project_slug=trainingcenter.certifying_organisation.project.slug organisation_slug=trainingcenter.certifying_organisation.slug slug=trainingcenter.slug %}'
+                                                   title="Edit {{ trainingcenter.name }}">
+                                                    <span class="icon is-small">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% endif %}
-    </td>
-    </tr>
-    </table>
-    </div>
 
-    <div class="menu-wrapper menu-wrapper-body">
-    <div class="menu-details">
-    <table>
-    <tr><td>
-    {% if num_courseconvener == 0 %}
-        <h5>No course convener are defined, but you can <a
-                    class="btn btn-default btn-mini"
-                    href='{% url "courseconvener-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>register one</a>.</h5>
-    {% endif %}
-    </td></tr>
+        <div class="card mb-5">
+            <header class="card-header">
+                <p class="card-header-title mb-0">
+                    Course Types
+                </p>
+                <div class="card-header-icon">
+                    {% if user_can_create %}
+                        <a class="button is-success"
+                           href='{% url 'coursetype-create' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
+                           title="Create New Course Type">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                        </a>
+                    {% endif %}
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    {% if num_coursetype == 0 %}
+                        <div class="notification is-warning">
+                            <p>No course types are defined, but you can <a class="button is-link is-small"
+                                href='{% url 'coursetype-create' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>create one</a>.</p>
+                        </div>
+                    {% else %}
+                        <table class="table is-fullwidth">
+                            {% for coursetype in coursetypes %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'coursetype-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}">
+                                            {{ coursetype.name }}
+                                        </a>
+                                    </td>
+                                    <td class="has-text-right">
+                                        {% if user_can_delete %}
+                                            <div class="buttons are-small is-justify-content-flex-end">
+                                                <a class="button is-danger is-light"
+                                                   href='{% url "coursetype-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
+                                                   title="Delete {{ coursetype.name }}">
+                                                    <span class="icon is-small">
+                                                        <i class="fas fa-minus"></i>
+                                                    </span>
+                                                </a>
+                                                <a class="button is-light"
+                                                   href='{% url "coursetype-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
+                                                   title="Edit {{ coursetype.name }}">
+                                                    <span class="icon is-small">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-    {% for courseconvener in courseconveners %}
-      {% include 'certifying_organisation/includes/convenor_list.html' %}
-    {%  endfor %}
-    </table>
-    </div>
-    </div>
+        <div class="card mb-5">
+            <header class="card-header">
+                <p class="card-header-title mb-0">
+                    Course Conveners
+                </p>
+                <div class="card-header-icon">
+                    {% if user_can_create %}
+                        <a class="button is-success"
+                           href='{% url "courseconvener-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
+                           title="Create New Course Convener">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                        </a>
+                    {% endif %}
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    {% if num_courseconvener == 0 %}
+                        <div class="notification is-warning">
+                            <p>No course conveners are defined, but you can <a class="button is-link is-small"
+                                href='{% url "courseconvener-create" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'>register one</a>.</p>
+                        </div>
+                    {% else %}
+                        <table class="table is-fullwidth">
+                            {% for courseconvener in courseconveners %}
+                                {% include 'certifying_organisation/includes/convenor_list.html' %}
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
 
