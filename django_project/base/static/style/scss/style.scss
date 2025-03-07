@@ -256,9 +256,9 @@ a.is-active > span {
 }
 
 .login-container {
-  background: #002033c2;
   border-radius: 20px;
   border: #ffffff1c solid;
+  backdrop-filter: blur(8px);
 }
 
 .login-container hr {

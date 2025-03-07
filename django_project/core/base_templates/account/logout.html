@@ -12,16 +12,21 @@
             {% csrf_token %}
             <div class="container">
 
-                <div class="custom-form-container">
+                <div class="notification is-light">
                     <p>{% trans 'Are you sure you want to log out?' %}</p>
                     <form class="logout" method="POST" action="{% url 'account_logout' %}">{% csrf_token %}
                         {% if redirect_field_value %}
                             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                         {% endif %}
-                        <button class="login custom-form-submit" type="submit">{% trans "Log Out" %}</button>
+                        <button class="button is-danger" type="submit">
+                            <span class="icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <span>{% trans "Log Out" %}</span>
+                        </button>
                     </form>
                 </div>
             </div> <!-- /container -->
-            </div>
         {% endblock %}
+    </div>
 {% endblock %}

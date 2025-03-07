@@ -81,48 +81,7 @@
                     {% endif %}
 
                     <form class="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
-                        <div class="field">
-                            <div class="control has-icons-left">
-                            <input
-                            class="input is-medium"
-                            type="text"
-                            placeholder="Username or e-mail"
-                            autofocus=""
-                            id="id_login"
-                            name="login"
-                            />
-                            <span class="icon is-left">
-                            <i class="fas fa-user"></i>
-                            </span>
-                        </div>
-                        </div>
-        
-                        <div class="field">
-                        <div class="control has-icons-left">
-                            <input
-                            class="input is-medium"
-                            type="password"
-                            placeholder="Password"
-                            id="id_password"
-                            name="password"
-                            />
-                            <span class="icon is-left">
-                            <i class="fas fa-lock"></i>
-                            </span>
-                        </div>
-                        </div>
-                        <div class="field">
-                            <div class="control is-flex is-align-items-center">
-                                <!-- Rounded switch -->
-                                <label class="switch">
-                                  <input type="checkbox" name="remember" id="id_remember">
-                                  <span class="slider round"></span>
-                                </label>
-                                <span class="ml-2 is-size-5">
-                                  {% trans "Remember me" %}
-                                </span>
-                            </div>
-                        </div>
+                        {% include "account/form_snippet.html" with form=form %}
         
                         {% if form.errors or form.non_field_errors %}
                         <div class="notification is-danger is-light">
