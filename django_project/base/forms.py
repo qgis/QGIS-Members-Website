@@ -192,7 +192,7 @@ class ProjectForm(forms.ModelForm):
             lambda obj: "%s <%s>" % (obj.get_full_name(), obj)
         self.fields['project_representative'].label_from_instance = \
             lambda obj: "%s <%s>" % (obj.get_full_name(), obj)
-        # self.helper.add_input(Submit('submit', 'Submit'))
+        # self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
         self.fields['is_lessons'].label = 'Enable Lessons'
         self.fields['is_sustaining_members'].label = \
             'Enable Sustaining Members'
@@ -275,7 +275,7 @@ class RegisterDomainForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(RegisterDomainForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(RegisterDomainForm, self).save(commit=False)
@@ -308,7 +308,7 @@ class OrganisationForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(OrganisationForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(OrganisationForm, self).save(commit=False)
@@ -332,7 +332,7 @@ class UserForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
-        form_title = 'Update User Profile'
+        form_title = '<h1>Update User Profile</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -346,7 +346,7 @@ class UserForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(UserForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
 
 class ProjectFlatpageForm(FlatpageForm):

@@ -47,7 +47,7 @@ class SpecificationForm(TranslationModelForm):
 
         super(SpecificationForm, self).__init__(*args, **kwargs)
 
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(SpecificationForm, self).save(commit=False)

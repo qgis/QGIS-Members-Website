@@ -213,7 +213,7 @@ class CourseTypeForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(CourseTypeForm, self).save(commit=False)
@@ -259,7 +259,7 @@ class CourseConvenerForm(forms.ModelForm):
         super(CourseConvenerForm, self).__init__(*args, **kwargs)
         self.fields['user'].label_from_instance = \
             lambda obj: "%s < %s >" % (obj.get_full_name(), obj)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(CourseConvenerForm, self).save(commit=False)
@@ -358,7 +358,7 @@ class TrainingCenterForm(geoforms.ModelForm):
                         lon = data['properties']['LON']
         point = Point(x=lon, y=lat, srid=4326)
         self.fields['location'].initial = point
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(TrainingCenterForm, self).save(commit=False)
@@ -425,7 +425,7 @@ class CourseForm(forms.ModelForm):
         self.fields['certifying_organisation'].initial = \
             self.certifying_organisation
         self.fields['certifying_organisation'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
         self.fields['certificate_type'].queryset = \
             CertificateType.objects.filter(
                 projectcertificatetype__project=
