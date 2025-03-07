@@ -1,6 +1,7 @@
 @charset "utf-8";
 @import "custom.bulma.scss";
 @import "sustaining_members.scss";
+@import "toogle-switch.scss";
 @import "../../../../node_modules/@creativebulma/bulma-tooltip/src/sass/index.sass";
 
 body {
@@ -228,6 +229,10 @@ p {
   .content > .columns .content {
     width: 100%;
   }
+  .login-container {
+    max-width: 100%;
+    min-width: 40dvw;
+  }
 }
 
 @media screen and (min-width: 1024px) {
@@ -241,6 +246,9 @@ p {
   .container {
     max-width: unset;
   }
+  .login-container {
+    width: 600px !important;
+  }
 }
 
 a.is-active > span {
@@ -248,16 +256,17 @@ a.is-active > span {
 }
 
 .login-container {
-  max-width: 100%;
-  min-width: 40dvw;
+  background: #002033c2;
+  border-radius: 20px;
+  border: #ffffff1c solid;
 }
 
 .login-container hr {
-  background-color: #dddddd;
+  background-color: #ffffff5e;
 }
 
 .box-container hr {
-  background-color: #dddddd;
+  background-color: #ffffff5e;
 }
 
 .box-container {

@@ -84,14 +84,14 @@
                         <div class="field">
                             <div class="control has-icons-left">
                             <input
-                            class="input is-large"
+                            class="input is-medium"
                             type="text"
                             placeholder="Username or e-mail"
                             autofocus=""
                             id="id_login"
                             name="login"
                             />
-                            <span class="icon is-small is-left">
+                            <span class="icon is-left">
                             <i class="fas fa-user"></i>
                             </span>
                         </div>
@@ -100,23 +100,27 @@
                         <div class="field">
                         <div class="control has-icons-left">
                             <input
-                            class="input is-large"
+                            class="input is-medium"
                             type="password"
                             placeholder="Password"
                             id="id_password"
                             name="password"
                             />
-                            <span class="icon is-small is-left">
+                            <span class="icon is-left">
                             <i class="fas fa-lock"></i>
                             </span>
                         </div>
                         </div>
                         <div class="field">
-                            <div class="control">
-                                <label class="checkbox has-text-success has-text-weight-normal">
-                                    <input type="checkbox" name="remember" id="id_remember">
-                                    {% trans "Remember me" %}
+                            <div class="control is-flex is-align-items-center">
+                                <!-- Rounded switch -->
+                                <label class="switch">
+                                  <input type="checkbox" name="remember" id="id_remember">
+                                  <span class="slider round"></span>
                                 </label>
+                                <span class="ml-2 is-size-5">
+                                  {% trans "Remember me" %}
+                                </span>
                             </div>
                         </div>
         
@@ -133,11 +137,11 @@
                         {% if redirect_field_value %}
                             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                         {% endif %}
-                        <button class="button is-success is-large is-fullwidth" type="submit" id="submit-button">
+                        <button class="button is-success is-medium is-fullwidth mt-5" type="submit" id="submit-button">
+                            <span>{% trans "Log In" %}</span>
                             <span class="icon">
                                 <i class="fa fa-sign-in" aria-hidden="true"></i>
                             </span>
-                            <span>{% trans "Log In" %}</span>
                         </button>
                     </form>
 
