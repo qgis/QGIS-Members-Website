@@ -18,16 +18,18 @@
       {% endif %}
     {% endif %}
 
-    <li>
-      <a href="{% url 'category-list' the_project.slug %}"> 
-      <i class="fas fa-tags mr-3"></i>
-      Categories
+    {% url 'category-list' the_project.slug as category_list_url %}
+    <li class="{% if request.path == category_list_url %}is-active{% endif %}">
+      <a href="{{ category_list_url }}">
+        <i class="fas fa-tags mr-3"></i>
+        Categories
       </a>
     </li>
-    <li>
-      <a href="{% url 'version-list' the_project.slug %}"> 
-      <i class="fas fa-code-branch mr-3"></i>
-      Versions
+    {% url 'version-list' the_project.slug as version_list_url %}
+    <li class="{% if request.path == version_list_url %}is-active{% endif %}">
+      <a href="{{ version_list_url }}">
+        <i class="fas fa-code-branch mr-3"></i>
+        Versions
       </a>
     </li>
 

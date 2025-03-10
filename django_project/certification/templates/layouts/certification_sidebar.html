@@ -1,29 +1,32 @@
 {% load static i18n %}
-
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
-    <li>
-      <a href="{% url 'about' the_project.slug %}">
+    {% url 'about' the_project.slug as about_url %}
+    <li class="{% if request.path == about_url %}is-active{% endif %}">
+      <a href="{{ about_url }}">
         <i class="fas fa-info-circle mr-3"></i>
         Learn about Certification
       </a>
     </li>
-    <li>
-      <a href="{% url 'certifyingorganisation-create' the_project.slug %}">
+    {% url 'certifyingorganisation-create' the_project.slug as create_url %}
+    <li class="{% if request.path == create_url %}is-active{% endif %}">
+      <a href="{{ create_url }}">
         <i class="fas fa-user-plus mr-3"></i>
         {% trans 'Sign Up for Certification!' %}
       </a>
     </li>
     {% if user.is_staff or user in the_project.certification_managers.all %}
-      <li>
-        <a href="{% url 'certification-management-view' the_project.slug %}">
+      {% url 'certification-management-view' the_project.slug as management_url %}
+      <li class="{% if request.path == management_url %}is-active{% endif %}">
+        <a href="{{ management_url }}">
           <i class="fas fa-tasks mr-3"></i>
           Certification Management
         </a>
       </li>
     {% endif %}
-    <li>
-      <a href="{% url 'certifyingorganisation-list' the_project.slug %}">
+    {% url 'certifyingorganisation-list' the_project.slug as organisation_list_url %}
+    <li class="{% if request.path == organisation_list_url %}is-active{% endif %}">
+      <a href="{{ organisation_list_url }}">
         <i class="fas fa-users mr-3"></i>
         Approved Organisations
       </a>
@@ -35,18 +38,19 @@
           Pending Organisations
         </a>
         <span onclick="toggleSubMenu('pending-organisations')" class="drop-arrow">
-          <img src="{% static "images/arrow.svg" %}"/>
+          <img src="{% static 'images/arrow.svg' %}"/>
         </span>
       </div>
       <ul id="pending-organisations" class="collapsed">
+        {% url 'pending-certifyingorganisation-list' the_project.slug as pending_url %}
         <li>
-          <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=False">
+          <a href="{{ pending_url }}?ready=False">
             <i class="fas fa-clock mr-3"></i>
             Not Ready
           </a>
         </li>
         <li>
-          <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=True">
+          <a href="{{ pending_url }}?ready=True">
             <i class="fas fa-check-circle mr-3"></i>
             Ready
           </a>
@@ -60,18 +64,20 @@
           Verify Certificates
         </a>
         <span onclick="toggleSubMenu('verify-certificates')" class="drop-arrow">
-          <img src="{% static "images/arrow.svg" %}"/>
+          <img src="{% static 'images/arrow.svg' %}"/>
         </span>
       </div>
       <ul id="verify-certificates" class="collapsed">
+        {% url 'validate-certificate-organisation' the_project.slug as validate_org_url %}
         <li>
-          <a href="{% url 'validate-certificate-organisation' the_project.slug %}">
+          <a href="{{ validate_org_url }}">
             <i class="fas fa-certificate mr-3"></i>
             For Certifying Organisation
           </a>
         </li>
+        {% url 'validate-certificate' the_project.slug as validate_url %}
         <li>
-          <a href="{% url 'validate-certificate' the_project.slug %}">
+          <a href="{{ validate_url }}">
             <i class="fas fa-certificate mr-3"></i>
             For Attendee
           </a>
