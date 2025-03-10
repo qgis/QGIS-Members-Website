@@ -1,88 +1,58 @@
 {% load static %}
 
-
-
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
     <li>
       <a href="{% url 'sponsor-programme' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-info-circle"></i>
-          </span>
-          <span>About the Programme</span>
-        </span>
+        <i class="fas fa-info-circle mr-3"></i>
+        About the Programme
       </a>
     </li>
     {% if user.is_authenticated %}
       {% if not is_sustaining_member %}
         <li>
           <a href="{% url 'sustaining-member-create' the_project.slug %}">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-user-plus"></i>
-              </span>
-              <span>Sign up</span>
-            </span>
+            <i class="fas fa-user-plus mr-3"></i>
+            Sign up
           </a>
         </li>
       {% else %}
         <li>
           <a href="{% url 'sustaining-membership' the_project.slug %}">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-user-check"></i>
-              </span>
-              <span>Membership</span>
-            </span>
+            <i class="fas fa-user-check mr-3"></i>
+            Membership
           </a>
         </li>
       {% endif %}
     {% endif %}
     <li>
       <a href="{% url 'sponsor-list' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-users"></i>
-          </span>
-          <span>Sustaining Members</span>
-        </span>
+        <i class="fas fa-users mr-3"></i>
+        Sustaining Members
       </a>
     </li>
     {% if user.is_authenticated %}
       <li>
         <a href="{% url 'sponsorshiplevel-list' the_project.slug %}">
-          <span class="icon-text">
-            <span class="icon">
-              <i class="fas fa-layer-group"></i>
-            </span>
-            <span>Sustaining Member Levels</span>
-          </span>
+          <i class="fas fa-layer-group mr-3"></i>
+          Sustaining Member Levels
         </a>
       </li>
       <li>
         <a href="{% url 'sponsorshipperiod-list' the_project.slug %}">
-          <span class="icon-text">
-            <span class="icon">
-              <i class="fas fa-calendar-alt"></i>
-            </span>
-            <span>Sustaining Member Periods</span>
-          </span>
+          <i class="fas fa-calendar-alt mr-3"></i>
+          Sustaining Member Periods
         </a>
       </li>
     {% endif %}
     <li>
       <a href="{% url 'sponsor-world-map' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-map"></i>
-          </span>
-          <span>Sustaining Members Map</span>
-        </span>
+        <i class="fas fa-map mr-3"></i>
+        Sustaining Members Map
       </a>
     </li>
   </ul>
-  </nav>
+</nav>
 
 <script>
   function rotateArrow(e) {

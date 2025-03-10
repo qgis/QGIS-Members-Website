@@ -4,86 +4,80 @@
   <ul class="content-wrapper">
     <li>
       <a href="{% url 'about' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-info-circle"></i>
-          </span>
-          <span>Learn about Certification</span>
-        </span>
+        <i class="fas fa-info-circle mr-3"></i>
+        Learn about Certification
       </a>
     </li>
     <li>
       <a href="{% url 'certifyingorganisation-create' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-user-plus"></i>
-          </span>
-          <span>{% trans 'Sign Up for Certification!' %}</span>
-        </span>
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'certifyingorganisation-list' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-users"></i>
-          </span>
-          <span>Approved Organisations</span>
-        </span>
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=False">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-clock"></i>
-          </span>
-          <span>Pending Organisations</span>
-        </span>
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=True">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-check-circle"></i>
-          </span>
-          <span>Pending Organisations - Ready</span>
-        </span>
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'validate-certificate-organisation' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-certificate"></i>
-          </span>
-          <span>Verify certificate for Certifying Organisation</span>
-        </span>
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'validate-certificate' the_project.slug %}">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-certificate"></i>
-          </span>
-          <span>Verify certificate for Attendee</span>
-        </span>
+        <i class="fas fa-user-plus mr-3"></i>
+        {% trans 'Sign Up for Certification!' %}
       </a>
     </li>
     {% if user.is_staff or user in the_project.certification_managers.all %}
       <li>
         <a href="{% url 'certification-management-view' the_project.slug %}">
-          <span class="icon-text">
-            <span class="icon">
-              <i class="fas fa-tasks"></i>
-            </span>
-            <span>Certification Management</span>
-          </span>
+          <i class="fas fa-tasks mr-3"></i>
+          Certification Management
         </a>
       </li>
     {% endif %}
+    <li>
+      <a href="{% url 'certifyingorganisation-list' the_project.slug %}">
+        <i class="fas fa-users mr-3"></i>
+        Approved Organisations
+      </a>
+    </li>
+    <li>
+      <div class="has-child">
+        <a onclick="toggleSubMenu('pending-organisations')">
+          <i class="fas fa-clock mr-3"></i>
+          Pending Organisations
+        </a>
+        <span onclick="toggleSubMenu('pending-organisations')" class="drop-arrow">
+          <img src="{% static "images/arrow.svg" %}"/>
+        </span>
+      </div>
+      <ul id="pending-organisations" class="collapsed">
+        <li>
+          <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=False">
+            <i class="fas fa-clock mr-3"></i>
+            Not Ready
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=True">
+            <i class="fas fa-check-circle mr-3"></i>
+            Ready
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <div class="has-child">
+        <a onclick="toggleSubMenu('verify-certificates')">
+          <i class="fas fa-certificate mr-3"></i>
+          Verify Certificates
+        </a>
+        <span onclick="toggleSubMenu('verify-certificates')" class="drop-arrow">
+          <img src="{% static "images/arrow.svg" %}"/>
+        </span>
+      </div>
+      <ul id="verify-certificates" class="collapsed">
+        <li>
+          <a href="{% url 'validate-certificate-organisation' the_project.slug %}">
+            <i class="fas fa-certificate mr-3"></i>
+            For Certifying Organisation
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'validate-certificate' the_project.slug %}">
+            <i class="fas fa-certificate mr-3"></i>
+            For Attendee
+          </a>
+        </li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
