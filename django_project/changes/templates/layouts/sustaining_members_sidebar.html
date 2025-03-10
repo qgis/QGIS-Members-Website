@@ -1,0 +1,109 @@
+{% load static %}
+
+
+
+<nav id="sidebar" class="sidebar">
+  <ul class="content-wrapper">
+    <li>
+      <a href="{% url 'sponsor-programme' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-info-circle"></i>
+          </span>
+          <span>About the Programme</span>
+        </span>
+      </a>
+    </li>
+    {% if user.is_authenticated %}
+      {% if not is_sustaining_member %}
+        <li>
+          <a href="{% url 'sustaining-member-create' the_project.slug %}">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-user-plus"></i>
+              </span>
+              <span>Sign up</span>
+            </span>
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url 'sustaining-membership' the_project.slug %}">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-user-check"></i>
+              </span>
+              <span>Membership</span>
+            </span>
+          </a>
+        </li>
+      {% endif %}
+    {% endif %}
+    <li>
+      <a href="{% url 'sponsor-list' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-users"></i>
+          </span>
+          <span>Sustaining Members</span>
+        </span>
+      </a>
+    </li>
+    {% if user.is_authenticated %}
+      <li>
+        <a href="{% url 'sponsorshiplevel-list' the_project.slug %}">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-layer-group"></i>
+            </span>
+            <span>Sustaining Member Levels</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'sponsorshipperiod-list' the_project.slug %}">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-calendar-alt"></i>
+            </span>
+            <span>Sustaining Member Periods</span>
+          </span>
+        </a>
+      </li>
+    {% endif %}
+    <li>
+      <a href="{% url 'sponsor-world-map' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-map"></i>
+          </span>
+          <span>Sustaining Members Map</span>
+        </span>
+      </a>
+    </li>
+  </ul>
+  </nav>
+
+<script>
+  function rotateArrow(e) {
+    e.previousElementSibling.querySelector('img').classList.toggle('rotated');
+  }
+
+  function toggleSubMenu(listId) {
+    console.log(listId)
+    let e = document.getElementById(listId);
+    e.classList.toggle('unfolded');
+    rotateArrow(e);
+  }
+
+  function toggleMenu() {
+    document.getElementById('sidebar').classList.toggle('visible');
+    document.getElementById('hamburger-btn').classList.toggle('open');
+  }
+  // expand active section
+  document.querySelectorAll('li.is-active,li:has(.is-active)').forEach(li => {
+    if (e = li.querySelector('ul')) {
+      e.classList.toggle('unfolded');
+    }
+  });
+</script>
