@@ -21,3 +21,8 @@ $('.sidebar-offcanvas').stick_in_parent({
     inner_scrolling: true,
     bottoming: false
 });
+
+
+function closeImageModal() {
+    $('#imagemodal').removeClass('is-active')
+}

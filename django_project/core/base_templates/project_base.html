@@ -124,19 +124,24 @@
     {% include 'layouts/footer.html' %}
 
 <!-- Creates the bootstrap modal where the thumbnaiul image will appear -->
-<div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" >
-        <div class="modal-content" >
-            <div class="modal-body" >
-                <a href="#" id="image-url" target="_blank">
-                    <img src="" id="imagepreview">
-                </a>
+<div class="modal" id="imagemodal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Image Preview</p>
+            <button class="delete" aria-label="close" onclick="closeImageModal();"></button>
+        </header>
+        <section class="modal-card-body">
+            <a href="#" id="image-url" target="_blank">
+                <img src="" id="imagepreview" style="max-width: 100%;">
+            </a>
+            <div class="notification is-primary3 is-light">
+                <p>Click the image to open original size image in new tab</p>
             </div>
-            Click the image to open original size image in new tab
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button" onclick="closeImageModal();">Close</button>
+        </footer>
     </div>
 </div>
 

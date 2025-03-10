@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/changes_base.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 
@@ -78,7 +78,7 @@
                     </td>
                     <td>
                         <div class="buttons is-pulled-right">
-                            <a class="button is-small is-light is-primary3"
+                            <a class="button is-small is-light"
                                 href='{% url "category-update" project_slug=category.project.slug slug=category.slug %}'>
                                 <span class="icon is-small">
                                     <i class="fas fa-pencil-alt"></i>

@@ -1,30 +1,70 @@
 {% load static %}
+
+
+
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
+    {% if user.is_authenticated %}
+      {% if user.is_staff or user == the_project.owner or user in the_project.changelog_managers.all %}
+        <li>
+          <a class="button is-success is-medium" href="{% url "version-create" the_project.slug %}">
+            <span class="icon">
+              <i class="fas fa-plus"></i>
+            </span>
+            <span>New Version</span>
+          </a>
+        </li>
+        <hr/>
+      {% endif %}
+    {% endif %}
+
     <li>
-      <div class="has-child">
-        <a onclick="toggleSubMenu('categories')">
-          <i class="fas fa-list mr-3"></i>
-          Categories
-        </a>
-        <span onclick="toggleSubMenu('categories')" class="drop-arrow">
-          <img src="{% static "images/arrow.svg" %}"/>
+      <a href="{% url 'category-list' the_project.slug %}"> 
+      <span class="icon-text">
+        <span class="icon">
+          <i class="fas fa-tags"></i>
         </span>
-      </div>
-      <ul id="categories" class="collapsed">
-        {% for row in version.categories %} 
-          {% if row.entries %}
-            <li class="has-child" data-category-id="{{ row.category.id }}">
-            <a href="#category-{{ row.category.id }}"> 
-              {{ row.category.name }} 
-            </a>
-          </li>
-          {% endif %}
-          {% endfor %}
-      </ul>
+        <span>Categories</span>
+      </span>
+      </a>
     </li>
-  </ul>
-</nav>
+    <li>
+      <a href="{% url 'version-list' the_project.slug %}"> 
+      <span class="icon-text">
+        <span class="icon">
+          <i class="fas fa-code-branch"></i>
+        </span>
+        <span>Versions</span>
+      </span>
+      </a>
+    </li>
+
+    {% if version %}
+      <li>
+        <div class="has-child">
+          <a onclick="toggleSubMenu('categories')">
+            <i class="fas fa-list mr-3"></i>
+            Categories for {{ project.name }} {{ version.name }}
+          </a>
+          <span onclick="toggleSubMenu('categories')" class="drop-arrow">
+            <img src="{% static "images/arrow.svg" %}"/>
+          </span>
+        </div>
+        <ul id="categories" class="collapsed unfolded">
+          {% for row in version.categories %} 
+            {% if row.entries %}
+              <li class="has-child" data-category-id="{{ row.category.id }}">
+              <a href="#category-{{ row.category.id }}"> 
+                {{ row.category.name }} 
+              </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+      </li>
+    {% endif %}
+    </ul>
+  </nav>
 
 <script>
   function rotateArrow(e) {
