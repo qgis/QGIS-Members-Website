@@ -1,0 +1,112 @@
+{% load static i18n %}
+
+<nav id="sidebar" class="sidebar">
+  <ul class="content-wrapper">
+    <li>
+      <a href="{% url 'about' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-info-circle"></i>
+          </span>
+          <span>Learn about Certification</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'certifyingorganisation-create' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-user-plus"></i>
+          </span>
+          <span>{% trans 'Sign Up for Certification!' %}</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'certifyingorganisation-list' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-users"></i>
+          </span>
+          <span>Approved Organisations</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=False">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-clock"></i>
+          </span>
+          <span>Pending Organisations</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'pending-certifyingorganisation-list' the_project.slug %}?ready=True">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-check-circle"></i>
+          </span>
+          <span>Pending Organisations - Ready</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'validate-certificate-organisation' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-certificate"></i>
+          </span>
+          <span>Verify certificate for Certifying Organisation</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'validate-certificate' the_project.slug %}">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fas fa-certificate"></i>
+          </span>
+          <span>Verify certificate for Attendee</span>
+        </span>
+      </a>
+    </li>
+    {% if user.is_staff or user in the_project.certification_managers.all %}
+      <li>
+        <a href="{% url 'certification-management-view' the_project.slug %}">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-tasks"></i>
+            </span>
+            <span>Certification Management</span>
+          </span>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+<script>
+  function rotateArrow(e) {
+    e.previousElementSibling.querySelector('img').classList.toggle('rotated');
+  }
+
+  function toggleSubMenu(listId) {
+    console.log(listId)
+    let e = document.getElementById(listId);
+    e.classList.toggle('unfolded');
+    rotateArrow(e);
+  }
+
+  function toggleMenu() {
+    document.getElementById('sidebar').classList.toggle('visible');
+    document.getElementById('hamburger-btn').classList.toggle('open');
+  }
+  // expand active section
+  document.querySelectorAll('li.is-active,li:has(.is-active)').forEach(li => {
+    if (e = li.querySelector('ul')) {
+      e.classList.toggle('unfolded');
+    }
+  });
+</script>
