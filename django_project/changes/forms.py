@@ -18,7 +18,7 @@ from .models import (
     SponsorshipLevel
 )
 from changes.utils.svgimagefile import SVGAndImageFormField
-
+from crispy_bulma.widgets import FileUploadInput
 
 class CategoryForm(forms.ModelForm):
 
@@ -83,7 +83,7 @@ class CategoryForm(forms.ModelForm):
 
 
 class VersionForm(forms.ModelForm):
-
+    image_file = forms.ImageField(widget=FileUploadInput)
     # noinspection PyClassicStyleClass
     class Meta:
         model = Version
@@ -147,6 +147,7 @@ class VersionForm(forms.ModelForm):
 class EntryForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass
+    image_file = forms.ImageField(widget=FileUploadInput)
     class Meta:
         model = Entry
         fields = (

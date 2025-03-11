@@ -24,9 +24,11 @@ from changes import (
     NOTICE_SUBSCRIPTION_CREATED
 )
 from helpers.notification import send_notification
-
+from crispy_bulma.widgets import FileUploadInput
 
 class SustainingMemberForm(forms.ModelForm):
+
+    logo = forms.ImageField(widget=FileUploadInput)
     class Meta:
         """Meta class."""
         model = Sponsor
