@@ -1,22 +1,9 @@
 {% extends 'project_base.html' %}
+{% load static %}
 
 {% block content %}
-    <div class="row text-center" style="margin-top: 20%;">
-        <h1 class="text-muted">404</h1>
-        <p class="lead">Sorry, but what you're looking for does not exist.</p>
-        <p class="lead text-muted">
-            This could be for any number of reasons, but most likely you followed a
-            broken link....
-        </p>
-        <p class="lead text-muted">
-            Here are the public projects you might be looking for:
-        </p>
-        <p class="lead text-muted">
-            {% for project in projects %}
-                <a href="{% url 'project-detail' slug=project.slug %}">
-                    {{ project.name }}
-                </a>{% if not forloop.last %} | {% endif %}
-            {% endfor %}
-        </p>
-    </div>
+    <img src="{% static "images/404.png" %}" alt="404 Page Not Found">
+    <h1 class="title">Uh-oh! You've hit a digital dead end</h1>
+    <p>It seems the page you were looking for has wandered off.</p>
+    <p>If you followed a link within this site, please file a ticket on <a href="https://github.com/qgis/QGIS-Website/issues">QGIS-Website project</a> and help us track down this elusive page.</p>
 {% endblock %}

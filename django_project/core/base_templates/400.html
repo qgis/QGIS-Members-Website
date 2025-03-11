@@ -1,14 +1,10 @@
 {% extends 'project_base.html' %}
 
+{% load static %}
+
 {% block content %}
-    <div class="row text-center" style="margin-top: 20%;">
-        <h1 class="text-muted">400</h1>
-        <p class="lead">Erm....</p>
-        <p class="lead text-muted">
-            It looks like you might be trying to do something you're not allowed to.
-            <br/>
-            If this is not the case, try logging in. If you are already logged in,
-            then you probably do not have permission. Sorry.
-        </p>
-    </div>
+    <img src="{% static "images/404.png" %}" alt="400 Bad Request">
+    <h1 class="title">Oops! Something went wrong with your request</h1>
+    <p>It looks like your request got a little tangled up.</p>
+    <p>If you think this is a mistake, please let us know by filing a ticket on the <a href="https://github.com/qgis/QGIS-Website/issues">QGIS-Website project</a>. We'll help you untangle it!</p>
 {% endblock %}

@@ -1,20 +1,10 @@
 {% extends 'project_base.html' %}
 
+{% load static %}
+
 {% block content %}
-    <div class="row text-center" style="margin-top: 20%;">
-        <h1 class="text-muted">500</h1>
-        <p class="lead">Ooops. Something broke....</p>
-        <p class="lead text-muted">
-            The powers that be have been informed.<br/>
-            In the meantime, please form an orderly queue and head to the
-            <a href="{% url 'project-list' %}">home page.</a>
-            {# Reference the sentry id too - see #}
-            {# http://raven.readthedocs.org/en/latest/integrations/ #}
-            {#  django.html#message-references #}
-            {% if request.sentry.id %}
-                <p>If you need assistance, you may reference this error as
-                    <strong>{{ request.sentry.id }}</strong>.</p>
-            {% endif %}
-        </p>
-    </div>
+    <img src="{% static "images/500.png" %}" alt="500 Internal Server Error">
+    <h1 class="title">Oops! Something went wrong on our end</h1>
+    <p>It looks like our server took a coffee break and forgot to come back.</p>
+    <p>Don't worry, we're on it! In the meantime, you can head back to the <a href="/">homepage</a> or file a ticket on our <a href="https://github.com/qgis/QGIS-Website/issues">QGIS-Website project</a> to let us know what happened.</p>
 {% endblock %}
