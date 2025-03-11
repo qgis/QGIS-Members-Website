@@ -114,123 +114,129 @@
         }
     </style>
 
-    <div class="page-header">
-        <h1 class="text-muted">{% trans 'Certification Manager Dashboard' %}</h1>
-    </div>
+    <h1 >{% trans 'Certification Manager Dashboard' %}</h1>
 
-
-    <div class="management-section">
-
+    <div class="card">
         <form action="{% url 'certificate-type-update' project_slug %}" method="post">
             {% csrf_token %}
-            <div class="management-section-header">
-                <p>{% trans 'Certification Type' %}</p>
-                <div class="section-header-buttons">
-                    <button class="submit btn btn-default"
-                       style="display:flex; width: fit-content"><span class="ui-icon ui-icon-check"></span> Save</button>
+            <header class="card-header">
+                <p class="card-header-title mb-0">{% trans 'Certification Type' %}</p>
+                <div class="card-header-icon">
+                    <button class="button is-small is-success">
+                        <span class="icon"><i class="fas fa-check"></i></span>
+                        <span>Save</span>
+                    </button>
                 </div>
-            </div>
-
-            <div class="management-section-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">Certificate Type</th>
-                        <th scope="col">Wording</th>
-                        <th scope="col">Apply</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for cer_type in certificate_types %}
-                        <tr {% if cer_type.id in certificate_types_applied %}style="background-color: #d7e5f0" {% endif %}>
-                            <td>{{ cer_type.name }}</td>
-                            <td>{{ cer_type.wording }}</td>
-                            <td>
-                                <input type="checkbox" name="certificate_types" value="{{ cer_type.name }}"
-                                       {% if cer_type.id in certificate_types_applied %}checked{% endif %}
-                                >
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <table class="table is-fullwidth is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Certificate Type' %}</th>
+                                <th>{% trans 'Wording' %}</th>
+                                <th>{% trans 'Apply' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cer_type in certificate_types %}
+                                <tr {% if cer_type.id in certificate_types_applied %}class="has-background-info-light"{% endif %}>
+                                    <td>{{ cer_type.name }}</td>
+                                    <td>{{ cer_type.wording }}</td>
+                                    <td>
+                                        <input type="checkbox" name="certificate_types" value="{{ cer_type.name }}"
+                                               {% if cer_type.id in certificate_types_applied %}checked{% endif %}>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </form>
     </div>
-
-    <div class="management-section">
-
-
-        <div class="management-section-header">
-            <p>Certification Checklist</p>
+    <div class="card mb-5">
+        <header class="card-header">
+            <p class="card-header-title mb-0">Certification Checklist</p>
             <div class="badge badge-success badge-updated">Updated</div>
-            <div class="section-header-buttons">
-                <a class="btn btn-default btn-mini tooltip-toggle" href="{% url "certificate-checklist-create" project_slug=project_slug %}"
-                   data-title="Add new question" data-original-title="" title="">
-                            <span class="glyphicon glyphicon-asterisk"></span>
+            <div class="card-header-icon">
+                <a class="button is-success is-small" href="{% url "certificate-checklist-create" project_slug=project_slug %}" title="Add new question">
+                    <span class="icon"><i class="fas fa-plus"></i></span>
+                    <span>New question</span>
                 </a>
             </div>
-        </div>
+        </header>
 
-        <div class="management-section-body">
-            <br/>
-            <h4>Reviewer</h4>
-            <div class="checklist-container checklist-sortable">
-                {% for checklist_row in checklist %}
-                    {% if checklist_row.approved and checklist_row.target == 'reviewer' %}
-                        <div class="row" id="checklist-{{ checklist_row.id }}">
-                            <div class="col-lg-1"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></div>
-                            <div class="col-lg-4">
-                                {{ checklist_row.question }}
-                                <span class="small help-text">{% if checklist_row.help_text %}{{ checklist_row.help_text }}{% endif %}</span>
+        <div class="card-content">
+            <div class="content">
+                <h4>Reviewer</h4>
+                <div class="checklist-container checklist-sortable">
+                    {% for checklist_row in checklist %}
+                        {% if checklist_row.approved and checklist_row.target == 'reviewer' %}
+                            <div class="columns is-vcentered" id="checklist-{{ checklist_row.id }}">
+                                <div class="column">
+                                    {{ checklist_row.question }}
+                                    <span class="help-text">{% if checklist_row.help_text %}{{ checklist_row.help_text }}{% endif %}</span>
+                                </div>
+                                <div class="column is-narrow">
+                                    {% if checklist_row.active %}
+                                        <button class="button is-warning is-small is-outlined" onclick="archive({{ checklist_row.id }}, this)">Archive</button>
+                                    {% else %}
+                                        <button class="button is-success is-small is-outlined" onclick="activate({{ checklist_row.id }}, this)">Activate</button>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="col-lg-4">{% if checklist_row.active %}
-                                <div class="btn btn-warning" onclick="archive({{ checklist_row.id }}, this)">Archive
-                                </div>{% else %}
-                                <div class="btn btn-success" onclick="activate({{ checklist_row.id }}, this)">Activate
-                                </div>{% endif %} </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <br/>
-            <h4>Organization Owner</h4>
-            <div class="checklist-container checklist-sortable">
-                {% for checklist_row in checklist %}
-                    {% if checklist_row.approved and checklist_row.target == 'organization_owner' %}
-                        <div class="row" id="checklist-{{ checklist_row.id }}">
-                            <div class="col-lg-1"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></div>
-                            <div class="col-lg-4">{{ checklist_row.question }}
-                                <span class="small help-text">{% if checklist_row.help_text %}{{ checklist_row.help_text }}{% endif %}</span>
+                            <hr/>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <br/>
+                <h4>Organization Owner</h4>
+                <div class="checklist-container checklist-sortable">
+                    {% for checklist_row in checklist %}
+                        {% if checklist_row.approved and checklist_row.target == 'organization_owner' %}
+                            <div class="columns is-vcentered" id="checklist-{{ checklist_row.id }}">
+                                <div class="column">
+                                    {{ checklist_row.question }}
+                                    <span class="help-text">{% if checklist_row.help_text %}{{ checklist_row.help_text }}{% endif %}</span>
+                                </div>
+                                <div class="column is-narrow">
+                                    {% if checklist_row.active %}
+                                        <button class="button is-warning is-small is-outlined" onclick="archive({{ checklist_row.id }}, this)">Archive</button>
+                                    {% else %}
+                                        <button class="button is-success is-small is-outlined" onclick="activate({{ checklist_row.id }}, this)">Activate</button>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="col-lg-4">{% if checklist_row.active %}
-                                <div class="btn btn-warning" onclick="archive({{ checklist_row.id }}, this)">Archive
-                                </div>{% else %}
-                                <div class="btn btn-success" onclick="activate({{ checklist_row.id }}, this)">Activate
-                                </div>{% endif %} </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                            <hr/>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="management-section">
-
+    <div class="card">
         <form action="{% url 'update-external-reviewer-text' project_slug %}" method="post">
             {% csrf_token %}
-            <div class="management-section-header">
-                <p>External Reviewer</p>
-                <div class="section-header-buttons">
-                    <button class="submit btn btn-default"
-                       style="display:flex; width: fit-content"><span class="ui-icon ui-icon-check"></span> Save</button>
+            <header class="card-header">
+                <p class="card-header-title mb-0">External Reviewer</p>
+                <div class="card-header-icon">
+                    <button class="button is-small is-success">
+                        <span class="icon"><i class="fas fa-check"></i></span>
+                        <span>Save</span>
+                    </button>
                 </div>
-            </div>
-
-            <div class="management-section-body">
-                <label for="exampleFormControlTextarea1">Invitation Email Text</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" name="text"
-                          rows="3">{{ external_reviewer_text }}</textarea>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="field">
+                        <label class="label" for="exampleFormControlTextarea1">Invitation Email Text</label>
+                        <div class="control">
+                            <textarea class="textarea" id="exampleFormControlTextarea1" name="text" rows="10">{{ external_reviewer_text }}</textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
