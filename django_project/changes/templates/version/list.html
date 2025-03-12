@@ -12,30 +12,32 @@
 {% endblock page_title %}
 
 {% block content %}
-    <div class="level">
-        <div class="level-left">
-            <h2 class="title is-4">
+    <div class="columns is-vcentered">
+        <div class="column">
+            <h1 class="title mb-0">
                 Versions
-            </h2>
+            </h1>
         </div>
-        <div class="level-right buttons">
-            {% if user.is_authenticated %}
-                {% if user.is_staff or user == the_project.owner or user in the_project.changelog_managers.all %}
-                    <a class="button is-success" href='{% url "version-create" project_slug %}' title="Create New Version">
+        <div class="column is-narrow">
+            <div class="buttons mb-0 mt-3">
+                {% if user.is_authenticated %}
+                    {% if user.is_staff or user == the_project.owner or user in the_project.changelog_managers.all %}
+                        <a class="button is-success" href='{% url "version-create" project_slug %}' title="Create New Version">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>New Version</span>
+                        </a>
+                    {% endif %}
+                {% endif %}
+                {% if versions %}
+                    <a class="button is-light" href='{% url "latest-version-atom-feed" project_slug %}' title="Atom Feed for Latest Version of {{ project.name }}">
                         <span class="icon">
-                            <i class="fas fa-plus"></i>
+                            <i class="fas fa-rss"></i>
                         </span>
-                        <span>New Version</span>
                     </a>
                 {% endif %}
-            {% endif %}
-            {% if versions %}
-                <a class="button is-light" href='{% url "latest-version-atom-feed" project_slug %}' title="Atom Feed for Latest Version of {{ project.name }}">
-                    <span class="icon">
-                        <i class="fas fa-rss"></i>
-                    </span>
-                </a>
-            {% endif %}
+            </div>
         </div>
     </div>
     {% if num_versions == 0 %}

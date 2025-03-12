@@ -12,11 +12,15 @@
 {% endblock page_title %}
 
 {% block content %}
-    <div class="page-header">
-        <h2 class="title is-4">
-            Categories
-            {% if user.is_authenticated %}
-                <div class="buttons is-pulled-right">
+    <div class="columns is-vcentered">
+        <div class="column">
+            <h1 class="mb-0">
+                Categories
+            </h1>
+        </div>
+        {% if user.is_authenticated %}
+            <div class="column is-narrow">
+                <div class="buttons mt-3 mb-0">
                     <a class="button is-success"
                        href='{% url "category-create" project_slug %}'
                        title="Create New Category">
@@ -41,8 +45,8 @@
                 <span id="order-not-saved" hidden class="notification is-danger is-light" style="font-size: 9pt; padding: 3px; font-style: italic;">
                     order not saved
                 </span>
-            {% endif %}
-        </h2>
+            </div>
+        {% endif %}
     </div>
 
     {% if num_categories == 0 %}
@@ -77,7 +81,7 @@
                         </a>
                     </td>
                     <td>
-                        <div class="buttons is-pulled-right">
+                        <div class="buttons is-justify-content-flex-end is-flex-wrap-nowrap">
                             <a class="button is-small is-light"
                                 href='{% url "category-update" project_slug=category.project.slug slug=category.slug %}'>
                                 <span class="icon is-small">

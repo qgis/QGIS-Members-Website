@@ -12,7 +12,7 @@
 
 {% block content %}
     <form action="" id="delete-confirmation" method="post">{% csrf_token %}
-        <div class="notification is-warning is-light">
+        <div class="notification is-danger is-light">
             <div class="columns">
                 <div class="column is-10">
                     <p class="is-size-5">Please confirm you wish to delete the category below!</p>
@@ -26,6 +26,7 @@
                             <span class="icon">
                                 <i class="fas fa-minus"></i>
                             </span>
+                            <span>Delete</span>
                         </a>
                         <a class="button is-light"
                            href='{% url "category-list" category.project.slug %}'
@@ -33,6 +34,7 @@
                             <span class="icon">
                                 <i class="fas fa-arrow-left"></i>
                             </span>
+                            <span>Cancel</span>
                         </a>
                     </div>
                 </div>
