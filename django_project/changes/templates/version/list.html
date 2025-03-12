@@ -45,10 +45,8 @@
             <h3>No versions are defined.</h3>
         </div>
     {% else %}
-        <div id="grid-view" class="columns is-multiline plugins-list-grid">
-            {% for version in versions %}
-                {% include 'version/includes/version-list-card.html' %}
-            {%  endfor %}
-        </div>
+        {% for version in versions %}
+            {% include 'version/includes/version-list-rich-item.html' %}
+        {%  endfor %}
     {%  endif %}
 {% endblock %}

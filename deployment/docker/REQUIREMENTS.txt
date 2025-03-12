@@ -18,7 +18,6 @@ django-crispy-forms~=2.1
 django-datatables-view~=1.20
 # youtube embed
 django-embed-video~=1.4
-easy-thumbnails~=2.8
 django-grappelli~=4.0
 # Update for Django 4, the original package is broken
 git+https://github.com/Xpirix/django-hashedfilenamestorage.git
@@ -55,5 +54,7 @@ sentry-sdk~=2.2
 setuptools~=75.1
 pyjwt~=2.8
 
+# New dependencies
 # Webpack
 django-webpack-loader~=3.1
+sorl-thumbnail~=12.11

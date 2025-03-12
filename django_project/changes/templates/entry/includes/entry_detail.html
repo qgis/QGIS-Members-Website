@@ -62,6 +62,7 @@
                 {% if not rst_download %}
                     <img id="{{ entry.image_file.url }}" class="image"
                          data-gifffer="{{ entry.image_file.url }}"
+                         src="{{ entry.image_file.url }}"
                          gifffer-alt=""/>
                     <a href="#" class="pop-gif">
                         Click here for bigger size animation.
@@ -76,7 +77,7 @@
             {% else %}
                 <a href="#" class="pop-image">
                     <img id="{{ entry.image_file.url }}" class="image"
-                         src="{{ entry.image_file|thumbnail_url:'large-entry' }}"
+                         src="{{ entry.image_file.url }}"
                          alt=""/>
                 </a>
             {% endif %}

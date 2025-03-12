@@ -115,7 +115,7 @@ class VersionForm(forms.ModelForm):
                 Field('name', css_class='form-control'),
                 Field('description', css_class='form-control'),
                 Field('image_file', css_class='form-control'),
-
+                Field('release_date', css_class='form-control'),
                 css_id='project-form')
         )
         self.helper.layout = layout
@@ -135,7 +135,7 @@ class VersionForm(forms.ModelForm):
             version = Version.objects.get(pk=instance.pk)
         except Version.DoesNotExist:
             version = None
-        if version:
+        if version and version.release_date:
             instance.release_date = version.release_date
         instance.author = self.user
         instance.project = self.project

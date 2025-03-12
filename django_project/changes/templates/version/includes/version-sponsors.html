@@ -12,7 +12,10 @@
                     <hr/>
                 {% endif %}
                 <h3 class="text-muted">
-                    <img src="{% thumbnail sponsorship_level.logo 50x50 %}"/> {{ sponsorship_level }}
+                    {% thumbnail sponsorship_level.logo "50x50" crop="center" as logo %}
+                        <img src="{{ logo.url }}" width="{{ logo.width }}" height="{{ logo.height }}" alt="{{ sponsorship_level }}">
+                    {% endthumbnail %}
+                    {{ sponsorship_level }}
                 </h3>
             </div>
 
@@ -23,14 +26,9 @@
                             <div class="thumbnail" style="height: 80px">
                                 {% if sponsor.logo %}
                                     <a href="{{ sponsor.sponsor_url }}">
-                                        <img
-                                            {% thumbnail sponsor.logo 150x50 as logo %}
-                                            {% if logo %}
-                                                src="{% thumbnail sponsor.logo 150x50 %}"
-                                            {% else %}
-                                                src="{{ sponsor.logo.url }}" width="150" height="50"
-                                            {% endif %}
-                                             alt="{{ sponsor }}" />
+                                        {% thumbnail sponsor.logo "150x50" crop="center" as logo %}
+                                            <img src="{{ logo.url }}" width="{{ logo.width }}" height="{{ logo.height }}" alt="{{ sponsor }}">
+                                        {% endthumbnail %}
                                     </a>
                                 {% endif %}
                                 <div class="caption">
@@ -49,14 +47,9 @@
                                         <div class="thumbnail">
                                             {% if sponsor.logo %}
                                                 <a href="{{ sponsor.sponsor_url }}">
-                                                    <img
-                                                        {% thumbnail sponsor.logo 150x50 as logo %}
-                                                        {% if logo %}
-                                                            src="{% thumbnail sponsor.logo 150x50 %}"
-                                                        {% else %}
-                                                            src="{{ sponsor.logo.url }}" width="150" height="50"
-                                                        {% endif %}
-                                                         alt="{{ sponsor }}" />
+                                                    {% thumbnail sponsor.logo "150x50" crop="center" as logo %}
+                                                        <img src="{{ logo.url }}" width="{{ logo.width }}" height="{{ logo.height }}" alt="{{ sponsor }}">
+                                                    {% endthumbnail %}
                                                 </a>
                                             {% endif %}
                                             <div class="caption">
@@ -74,9 +67,6 @@
                     </table>
                 {% endif %}
             </div>
-
-
-
         {% endfor %}
     </div>
 {% endif %}

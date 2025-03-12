@@ -15,7 +15,7 @@ INSTALLED_APPS += [
     'crispy_forms',
     'crispy_bulma',
     'widget_tweaks',  # lets us add some bootstrap css to form elements
-    'easy_thumbnails',
+    'sorl.thumbnail',  # for image thumbnails
     'reversion',
     'rosetta',
     'embed_video',
