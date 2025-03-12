@@ -300,6 +300,7 @@ class SponsorForm(forms.ModelForm):
 
 class SponsorshipLevelForm(forms.ModelForm):
 
+    logo = forms.ImageField(widget=FileUploadInput)
     # noinspection PyClassicStyleClass
     class Meta:
         model = SponsorshipLevel
