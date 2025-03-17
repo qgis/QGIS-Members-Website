@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/changes_base.html" %}
 {% load custom_markup %}
 
 {% block title %}Entries - {{ block.super }}{% endblock %}
@@ -7,42 +7,50 @@
 {% endblock %}
 
 {% block page_title %}
-    <h1>Entries (all)</h1>
+    <h1 class="title">Entries (all)</h1>
 {% endblock page_title %}
 
 {% block content %}
 
-    <div class="row">
-        <div class="col-lg-10">
-            <h3>{{ category.name }}</h3>
+    <div class="columns">
+        <div class="column is-10">
+            <h3 class="title is-3">{{ category.name }}</h3>
         </div>
-        <div class="col-lg-2">
-            <div class="btn-group">
-                <a class="btn btn-default btn-sm tooltip-toggle"
+        <div class="column is-2">
+            <div class="buttons">
+                <a class="button is-light"
                    href='{% url "category-delete" project_slug=category.project.slug slug=category.slug %}'
-                   data-title="Delete {{ category.title }}">
-                    <span class="glyphicon glyphicon-minus"></span>
+                   title="Delete {{ category.title }}">
+                    <span class="icon">
+                        <i class="fas fa-minus"></i>
+                    </span>
                 </a>
-                <a class="btn btn-default btn-sm tooltip-toggle"
+                <a class="button is-light"
                    href='{% url "category-update" project_slug=category.project.slug slug=category.slug %}'
-                   data-title="Edit {{ category.title }}">
-                    <span class="glyphicon glyphicon-pencil"></span>
+                   title="Edit {{ category.title }}">
+                    <span class="icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </span>
                 </a>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-8">
+    <div class="columns">
+        <div class="column is-8">
             {% if category.description %}
-                {{ category.description|base_markdown }}
+                <div class="content">
+                    {{ category.description|base_markdown }}
+                </div>
             {% else %}
                 <p>No description</p>
             {% endif %}
         </div>
-        <div class="col-lg-4">
+        <div class="column is-4">
             {% if category.image_file %}
-                <img class="img-responsive img-rounded pull-right"
-                     src="{{ category.image_file.url }}" />
+                <figure class="image is-4by3">
+                    <img class="is-rounded"
+                         src="{{ category.image_file.url }}" />
+                </figure>
             {%  endif %}
         </div>
     </div>

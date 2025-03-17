@@ -1,7 +1,6 @@
 ## docker-compose override recipe sample
 ## Intended to be used to override default recipe for development environment
 ## Copy paste it as docker-compose.override.yml to use
-version: '3'
 volumes:
   postgres-data:
     driver_opts:
@@ -59,6 +58,3 @@ services:
     volumes:
       - ../django_project:/home/web/django_project
       - ./logs:/var/log
-    ports:
-      - "${TEST_HTTP_PORT}:8080"
-      - "${SSH_PORT}:22"

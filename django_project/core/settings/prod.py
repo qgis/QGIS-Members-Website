@@ -28,6 +28,8 @@ ALLOWED_HOSTS = [
 PIPELINE['PIPELINE_ENABLED'] = True
 PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
 PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
+# PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.csshtmljsminify.CssHtmlJsMinifyCompressor'
+# PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.csshtmljsminify.CssHtmlJsMinifyCompressor'
 
 # Comment if you are not running behind proxy
 USE_X_FORWARDED_HOST = True
@@ -128,3 +130,5 @@ if 'raven.contrib.django.raven_compat' in INSTALLED_APPS and SENTRY_KEY:
             },
         },
     }
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'

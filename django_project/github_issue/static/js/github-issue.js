@@ -4,11 +4,11 @@ window.submitIssue = function () {
   $.post("/github-issue", {
     'title': $("#issue-title").val(), 'desc': $("#issue-description").val() })
   .done(function() {
-    $('#issue-modal').modal('hide');
+    $('#issue-modal').removeClass('is-active');
     $("#issue-submit-button").removeAttr("disabled");
   })
   .fail(function() {
-    $('#issue-modal').modal('hide');
+    $('#issue-modal').removeClass('is-active');
     alert('Issue not submitted, configuration error!');
     $("#issue-submit-button").removeAttr("disabled");
   })

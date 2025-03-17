@@ -727,7 +727,7 @@ class CertifyingOrganisationUpdateView(
         kwargs.update({
             'user': self.request.user,
             'project': self.project,
-            'form_title': 'Update Certifying Organisation',
+            'form_title': '<h1>Update Certifying Organisation</h1>',
             'show_owner_message': show_owner_message
         })
         return kwargs
@@ -823,9 +823,9 @@ class CertifyingOrganisationJson(BaseDatatableView):
         elif column == 'country_name':
             return escape('{0}'.format(row.country.name))
         elif column == 'creation_date':
-            return escape('{0}'.format(row.creation_date))
+            return escape('{0}'.format(row.creation_date.strftime('%d/%m/%Y')))
         elif column == 'update_date':
-            return escape('{0}'.format(row.update_date))
+            return escape('{0}'.format(row.update_date.strftime('%d/%m/%Y')))
         elif column == 'can_approve':
             return (
                 not row.approved and self.request.user.is_staff or

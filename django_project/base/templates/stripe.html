@@ -80,7 +80,7 @@
     let clientSecret = '';
 
     function showPaymentModal() {
-        $('#paymentModal').modal('show');
+        $('#paymentModal').addClass('is-active');
     }
 
     $('#paymentModal').on('shown.bs.modal', function (e) {
@@ -185,7 +185,7 @@
                 if (result.paymentIntent.status === 'succeeded') {
                     $(ev.target).html('Donate');
                     $(ev.target).attr('disabled', false);
-                    $('#paymentModal').modal('hide');
+                    $('#paymentModal').removeClass('is-active');
                     alert('success!');
                     // Show a success message to your customer
                     // There's a risk of the customer closing the window before callback

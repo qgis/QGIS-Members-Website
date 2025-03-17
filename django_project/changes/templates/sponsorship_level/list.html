@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/sustaining_members_base.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 {% block title %}Sustaining Membership Levels - {{ block.super }}{% endblock %}
@@ -11,84 +11,110 @@
 {% endblock page_title %}
 
 {% block content %}
-    <div class="page-header">
-        <h1 class="text-muted">
-            {% if unapproved %}Unapproved {% endif %}
-            Sustaining Membership Levels
+    <div class="columns is-vcentered">
+        <div class="column">
+            <h1 class="title">
+                {% if unapproved %}Unapproved {% endif %}
+                Sustaining Membership Levels
+            </h1>
+        </div>
+        <div class="column is-narrow">
             {% if user.is_authenticated %}
-                {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
-                    <div class="pull-right btn-group">
-                        <a class="btn btn-default btn-mini tooltip-toggle"
+                <div class="buttons">
+                    {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
+                        <a class="button is-success has-tooltip-bottom has-tooltip-arrow"
                            href='{% url "sponsorshiplevel-create" project_slug %}'
-                           data-title="Create New Sponsorship Level">
-                            {% show_button_icon "add" %}
+                           data-tooltip="Create New Sponsorship Level">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
                         </a>
-                {% endif%}
-                {% if not unapproved %}
-                    <a class="btn btn-default btn-mini tooltip-toggle"
-                       href='{% url "pending-sponsorshiplevel-list" project_slug %}'
-                       data-title="View Pending Sponsorship level">
-                        <span class="glyphicon glyphicon-time"></span>
-                    </a>
-                {% endif %}
-                </div>
-            {% endif %}
-        </h1>
-    </div>
-    {% ifequal num_sponsorshiplevels 0 %}
-        {% if unapproved %}
-            <h3>All sustaining membership level are approved.</h3>
-        {% else %}
-            <h3>No sustaining membership level are defined, but you can <a
-                    class="btn btn-default btn-mini"
-                    href='{% url "sponsorshiplevel-create" project_slug %}'>create one</a>.</h3>
-        {% endif %}
-    {% endifequal %}
-
-    {% for sponsorshiplevel in sponsorshiplevels %}
-        <script>console.debug("{{ sponsorshiplevel }}");</script>
-        <div class="row" style="margin-top:10px;">
-            <div class="col-lg-1">
-                {% if sponsorshiplevel.logo %}
-                    <a href="{{ sponsorshiplevel.logo.url }}">
-                        <img class="img-responsive img-rounded pull-right"
-                             src="{% thumbnail sponsorshiplevel.logo 50x50 crop %}"/>
-                    </a>
-                {% endif %}
-            </div>
-            <div class="col-lg-9">
-                <h3>{{ sponsorshiplevel.name }}</h3>
-
-                <h5>{{ sponsorshiplevel.project.name }} - ({{ sponsorshiplevel.value }} {{ sponsorshiplevel.currency }})</h5>
-            </div>
-            <div class="col-lg-2">
-                <div class="btn-group pull-right">
-                    {% if not sponsorshiplevel.approved %}
-                        {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
-                            <a class="btn btn-default btn-mini"
-                               href='{% url "sponsorshiplevel-approve" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
-                                <span class="glyphicon glyphicon-thumbs-up"></span>
-                            </a>
-                            <a class="btn btn-default btn-mini"
-                               href='{% url "sponsorshiplevel-delete" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
-                                {% show_button_icon "delete" %}
-                            </a>
-                            <a class="btn btn-default btn-mini"
-                               href='{% url "sponsorshiplevel-update" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
-                                {% show_button_icon "update" %}
-                            </a>
-                        {% endif %}
                     {% endif %}
                     {% if not unapproved %}
-                        <a class="btn btn-default btn-mini"
-                           href='{% url "sponsorshiplevel-detail" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
-                            <span class="glyphicon glyphicon-eye-open"></span>
+                        <a class="button is-warning is-outlined has-tooltip-bottom has-tooltip-arrow"
+                           href='{% url "pending-sponsorshiplevel-list" project_slug %}'
+                           data-tooltip="View Pending Sponsorship level">
+                            <span class="icon">
+                                <i class="fas fa-clock"></i>
+                            </span>
                         </a>
                     {% endif %}
                 </div>
-            </div>
+            {% endif %}
         </div>
-    {% endfor %}
+    </div>
+    {% if num_sponsorshiplevels == 0 %}
+        {% if unapproved %}
+            <h3 class="subtitle">All sustaining membership levels are approved.</h3>
+        {% else %}
+            <h3 class="subtitle">No sustaining membership levels are defined, but you can 
+                <a class="button is-info is-small" href='{% url "sponsorshiplevel-create" project_slug %}'>create one</a>.
+            </h3>
+        {% endif %}
+    {% endif %}
+    <div class="columns is-multiline">
+        {% for sponsorshiplevel in sponsorshiplevels %}
+            <div class="column is-medium is-half-tablet is-third-desktop is-one-quarter-widescreen is-one-quarter-fullhd">
+                <div class="card is-flex is-flex-direction-column is-justify-content-space-between">
+                    <div class="card-image">
+                        {% if sponsorshiplevel.logo %}
+                            {% thumbnail sponsorshiplevel.logo "350x350" as im %}
+                                <figure class="image m-0">
+                                    <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="Sponsorship Level Logo" />
+                                </figure>
+                            {% endthumbnail %}
+                        {% endif %}
+                    </div>
+                    <div class="card-content is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%;">
+                        <div class="media mb-0">
+                            <div class="media-content is-flex is-justify-content-space-between">
+                                <p class="title is-5 mb-0">{{ sponsorshiplevel.name }}</p>
+                                <p class="is-size-6 is-italic has-text-weight-medium">
+                                    <span>{{ sponsorshiplevel.project.name }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mb-0 has-text-justified">
+                            <p>{{ sponsorshiplevel.value }} {{ sponsorshiplevel.currency }}</p>
+                        </div>
+                        <p style="height: 100%;"></p>
+                    </div>
+                    <footer class="card-footer">
+                        {% if not sponsorshiplevel.approved %}
+                            {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
+                                <a class="card-footer-item" href='{% url "sponsorshiplevel-approve" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
+                                    <span class="icon">
+                                        <i class="fas fa-thumbs-up"></i>
+                                    </span>
+                                    <span>Approve</span>
+                                </a>
+                                <a class="card-footer-item" href='{% url "sponsorshiplevel-delete" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
+                                    <span class="icon">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span>Delete</span>
+                                </a>
+                                <a class="card-footer-item" href='{% url "sponsorshiplevel-update" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
+                                    <span class="icon">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                                    <span>Edit</span>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        {% if not unapproved %}
+                            <a class="card-footer-item" href='{% url "sponsorshiplevel-detail" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'>
+                                <span class="icon">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                                <span>View</span>
+                            </a>
+                        {% endif %}
+                    </footer>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
     <hr/>
     {% include "_pagination.html" %}
 {% endblock %}

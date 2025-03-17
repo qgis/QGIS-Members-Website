@@ -276,7 +276,7 @@ class CategoryDetailView(CategoryMixin, DetailView):
 
 
 # noinspection PyAttributeOutsideInit
-class CategoryDeleteView(LoginRequiredMixin, CategoryMixin, DeleteView):
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     """Delete view for Category."""
     context_object_name = 'category'
     template_name = 'category/delete.html'

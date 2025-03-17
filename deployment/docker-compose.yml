@@ -6,7 +6,6 @@
 # docker-compose up -d web
 #
 # See accompanying Make commands for easy collectstatic etc.
-version: '3'
 volumes:
   postgres-data:
   db-backups:
@@ -15,30 +14,33 @@ volumes:
   reports-data:
   nginx-conf:
 services:
-  smtp:
-    image: catatnight/postfix
-    hostname: postfix
-    environment:
-      # You could change this to something more suitable
-      - maildomain=kartoza.com
-      - smtp_user=noreply:docker
-    restart: unless-stopped
+  # smtp:
+  #   image: catatnight/postfix
+  #   hostname: postfix
+  #   environment:
+  #     # You could change this to something more suitable
+  #     - maildomain=kartoza.com
+  #     - smtp_user=noreply:docker
+  #   restart: unless-stopped
 
   db:
-    image: kartoza/postgis:9.6-2.4
+    image: kartoza/postgis:16-3.4
     volumes:
       - postgres-data:/var/lib/postgresql
       - db-backups:/backups
     environment:
-      - USERNAME=${DATABASE_USERNAME}
-      - PASS=${DATABASE_PASSWORD}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASS=${DATABASE_PASSWORD}
       - ALLOW_IP_RANGE=0.0.0.0/0
     restart: unless-stopped
     ports:
       - "7543:5432"
 
   uwsgi: &uwsgi-common
-    image: kartoza/projecta-uwsgi
+    build:
+      context: ${PWD}/../
+      dockerfile: deployment/docker/Dockerfile
+      target: prod
     environment:
       - DATABASE_NAME=${DATABASE_NAME}
       - DATABASE_USERNAME=${DATABASE_USERNAME}
@@ -47,14 +49,32 @@ services:
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
       - VIRTUAL_HOST=${VIRTUAL_HOST}
       - VIRTUAL_PORT=${VIRTUAL_PORT}
+      - VALID_DOMAIN=${VALID_DOMAIN}
+      - EMAIL_BACKEND=${EMAIL_BACKEND}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-automation}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - EMAIL_SUBJECT_PREFIX=${EMAIL_SUBJECT_PREFIX}
+      - MAILDOMAIN=${MAILDOMAIN}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY}
+      - STRIPE_LIVE_PUBLIC_KEY=${STRIPE_LIVE_PUBLIC_KEY}
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET}
+      - SERVER_EMAIL=${SERVER_EMAIL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_RATE=${SENTRY_RATE}
     volumes:
       - static-data:/home/web/static:rw
       - media-data:/home/web/media:rw
       - reports-data:/home/web/reports
+    command: bash -c "npm run build && uwsgi --ini /uwsgi.conf"
     links:
       - db:db
+      # - smtp:smtp
     restart: unless-stopped
     user: root
     logging:
@@ -64,7 +84,7 @@ services:
         max-file: "10"
 
   dbbackups:
-    image: kartoza/pg-backup:9.6
+    image: kartoza/pg-backup:16-3.4
     hostname: pg-backups
     volumes:
       - db-backups:/backups
@@ -76,10 +96,10 @@ services:
       - DUMPPREFIX=${DUMPPREFIX}
       # These are all defaults anyway, but setting explicitly in
       # case we ever want to ever use different credentials
-      - PGUSER=${DATABASE_USERNAME}
-      - PGPASSWORD=${DATABASE_PASSWORD}
-      - PGPORT=5432
-      - PGHOST=${DATABASE_HOST}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASS=${DATABASE_PASSWORD}
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=${DATABASE_HOST}
       - PGDATABASE=${DATABASE_NAME}
     restart: unless-stopped
 
@@ -104,19 +124,23 @@ services:
   # from prod environment if wanted
   devweb:
     <<: *uwsgi-common
+    build:
+      context: ${PWD}/../
+      dockerfile: deployment/docker/Dockerfile
+      target: dev
+    ports:
+      - "62202:8000"
 
-  btsync-db:
-    # BTSync backups for database dumps
-    image: kartoza/btsync
+  webpack:
+    build:
+      context: ${PWD}/../
+      dockerfile: deployment/docker/Dockerfile
+      target: dev
+    working_dir: /home/web/django_project
+    command: npm start
     volumes:
-      # We mount RW so that we can use remove peer to clean up old backups off the server
-      - db-backups:/web:rw
-
-  btsync-media:
-    # BTSync backups for django media
-    image: kartoza/btsync
-    volumes:
-      # We mount RO as we do not really want peers to change this data
-      - media-data:/web:ro
+      - ../django_project:/home/web/django_project
+      - static-data:/home/web/static:rw
+      - ${MEDIA_VOLUME}:/home/web/media:rw
 
 

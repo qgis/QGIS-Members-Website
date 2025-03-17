@@ -157,7 +157,7 @@
             $('[name=repo]').val('{{ version.project.project_repository_url }}').trigger('change');
         {% endif %}
         $('.error-notification').hide();
-        $('#GithubPRModal').modal('hide');
+        $('#GithubPRModal').removeClass('is-active');
     }
 
     function submitForm(obj) {

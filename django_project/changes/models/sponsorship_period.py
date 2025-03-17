@@ -9,9 +9,9 @@ from django.utils.text import slugify
 # noinspection PyPackageRequirements
 from core.settings.contrib import STOP_WORDS
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
-from easy_thumbnails.files import get_thumbnailer
+from sorl.thumbnail import get_thumbnail
 
 __author__ = 'rischan'
 
@@ -183,10 +183,9 @@ class SponsorshipPeriod(models.Model):
         :returns: A url to the resampled logo
         :rtype: str
         """
-        options = {'size': (
-            self.sponsorship_level.logo_width,
-            self.sponsorship_level.logo_height), 'crop': False}
-        thumb_url = ''
-        thumb_url = get_thumbnailer(
-                self.sponsor.logo).get_thumbnail(options).url
+        thumb_url = get_thumbnail(
+            self.sponsor.logo,
+            f'{self.sponsorship_level.logo_width}x{self.sponsorship_level.logo_height}',
+            crop=False
+        ).url
         return thumb_url

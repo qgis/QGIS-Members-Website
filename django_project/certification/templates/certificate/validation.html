@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/certification_base.html" %}
 {% load static %}
 
 {% block extra_js %}
@@ -6,9 +6,9 @@
 
 {% block content %}
 
-    <div class="container" style="text-align: center">
-        <h1>Validate Certificate</h1>
-        <h4>Input your certificate ID here:</h4>
+    <div class="container has-text-centered">
+        <h1 class="title">Validate Certificate</h1>
+        <h4 class="subtitle">Input your certificate ID here:</h4>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -21,9 +21,22 @@
         });
     </script>
 
-    <div class="container" style="text-align: center">
-        <input style="text-align:center; margin-top: 20px;" type="text" id="InputID" value="" autofocus/>
-        <button style="text-align: center" class="go" id="submit-button"><i style="font-size: 8pt" class="glyphicon glyphicon-search"></i> Search</button>
+    <div class="container has-text-centered">
+        <div class="field">
+            <div class="control">
+                <input class="input is-medium" type="text" id="InputID" value="" autofocus/>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button class="button is-success is-medium" id="submit-button">
+                    <span class="icon is-small">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <span>Search</span>
+                </button>
+            </div>
+        </div>
     </div>
 
 {% endblock %}

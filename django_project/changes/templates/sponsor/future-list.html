@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/sustaining_members_base.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 {% load static %}
@@ -80,13 +80,13 @@
                 </div>
         </h1>
     </div>
-    {% ifequal num_sponsors 0 %}
+    {% if num_sponsors == 0 %}
         {% if unapproved %}
             <h3>All sponsors are approved.</h3>
         {% else %}
             <h3>No sponsors are defined.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
     {% if sponsors %}<h2 class="text-muted">List of Future Sponsors</h2> {% endif %}
 
@@ -131,9 +131,9 @@
                         <h5>{{ sponsor.start_date }} - {{ sponsor.end_date }}</h5>
 
                         <h5>{{ sponsor.sponsorship_level }}</h5>
-                        {% ifnotequal sponsor.amount_sponsored None %}
+                        {% if sponsor.amount_sponsored != None %}
                         <h5>Amount sponsored : {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</h5>
-                        {% endifnotequal %}
+                        {% endif %}
                     </div>
                     <div class="col-lg-2">
                         <div class="btn-group pull-right">

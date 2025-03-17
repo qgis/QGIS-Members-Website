@@ -74,7 +74,7 @@ class CreateCommitteeForm(forms.ModelForm):
         self.helper.html5_required = False
         self.helper.form_id = 'committee-form'
         super(CreateCommitteeForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
         self.fields['chair'].queryset = self.fields['chair'].queryset \
             .order_by('username')
         self.fields['users'].queryset = self.fields['users'].queryset\
@@ -122,7 +122,7 @@ class BallotCreateForm(forms.ModelForm):
         self.helper.html5_required = False
         self.helper.form_id = 'committee-form'
         super(BallotCreateForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(BallotCreateForm, self).save(commit=False)

@@ -5,14 +5,14 @@
 $(".pop-image").on("click", function() {
     $('#imagepreview').attr('src', $(this).children().attr('id'));
     $('#image-url').attr('href', $(this).children().attr('id'));
-    $('#imagemodal').modal('show');
+    $('#imagemodal').addClass('is-active');
     return false;
 });
 
 $(".pop-gif").on("click", function() {
     $('#imagepreview').attr('src', $(this).siblings().attr('id'));
     $('#image-url').attr('href', $(this).siblings().attr('id'));
-    $('#imagemodal').modal('show');
+    $('#imagemodal').addClass('is-active');
     return false;
 });
 
@@ -21,3 +21,8 @@ $('.sidebar-offcanvas').stick_in_parent({
     inner_scrolling: true,
     bottoming: false
 });
+
+
+function closeImageModal() {
+    $('#imagemodal').removeClass('is-active')
+}

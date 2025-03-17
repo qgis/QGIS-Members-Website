@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.flatpages.forms import FlatpageForm
 from django.forms import inlineformset_factory
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
     Layout,
@@ -14,7 +14,7 @@ from crispy_forms.layout import (
 )
 from .models import (
     Project, ProjectScreenshot, Domain, Organisation, ProjectFlatpage)
-from certification.forms import CustomSelectMultipleWidget
+from certification.forms import MultiSelectWidget
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,12 @@ class ProjectForm(forms.ModelForm):
 
     certification_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
-        required=False,
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),        required=False,
         help_text=_(
             'Managers of the certification app in this project. '
             'They will receive email notification about organisation and have'
@@ -58,7 +62,12 @@ class ProjectForm(forms.ModelForm):
 
     changelog_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
         required=False,
         help_text=_(
             'Managers of the changelog in this project. '
@@ -69,7 +78,12 @@ class ProjectForm(forms.ModelForm):
     sponsorship_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
         label='Sustaining member managers',
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
         required=False,
         help_text=_(
             'Managers of the sustaining member in this project. '
@@ -79,7 +93,12 @@ class ProjectForm(forms.ModelForm):
 
     lesson_managers = forms.ModelMultipleChoiceField(
         queryset=User.objects.order_by('username'),
-        widget=CustomSelectMultipleWidget("user", is_stacked=False),
+        widget=MultiSelectWidget(
+            attrs={
+                'get_list_url': '/autocomplete/users/',
+                'color_style': 'is-success',
+            }
+        ),
         required=False,
         help_text=_(
             'Managers of the lesson app in this project. '
@@ -173,7 +192,7 @@ class ProjectForm(forms.ModelForm):
             lambda obj: "%s <%s>" % (obj.get_full_name(), obj)
         self.fields['project_representative'].label_from_instance = \
             lambda obj: "%s <%s>" % (obj.get_full_name(), obj)
-        # self.helper.add_input(Submit('submit', 'Submit'))
+        # self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
         self.fields['is_lessons'].label = 'Enable Lessons'
         self.fields['is_sustaining_members'].label = \
             'Enable Sustaining Members'
@@ -256,7 +275,7 @@ class RegisterDomainForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(RegisterDomainForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(RegisterDomainForm, self).save(commit=False)
@@ -289,7 +308,7 @@ class OrganisationForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(OrganisationForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(OrganisationForm, self).save(commit=False)
@@ -313,7 +332,7 @@ class UserForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
-        form_title = 'Update User Profile'
+        form_title = '<h1>Update User Profile</h1>'
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -327,7 +346,7 @@ class UserForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(UserForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
 
 class ProjectFlatpageForm(FlatpageForm):

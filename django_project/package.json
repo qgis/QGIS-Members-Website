@@ -1,0 +1,36 @@
+{
+  "name": "qgis-plugins",
+  "version": "1.0.0",
+  "description": "QGIS Plugins Website",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx webpack --config webpack.config.js --mode development --watch",
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@creativebulma/bulma-tooltip": "^1.2.0",
+    "css-loader": "^7.1.2",
+    "expose-loader": "^5.0.1",
+    "mini-css-extract-plugin": "^2.9.2",
+    "sass": "^1.85.1",
+    "sass-loader": "^16.0.5",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.98.0",
+    "webpack-bundle-tracker": "^3.1.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0",
+    "webpack-livereload-plugin": "^3.0.2"
+  },
+  "dependencies": {
+    "datatables.net": "^2.2.2",
+    "datatables.net-dt": "^2.2.2",
+    "jquery": "^3.7.1",
+    "leaflet": "^1.9.4",
+    "moment": "^2.30.1"
+  }
+}

@@ -364,7 +364,7 @@ class SponsorDetailView(SponsorMixin, DetailView):
 
 
 # noinspection PyAttributeOutsideInit
-class SponsorDeleteView(LoginRequiredMixin, SponsorMixin, DeleteView):
+class SponsorDeleteView(LoginRequiredMixin, DeleteView):
     """Delete view for Sponsor."""
     context_object_name = 'sponsor'
     template_name = 'sponsor/delete.html'

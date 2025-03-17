@@ -1,7 +1,7 @@
 # coding=utf-8
 """Worksheet form."""
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
@@ -108,7 +108,7 @@ class WorksheetForm(TranslationModelForm):
 
         super(WorksheetForm, self).__init__(*args, **kwargs)
 
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Submit', css_class='button is-success pt-2 mt-5'))
 
     def save(self, commit=True):
         instance = super(WorksheetForm, self).save(commit=False)

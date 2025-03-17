@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/certification_base.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 {% block title %}Certifying Organisations - {{ block.super }}{% endblock %}
@@ -53,7 +53,7 @@
             {% endif %}
         </h1>
     </div>
-    {% ifequal num_certifyingorganisations 0 %}
+    {% if num_certifyingorganisations == 0 %}
         {% if unapproved %}
             <h3>All certifying organisations are approved.</h3>
         {% else %}
@@ -61,7 +61,7 @@
                     class="btn btn-default btn-mini"
                     href='{% url "certifyingorganisation-create" project_slug %}'>create one</a>.</h3>
         {% endif %}
-    {% endifequal %}
+    {% endif %}
 
     {% include 'certifying_organisation/includes/certifying-organisation-datatable.html' with approved=False %}
 

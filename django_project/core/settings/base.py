@@ -148,7 +148,8 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.syndication',
     'django.contrib.gis',
-    'django.contrib.flatpages'
+    'django.contrib.flatpages',
+    'webpack_loader',
 ]
 
 # A sample logging configuration. The only tangible logging
@@ -202,3 +203,15 @@ if SENTRY_DSN and SENTRY_DSN != "":
         # of transactions for performance monitoring.
         traces_sample_rate=SENTRY_RATE,
     )
+
+STRIPE_API_VERSION = '2019-09-09'
+
+SITE_ROOT = os.path.dirname(BASE_DIR)
+
+# Webpack
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles',
+        'STATS_FILE': os.path.join(SITE_ROOT, 'webpack-stats.json'),
+    }
+}

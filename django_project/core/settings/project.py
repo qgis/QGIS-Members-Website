@@ -7,9 +7,10 @@ repository!
 """
 
 import os  # noqa
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from .utils import absolute_path
 from .contrib import *  # noqa
+import json
 
 # Project apps
 INSTALLED_APPS += [
@@ -47,6 +48,8 @@ LOCALE_PATHS = (absolute_path('locale'),)
 MIDDLEWARE += [
     # For nav bar generation
     'core.custom_middleware.NavContextMiddleware',
+    # Allauth middleware
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 # Project specific javascript files to be pipelined
@@ -63,29 +66,14 @@ PIPELINE['JAVASCRIPT']['project'] = {
     'output_filename': 'js/project.js',
 }
 
-# Project specific css files to be pipelined
-# For third party libs like bootstrap should go in contrib.py
-PIPELINE['STYLESHEETS']['project'] = {
-    'source_filenames': (
-        'css/changelog.css',
-        'css/form.css',
-        'css/fonts.css',
-        'css/base.css',
-    ),
-    'output_filename': 'css/project.css',
-    'extra_context': {
-        'media': 'screen,projection',
-    },
-}
-
-VALID_DOMAIN = [
-    'localhost',
-    'changelog.kartoza.com',
-    'staging.changelog.kartoza.com'
-]
+VALID_DOMAIN = json.loads(os.environ.get("VALID_DOMAIN", "[]"))
 
 EMAIL_HOST_USER = 'noreply@kartoza.com'
 LOGIN_URL = '/en/accounts/login/'
 
 # The numeric mode (i.e. 0o644) to set newly uploaded files to.
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+
+# Default primary key type
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

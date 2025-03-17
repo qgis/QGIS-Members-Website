@@ -2,92 +2,101 @@
 {% load thumbnail %}
 {% load embed_video_tags %}
 
-<div class="row">
+<div class="columns">
     <a class="anchor-entry" id="{{ entry.slug }}"></a>
-    <div class="col-lg-10">
-        <h3><span class="text-muted">Feature:</span> {{ entry.title }}</h3>
+    <div class="column is-10">
+        <h3><span>Feature:</span> {{ entry.title }}</h3>
     </div>
-    <div class="col-lg-2">
-        <div class="btn-group pull-right align-bottom">
+    <div class="column is-2">
+        <div class="buttons is-right">
             {% if not entry.version.locked %}
                 {% if user.is_authenticated and not rst_download %}
-                    <a class="btn-default btn-mini tooltip-toggle"
-                       data-title="Delete Entry"
+                    <a class="button is-light is-small has-tooltip-bottom"
+                       data-tooltip="Delete Entry"
                        href='{% url "entry-delete" pk=entry.id %}'>
-                        <span class="glyphicon glyphicon-minus"></span>
+                        <span class="icon is-small">
+                            <i class="fas fa-minus"></i>
+                        </span>
                     </a>
-                    <a class="btn-default btn-mini tooltip-toggle"
-                       data-title="Update Entry"
+                    <a class="button is-light is-small has-tooltip-bottom"
+                       data-tooltip="Update Entry"
                        href='{% url "entry-update" pk=entry.id %}'>
-                        <span class="glyphicon glyphicon-pencil"></span>
+                        <span class="icon is-small">
+                            <i class="fas fa-pencil-alt"></i>
+                        </span>
                     </a>
                 {% endif %}
             {% else %}
-                <a class="btn-default btn-mini tooltip-toggle"
-                   data-title="This entry is locked because the version is locked." disabled="disabled">
-                    <i class="fa fa-lock" aria-hidden="true"></i>
+                <a class="button is-light is-small has-tooltip-bottom"
+                   data-tooltip="This entry is locked because the version is locked." disabled="disabled">
+                    <span class="icon is-small">
+                        <i class="fas fa-lock"></i>
+                    </span>
                 </a>
             {% endif %}
 
-            <a class="btn-default btn-mini tooltip-toggle"
-               data-title="Get Permalink"
+            <a class="button is-light is-small has-tooltip-bottom"
+               data-tooltip="Get Permalink"
                onclick="copyToClipboard('{{ request.scheme }}://{{ request.get_host }}{{ request.path }}#{{ entry.slug }}')">
-                <span class="glyphicon glyphicon-link"></span>
+                <span class="icon is-small">
+                    <i class="fas fa-link"></i>
+                </span>
             </a>
         </div>
     </div>
 </div>
-<div class="row" style="margin-top:10px">
+<div class="columns" style="margin-top:10px">
 <style>
    code {
        display: inline;
        padding: 0.5rem;
-        word-wrap: normal;
+       word-wrap: normal;
    }
 </style>
-    <div class="col-lg-8">
+    <div class="column is-8">
         {{ entry.description|base_markdown }}
     </div>
-    <div class="col-lg-4 text-center">
-            {% if entry.image_file %}
-                {% if entry.image_file|is_gif %}
-                    {% if not rst_download %}
-                        <img id="{{ entry.image_file.url }}" class="img-responsive img-rounded pull-right"
-                             data-gifffer="{{ entry.image_file.url }}"
-                             gifffer-alt=""/>{# see core/settings/contrib.py for large-entry #}
-                        <a href="#" class="pop-gif">
-                            Click here for bigger size animation.
-                        </a>
-                    {% else %}
-                        <a href="{{ entry.image_file.url }}">
-                        <img class="img-responsive img-rounded pull-right"
-                             src="{{ entry.image_file.url }}"
-                             alt=""/>{# see core/settings/contrib.py for large-entry #}
-                        </a>
-                    {% endif %}
+    <div class="column is-4 has-text-centered">
+        {% if entry.image_file %}
+            {% if entry.image_file|is_gif %}
+                {% if not rst_download %}
+                    <img id="{{ entry.image_file.url }}" class="image"
+                         data-gifffer="{{ entry.image_file.url }}"
+                         src="{{ entry.image_file.url }}"
+                         gifffer-alt=""/>
+                    <a href="#" class="pop-gif">
+                        Click here for bigger size animation.
+                    </a>
                 {% else %}
-                    <a href="#" class="pop-image">
-                    <img id="{{ entry.image_file.url }}" class="img-responsive img-rounded pull-right"
-                         src="{{ entry.image_file|thumbnail_url:'large-entry' }}"
-                         alt=""/>{# see core/settings/contrib.py for large-entry #}
+                    <a href="{{ entry.image_file.url }}">
+                        <img class="image"
+                             src="{{ entry.image_file.url }}"
+                             alt=""/>
                     </a>
                 {% endif %}
+            {% else %}
+                <a href="#" class="pop-image">
+                    <img id="{{ entry.image_file.url }}" class="image"
+                         src="{{ entry.image_file.url }}"
+                         alt=""/>
+                </a>
             {% endif %}
+        {% endif %}
     </div>
 </div>
 
 {% if entry.video %}
-    <div class="row">
-        <div class="col-lg-8 col-md-offset-1">
+    <div class="columns">
+        <div class="column is-8 is-offset-1">
             {% video entry.video 'small' %}
         </div>
     </div>
 {% endif %}
 
-<div class="row">
-    <div class="col-lg-8">
+<div class="columns">
+    <div class="column is-8">
         {% if not rst_download %}
-            <h5 class="text-muted">
+            <h5>
                 {{ entry.funder_info_html|base_markdown }}
                 {{ entry.developer_info_html|base_markdown }}
             </h5>

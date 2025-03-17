@@ -1,4 +1,4 @@
-{% extends "project_base.html" %}
+{% extends "layouts/changes_base.html" %}
 {% load custom_markup %}
 {% load thumbnail %}
 
@@ -72,10 +72,10 @@
     </div>
 {% endif %}
 </div>
-    {% ifequal num_entries 0 %}
+    {% if num_entries == 0 %}
         <h3>No entries are defined (use the 'add' menu above to create them).
         </h3>
-    {% endifequal %}
+    {% endif %}
     <hr />
 
     {% for entry in version.entries %}

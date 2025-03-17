@@ -18,7 +18,7 @@ from .models import (
     SponsorshipLevel
 )
 from changes.utils.svgimagefile import SVGAndImageFormField
-
+from crispy_bulma.widgets import FileUploadInput
 
 class CategoryForm(forms.ModelForm):
 
@@ -30,7 +30,17 @@ class CategoryForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.project = kwargs.pop('project')
-        form_title = 'New Category in %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Category in {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Category {kwargs["instance"].name}'
+                '</h2>'
+            )
         layout = Layout(
             Fieldset(
                 form_title,
@@ -41,7 +51,13 @@ class CategoryForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(CategoryForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(CategoryForm, self).save(commit=False)
@@ -53,8 +69,9 @@ class CategoryForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
 
         try:
-            Category.objects.get(
-                name=cleaned_data['name'], project=self.project)
+            if 'name' in cleaned_data:
+                Category.objects.get(
+                    name=cleaned_data['name'], project=self.project)
         except Category.DoesNotExist:
             pass
         else:
@@ -66,7 +83,7 @@ class CategoryForm(forms.ModelForm):
 
 
 class VersionForm(forms.ModelForm):
-
+    image_file = forms.ImageField(widget=FileUploadInput)
     # noinspection PyClassicStyleClass
     class Meta:
         model = Version
@@ -80,7 +97,17 @@ class VersionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'New Version for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Version in {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Version {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -88,13 +115,19 @@ class VersionForm(forms.ModelForm):
                 Field('name', css_class='form-control'),
                 Field('description', css_class='form-control'),
                 Field('image_file', css_class='form-control'),
-
+                Field('release_date', css_class='form-control'),
                 css_id='project-form')
         )
         self.helper.layout = layout
         self.helper.html5_required = False
         super(VersionForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(VersionForm, self).save(commit=False)
@@ -102,7 +135,7 @@ class VersionForm(forms.ModelForm):
             version = Version.objects.get(pk=instance.pk)
         except Version.DoesNotExist:
             version = None
-        if version:
+        if version and version.release_date:
             instance.release_date = version.release_date
         instance.author = self.user
         instance.project = self.project
@@ -114,6 +147,7 @@ class VersionForm(forms.ModelForm):
 class EntryForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass
+    image_file = forms.ImageField(widget=FileUploadInput)
     class Meta:
         model = Entry
         fields = (
@@ -127,10 +161,17 @@ class EntryForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         self.version = kwargs.pop('version')
         self.project = kwargs.pop('project')
-        form_title = 'New Entry in %s %s' % (
-            self.project.name,
-            self.version.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Entry in {self.project.name} {self.version.name}'
+            '</h2>'
         )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Entry {kwargs["instance"].title}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -151,7 +192,13 @@ class EntryForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(EntryForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
         self.fields['title'].label = 'Feature Title'
         # Need to add required=False explicitly for these because
         # even though they are declared as not required in the model,
@@ -203,7 +250,17 @@ class SponsorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'New Sponsor for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'New Sponsor for {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Sponsor {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -225,7 +282,13 @@ class SponsorForm(forms.ModelForm):
         super(SponsorForm, self).__init__(*args, **kwargs)
         self.fields['project'].initial = self.project
         self.fields['project'].widget = forms.HiddenInput()
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(SponsorForm, self).save(commit=False)
@@ -237,6 +300,7 @@ class SponsorForm(forms.ModelForm):
 
 class SponsorshipLevelForm(forms.ModelForm):
 
+    logo = forms.ImageField(widget=FileUploadInput)
     # noinspection PyClassicStyleClass
     class Meta:
         model = SponsorshipLevel
@@ -250,7 +314,17 @@ class SponsorshipLevelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'Sponsorship Level Form for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'Sponsorship Level Form for {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Sponsorship Level {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -264,7 +338,13 @@ class SponsorshipLevelForm(forms.ModelForm):
         self.helper.layout = layout
         self.helper.html5_required = False
         super(SponsorshipLevelForm, self).__init__(*args, **kwargs)
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(SponsorshipLevelForm, self).save(commit=False)
@@ -291,7 +371,17 @@ class SponsorshipPeriodForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.project = kwargs.pop('project')
-        form_title = 'Sponsorship Period Form for %s' % self.project.name
+        form_title = (
+            '<h2 class="is-title is-size-4">'
+            f'Sponsorship Period Form for {self.project.name}'
+            '</h2>'
+        )
+        if 'instance' in kwargs and kwargs['instance']:
+            form_title = (
+                '<h2 class="is-title is-size-4">'
+                f'Edit Sponsorship Period {kwargs["instance"].name}'
+                '</h2>'
+            )
         self.helper = FormHelper()
         layout = Layout(
             Fieldset(
@@ -316,7 +406,13 @@ class SponsorshipPeriodForm(forms.ModelForm):
         self.fields['sponsorship_level'].queryset = \
             SponsorshipLevel.objects.filter(
                 project=self.project, approved=True).order_by('name')
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(
+            Submit(
+                'submit',
+                'Submit',
+                css_class='button is-success pt-2 mt-5'
+            )
+        )
 
     def save(self, commit=True):
         instance = super(SponsorshipPeriodForm, self).save(commit=False)

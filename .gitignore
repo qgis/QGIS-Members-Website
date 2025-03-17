@@ -126,3 +126,9 @@ deployment/btsync-media.env.PRODUCTION
 # These don't get versioned since they are generated on the fly 
 deployment/docker/Dockerfile-prod
 deployment/docker/projecta.tar.gz
+
+# Webpack
+node_modules
+django_project/base/static/bundles
+django_project/package-lock.json
+django_project/webpack-stats.json

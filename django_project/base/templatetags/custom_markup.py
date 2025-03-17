@@ -2,11 +2,15 @@ import markdown
 from django import template
 from django.contrib.staticfiles import finders
 from django.template.defaultfilters import stringfilter
-from django.utils.encoding import force_text as force_unicode
+from django.utils.encoding import force_str as force_unicode
 from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+
+@register.filter("klass")
+def klass(ob):
+    return ob.__class__.__name__
 
 @register.filter(name='base_markdown', is_safe=True)
 @stringfilter

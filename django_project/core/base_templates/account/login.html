@@ -7,47 +7,69 @@
 {% block js_head %}
     <script type="text/javascript">
         $(document).ready(function () {
-            $('a.google').html($('.google-button'));
-            $('a.github').html($('.github-button'));
+            $('a[title="Google"]').html($('.google-button'));
+            $('a[title="GitHub"]').html($('.github-button'));
+            // Function to update the button state
+            function updateButtonState() {
+                var usernameIsEmpty = $("#id_login").val() === "";
+                var passwordIsEmpty = $("#id_password").val() === "";
+        
+                if (usernameIsEmpty || passwordIsEmpty) {
+                $("#submit-button").prop("disabled", true);
+                } else {
+                $("#submit-button").prop("disabled", false);
+                }
+            }
+        
+            // Call the function when the page loads
+            updateButtonState();
+        
+            // Call the function when the field changes or the form is submitted
+            $("#id_login").on("input", updateButtonState);
+            $("#id_password").on("input", updateButtonState);
+            $("form").on("submit", updateButtonState);
         });
     </script>
 {% endblock %}
 
 {% block title %}Log In{% endblock %}
 
-{% block container %}
-    <div class="content">
-        {% block content %}
-
-            {% csrf_token %}
-            <div class="container">
-
-                <div class="custom-form-container">
-                    <h1>{% trans "Log In" %}</h1>
+{% block pagetitle %}
+    <section class="hero is-dark is-medium has-bg-img" style="background: url({% static "images/hegobg1.webp" %});
+    background-position: 50%;
+    background-size: cover;">
+    <div class="hero-body" style="height: 100dvh;">
+        <div class="columns is-vcentered is-centered">
+            <div class="column is-4 p-6 login-container">
+                <div class="has-text-centered">
+                    <h3 class="title">{% trans "Log In" %}</h3>
+                    <hr class="login-hr" />
+                    <p class="subtitle">
+                        {% trans "Please sign in with one of your existing third party accounts." %}
+                    </p>
 
                     {% get_providers as socialaccount_providers %}
 
                     {% if socialaccount_providers %}
-                        <p>{% blocktrans with site.name as site_name %}Please sign in with one
-                            of your existing third party accounts.{% endblocktrans %}</p>
-
                         <div class="socialaccount_ballot">
-
-                                {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
                         </div>
 
-                        <div class="login-or">
-                            {% blocktrans %}Or, <a href="{{ signup_url }}">sign up</a>
+                        <p class="subtitle">
+                            {% blocktrans %}Or, <a href="{{ signup_url }}" class="has-text-success">sign up</a>
                                 for a {{ site_name }} account and sign in below:{% endblocktrans %}
+                        </p>
+                        <div class="button github-button is-dark is-fullwidth mb-3" hidden>
+                            <span class="icon">
+                                <i class="fab fa-github"></i>
+                            </span>
+                            <span>Sign in with GitHub</span>
                         </div>
-
-                        <div class="github-button" hidden>
-                            <img src="{% static "img/github.png" %}" />
-                            <div class="text-button">Sign in with GitHub</div>
-                        </div>
-                        <div class="google-button" hidden>
-                            <img src="{% static "img/google.png" %}" />
-                            <div class="text-button">Sign in with Google</div>
+                        <div class="button google-button is-light is-fullwidth mb-3" hidden>
+                            <span class="icon">
+                                <img src="{% static "img/google.png" %}" />
+                            </span>
+                            <span>Sign in with Google</span>
                         </div>
                         <hr>
 
@@ -55,23 +77,40 @@
 
                     {% else %}
                         <p>{% blocktrans %}If you have not created an account yet, then please
-                            <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+                            <a href="{{ signup_url }}" class="has-text-success">sign up</a> first.{% endblocktrans %}</p>
                     {% endif %}
 
                     <form class="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
-                        {{ form.as_p }}
+                        {% include "account/form_snippet.html" with form=form %}
+        
+                        {% if form.errors or form.non_field_errors %}
+                        <div class="notification is-danger is-light">
+                            {% for error in form.non_field_errors %}
+                                {{ error }} <br/>
+                            {% endfor %}
+                            {% for error in form.field_errors %}
+                            {{ error }} <br/>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         {% if redirect_field_value %}
                             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                         {% endif %}
-                        <button class="login custom-form-submit" type="submit">{% trans "Log In" %}</button>
+                        <button class="button is-success is-medium is-fullwidth mt-5" type="submit" id="submit-button">
+                            <span>{% trans "Log In" %}</span>
+                            <span class="icon">
+                                <i class="fa fa-sign-in" aria-hidden="true"></i>
+                            </span>
+                        </button>
                     </form>
 
-                    <div class="login-help">
-                        <a href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a> -
-                        <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password" %}</a>
-                    </div>
+                    <p class="login-help">
+                        <a href="{% url 'account_signup' %}" class="has-text-success">{% trans "Sign Up" %}</a> -
+                        <a href="{% url 'account_reset_password' %}" class="has-text-success">{% trans "Forgot Password" %}</a>
+                    </p>
                 </div>
-            </div> <!-- /container -->
             </div>
-        {% endblock %}
+        </div>
+    </div>
+    </section>
 {% endblock %}
