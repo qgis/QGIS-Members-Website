@@ -18,18 +18,18 @@
       {% endif %}
     {% endif %}
 
-    {% url 'category-list' as category_list_url %}
-    <li class="{% if request.path == category_list_url %}is-active{% endif %}">
-      <a href="{{ category_list_url }}">
-        <i class="fas fa-tags mr-3"></i>
-        Categories
-      </a>
-    </li>
     {% url 'version-list' as version_list_url %}
     <li class="{% if request.path == version_list_url %}is-active{% endif %}">
       <a href="{{ version_list_url }}">
-        <i class="fas fa-code-branch mr-3"></i>
-        Versions
+      <i class="fas fa-home mr-3"></i>
+      QGIS Changelog Home
+      </a>
+    </li>
+    {% url 'category-list' as category_list_url %}
+    <li class="{% if request.path == category_list_url %}is-active{% endif %}">
+      <a href="{{ category_list_url }}">
+      <i class="fas fa-list mr-3"></i>
+      Categories
       </a>
     </li>
 

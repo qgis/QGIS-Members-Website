@@ -2,5 +2,11 @@
 {% load i18n %}
 
 
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'category-list' %}">Categories</a>
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'version-list' %}">Versions</a>
+<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'version-list' %}">
+  <i class="fas fa-home mr-3"></i>
+  QGIS Changelog Home
+</a>
+<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'category-list' %}">
+  <i class="fas fa-list mr-3"></i>
+  Categories
+</a>
