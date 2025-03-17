@@ -11,7 +11,7 @@ register = template.Library()
 @register.filter(name='base_markdown', is_safe=True)
 @stringfilter
 def base_markdown(value):
-    extensions = ["nl2br", "markdown.extensions.tables", ]
+    extensions = ["nl2br", "markdown.extensions.tables", "fenced_code"]
     html_output = markdown.markdown(
         force_unicode(value),
         extensions=extensions,
@@ -83,3 +83,8 @@ def columns(thelist, n):
     if list_len % n != 0:
         split += 1
     return [thelist[i::split] for i in range(split)]
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

@@ -1,7 +1,7 @@
 {% extends "project_base.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load custom_markup %}
-{% load staticfiles %}
+{% load static %}
 
 {% block title %}Certifying Organisation - {{ block.super }}{% endblock %}
 
@@ -85,6 +85,45 @@
             color: darkblue !important;
             text-decoration: none !important;
         }
+        .btn-disabled, .btn-disabled:hover {
+            color: #d3d3d3
+        }
+        .timeline {
+            margin-top: 20px;
+            margin-left: 10px;
+        }
+        .timeline .time {
+            font-weight: bold;
+        }
+
+        .timeline ul, .timeline li {
+            list-style: none;
+            padding: 0;
+        }
+
+        .timeline li {
+            padding-bottom: 1.5rem;
+            border-left: 2px solid #8f8f8f;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline li:last-child {
+            border-left: 1px solid rgba(255, 255, 255, 0);
+            padding-bottom: 0;
+        }
+
+        .timeline li:before {
+            content: "";
+            width: 15px;
+            height: 15px;
+            background: #e8e8e8;
+            border: 2px solid #707070;
+            border-radius: 50%;
+            position: absolute;
+            left: -8.5px;
+            top: 0px;
+        }
     </style>
 
     {% if messages %}
@@ -103,13 +142,147 @@
         </div>
     {% endif %}
 
-    <div class="row">
+    <!-- Modal -->
+    <div class="modal fade" id="rejectionModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><b>Rejection Form</b></h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are going to reject this organisation below:</p>
+                    <ul>
+                        <li><span>Organisation: </span><span class="rejection-form-info" id="rejected-organisation-name"></span></li>
+                        <li><span>Country: </span><span class="rejection-form-info" id="rejected-organisation-country"></span></li>
+                    </ul>
+                    <form id="rejectionForm" role="form">
+                        <label>Please indicate your reason of this rejection.</label><br>
+                        <input name="status" class="form-control" value="Rejected, because ">
+                        <input name="rejected-organisation-slug" hidden>
+                        <input name="rejected-organisation-project-slug" hidden>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="closeRejectionForm()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitRejectionForm()">Submit</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="updateStatusModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><b>Update Status Form</b></h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are going to update the status of this organisation below:</p>
+                    <ul>
+                        <li><span>Organisation: </span><span class="status-form-info" id="status-organisation-name"></span></li>
+                        <li><span>Country: </span><span class="status-form-info" id="status-organisation-country"></span></li>
+                    </ul>
+                    <form id="updateStatusForm" role="form">
+                        <label>Status:</label><br>
+                        <select name="update-status" class="form-control">
+                        </select><br/>
+                        <label>Remarks:</label><br>
+                        <input name="update-remarks" class="form-control">
+                        <input name="status-organisation-slug" hidden>
+                        <input name="status-organisation-project-slug" hidden>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="closeUpdateStatusForm()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitUpdateStatusForm()">Submit</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="inviteReviewerModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><b>Invite External Reviewer</b></h4>
+                </div>
+                <div class="modal-body">
+                    <div id="ie-badge" class="badge badge-success" style="margin-bottom: 10px;display: none"></div>
+                    <form id="inviteExternalReviewerForm" role="form">
+                        <label>Name:</label><br/>
+                        <input name="reviewer-name" class="form-control">
+                        <br/>
+                        <label>Email:</label><br>
+                        <input name="reviewer-email" class="form-control">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="closeInviteExternalReviewer()">Cancel</button>
+                    <button id="btn-submit-invite" type="button" class="btn btn-primary" onclick="submitInviteExternalReviewer(this)">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="checklistModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content -->
+            <form method="post" id="checklistForm" action="{% url "update-checklist-reviewer" project_slug=project_slug slug=certifyingorganisation.slug %}">
+                {% csrf_token %}
+                <input type="hidden" name="organisation" value="{{ certifyingorganisation.id }}"/>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><b>Checklist</b></h4>
+                        <div class="modal-body">
+                            {% for checklist in available_checklist %}
+                                <hr/>
+                                <div class="inline-form">
+                                    <div class="form-label">{% if checklist.organisation_checklist.0.checklist_question %}{{ checklist.organisation_checklist.0.checklist_question }}{% else %}{{ checklist.question }}{% endif %}</div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="checklist-{{ checklist.id  }}" id="yes-{{ checklist.id }}" {% if checklist.organisation_checklist.0.checked %}checked{% endif %} value="yes">
+                                        <label class="form-check-label" for="yes-{{ checklist.id }}" >Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="checklist-{{ checklist.id  }}" id="no-{{ checklist.id }}"
+                                               {% if not checklist.organisation_checklist.0.checked %}checked{% endif %} value="no">
+                                        <label class="form-check-label" for="no-{{ checklist.id }}">No</label>
+                                    </div>
+                                </div>
+                                {% if checklist.show_text_box %}
+                                <div>
+                                    <textarea class="form-control" name="textarea-{{ checklist.id }}" rows="3">{{ checklist.organisation_checklist.0.text_box_content }}</textarea>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" onclick="closeChecklistModal()">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="submitChecklistForm()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End modal -->
+
+    <div class="row" style="display: flex">
         <div class="col-lg-8">
             <h1>{{ certifyingorganisation.name }}</h1><br/>
         </div>
 
         {# Only organisation owners or staff can edit #}
-        <div class="col-lg-4">
+        <div class="col-lg-4 tools-container">
 
             <div class="pull-right">
             <a class="glyphicon glyphicon-info-sign tooltip-toggle about-link"
@@ -120,6 +293,7 @@
 
 
             <div class="btn-group">
+                {% if certifyingorganisation.approved %}
                 <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
                        href='{% url "feed-training-center" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}' target="_blank"
                        data-title="GeoJSON Feed for List of Training Center">
@@ -135,20 +309,25 @@
                        data-title="Feed for List of Past Courses">
                         <i class="fa fa-rss" style="color: grey"></i>
                     </a>
-                {% if user in certifyingorganisation.organisation_owners.all or user.is_staff or user == project.owner or user in certifyingorganisation.project.certification_manager.all %}
-                <a class="btn btn-default btn-mini btn-delete tooltip-toggle"
-                   href='{% url "certifyingorganisation-delete" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
-                   data-title="Delete {{ certifyingorganisation.name }}">
-                    <span class="glyphicon glyphicon-minus"></span>
-                </a>
-                <a class="btn btn-default btn-mini tooltip-toggle"
-                   href='{% url "certifyingorganisation-update" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
-                   data-title="Edit {{ certifyingorganisation.name }}">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </a>
+                {% endif %}
+                {% if user_can_delete %}
+                    <a class="btn btn-default btn-mini btn-delete tooltip-toggle"
+                       href='{% url "certifyingorganisation-delete" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
+                       data-title="Delete {{ certifyingorganisation.name }}">
+                        <span class="glyphicon glyphicon-minus"></span>
+                    </a>
+                    <a class="btn btn-default btn-mini tooltip-toggle"
+                       href='{% url "certifyingorganisation-update" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
+                       data-title="Edit {{ certifyingorganisation.name }}">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
                 {% endif %}
                  <a class="btn btn-default btn-mini tooltip-toggle"
-                    href='{% url "certifyingorganisation-list" certifyingorganisation.project.slug %}'
+                    href='{% if certifyingorganisation.approved %}
+                            {% url "certifyingorganisation-list" certifyingorganisation.project.slug %}
+                          {% else %}
+                            {% url "pending-certifyingorganisation-list" certifyingorganisation.project.slug %}?ready={% if certifyingorganisation.status.name == 'Pending' %}false{% else %}true{% endif %}
+                          {% endif %}'
                     data-title="Back">
                      <span class="glyphicon glyphicon-arrow-left"></span>
                  </a>
@@ -158,65 +337,200 @@
     </div>
 
     <div class="container row">
-    <div class="details col-lg-5" style="margin-bottom: 20px">
-        <span class="grey-italic col-lg-4">Organisation name</span><span class="col-lg-8">{{ certifyingorganisation.name }}</span><br/>
-        <span class="grey-italic col-lg-4">Address</span><span class="col-lg-8">{{ certifyingorganisation.address }}</span><br/>
-        <span class="grey-italic col-lg-4">Country</span><span class="col-lg-8">{{ certifyingorganisation.country.name }}</span><br/>
-        <span class="grey-italic col-lg-4">Email</span><span class="col-lg-8">{{ certifyingorganisation.organisation_email }}</span><br/>
-        <span class="grey-italic col-lg-4">Phone</span><span class="col-lg-8">{{ certifyingorganisation.organisation_phone }}</span><br/>
-        <span class="grey-italic col-lg-4">Organisation owners</span>
-        <span class="col-lg-8">
-        {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
-            {% if organisation_owners.first_name %}
-                {{ organisation_owners.first_name }} {{ organisation_owners.last_name }}{{ ", " }}
-            {% else %}
-                {{ organisation_owners }}{{ ", " }}
+    <div class="details col-lg-6 col-md-6 col-sm-12" style="margin-bottom: 20px">
+        <div class="content-container">
+            <div class="title">Organisation name</div>
+            <div class="content">{{ certifyingorganisation.name }}</div>
+        </div>
+        <div class="content-container">
+            <div class="title">Address</div>
+            <div class="content">{{ certifyingorganisation.address }}</div>
+        </div>
+        <div class="content-container">
+            <div class="title">Country</div>
+            <div class="content">{{ certifyingorganisation.country.name }}</div>
+        </div>
+        <div class="content-container">
+            <div class="title">Email</div>
+            <div class="content">{{ certifyingorganisation.organisation_email }}</div>
+        </div>
+        <div class="content-container">
+            <div class="title">Phone</div>
+            <div class="content">{{ certifyingorganisation.organisation_phone }}</div>
+        </div>
+        <div class="content-container">
+            <div class="title">Organisation owners</div>
+            <div class="content">
+                {% for organisation_owners in certifyingorganisation.organisation_owners.all %}
+                    {% if organisation_owners.first_name %}
+                        {{ organisation_owners.first_name }}
+                        {{ organisation_owners.last_name }}{{ ", " }}
+                    {% else %}
+                        {{ organisation_owners }}{{ ", " }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="content-container">
+            <div class="title">Organisation URL</div>
+            <div class="content">
+                {% if certifyingorganisation.url %}
+                <a href='{{ certifyingorganisation.url }}' style="font-size: 10pt;">
+                    {{ certifyingorganisation.url }}</a>
+                {% else %}
+                -
+                {% endif %}
+            </div>
+        </div>
+        <hr/>
+        <div class="content-container">
+            {% for question in submitted_checklist %}
+                {% if question.checklist_target == 'organization_owner' %}
+                    <div>
+                        {{ question.checklist_question }} :
+                            {% if question.checked %}
+                                <i class="fa fa-check-circle" aria-hidden="true" style="color: green"></i>
+                            {% else %}
+                                <i class="fa fa-times-circle" aria-hidden="true" style="color: red"></i>
+                            {% endif %}
+                    </div>
+                    {% if question.text_box_content %}
+                        <div>{{ question.text_box_content | base_markdown }}</div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% if certifyingorganisation.approved %}
+    <div class="col-lg-6 ">
+
+        {% if user_can_create %}
+        <div class="panel-wrap col-lg-12">
+            <a href="{% url "top-up" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}" class="btn btn-success top-up-btn">
+                Top up credits <i class="glyphicon glyphicon-shopping-cart"></i>
+            </a>
+            {% if certifyingorganisation.organisation_credits <= 0 %}
+            <div class="insufficient-credit">Your credits is insufficient to issue more certificates, please top up.</div>
             {% endif %}
-        {% endfor %}</span><br/>
-     <span class="grey-italic col-lg-4 pull-left float-left">Organisation URL</span>
-        <span class="col-lg-8"><a href='{{ certifyingorganisation.url }}' style="font-size: 10pt;">
-            {{ certifyingorganisation.url }}</a>
-        </span><br/>
-    </div>
-    <div class="col-lg-6">
-    <div class="col-lg-4 pull-right" style="padding-right: 0">
-        <h4 class="panel-heading" style="padding-left:0; padding-right: 0">
-            Training Centers</h4>
-        <h3 class="panel-body">{{ num_trainingcenter }}</h3>
-    </div>
-
-    <div class="col-lg-3 pull-right" style="padding: 0">
-        <h4 class="panel-heading">Attendees</h4>
-        <h3 class="panel-body">{{ num_attendees }}</h3>
-    </div>
-
-    {% if user_can_create %}
-    <div class="panel-wrap col-lg-4 pull-right">
-        <h4 class="panel-heading" style="padding-left: 30%; text-align: left">Credits
-                <a class="btn btn-default btn-xs tooltip-toggle btn-top-up button-action" style="position: absolute; float: right; margin-left: 5px;"
-                   href= '{% url "top-up" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug %}'
-                   data-title="Top up credits">
-                <i class="glyphicon glyphicon-shopping-cart"></i></a>
-        </h4>
-        {% if certifyingorganisation.organisation_credits >= certifyingorganisation.project.certificate_credit %}
-        <h3 class="panel-body tooltip-toggle"
-            data-title="Available credits to issue certificate"
-            data-placement="left"
-        >{{ certifyingorganisation.organisation_credits }}
-        </h3>
-        {% else %}
-        <h3 class="panel-body tooltip-toggle"
-            data-title="Your credits is insufficient to issue more certificates, please top up"
-            data-placement="left"
-            style="color: indianred"
-        >{{ certifyingorganisation.organisation_credits }}
-        </h3>
+            <h4 class="panel-heading">Credits
+            </h4>
+            {% if certifyingorganisation.organisation_credits >= certifyingorganisation.project.certificate_credit %}
+            <h3 class="panel-body tooltip-toggle"
+                data-title="Available credits to issue certificate"
+                data-placement="left"
+            >{{ certifyingorganisation.organisation_credits }}
+            </h3>
+            {% else %}
+            <h3 class="panel-body tooltip-toggle"
+                data-title="Your credits is insufficient to issue more certificates, please top up"
+                data-placement="left"
+                style="color: indianred; "
+            >{{ certifyingorganisation.organisation_credits }}
+            </h3>
+            {% endif %}
+        </div>
         {% endif %}
+
+        <div class="col-lg-12">
+            <h4 class="panel-heading" style="padding-left:0; padding-right: 0">
+                Training Centers</h4>
+            <h3 class="panel-body">{{ num_trainingcenter }}</h3>
+        </div>
+
+        <div class="col-lg-12">
+            <h4 class="panel-heading">Attendees</h4>
+            <h3 class="panel-body">{{ num_attendees }}</h3>
+        </div>
+
     </div>
+    {% else %}
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="org-status">
+                <div class="content-container">
+                    <div class="title">Status</div>
+                    <div class="content">{% if certifyingorganisation.status %}{{ certifyingorganisation.status }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="content-container">
+                    <div class="title">Remarks</div>
+                    <div class="content">{% if certifyingorganisation.remarks %}{{ certifyingorganisation.remarks }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="content-container">
+                    <div class="title">External Reviewers</div>
+                    <div class="content">
+                        <ul id="list-external-reviewer">
+                            {% for external_reviewer in external_reviewers %}
+                                <li>{% if external_reviewer.name %}<strong>{{ external_reviewer.name }}</strong> - {% endif %}{{ external_reviewer.email }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% if user_can_update_status %}
+                    <a class="btn btn-default {% if checked_checklist == available_checklist|length %}btn-success{% else %}btn-warning{% endif %} btn-checklist-form">
+                        <i class="fa fa-list" aria-hidden="true"></i> {{ checked_checklist }}/{{ available_checklist|length }} Checklist</a>
+                    {% if 'approved' not in available_status %}
+                    <a class="btn btn-success btn-mini btn-approved tooltip-toggle"
+                       href='{% url "certifyingorganisation-approve" project_slug=certifyingorganisation.project.slug slug=certifyingorganisation.slug %}'
+                       data-title="Approve {{ certifyingorganisation.name }}">
+                        <span class="glyphicon glyphicon-thumbs-up"></span> Approve
+                    </a>
+                    {% endif %}
+                    {% if 'rejected' not in available_status %}
+                    <a class="btn btn-danger btn-mini tooltip-toggle btn-reject"
+                       organisation_name="{{ certifyingorganisation.name }}"
+                       organisation_country="{{ certifyingorganisation.country.name }}"
+                       organisation_slug="{{ certifyingorganisation.slug }}"
+                       organisation_project_slug="{{ certifyingorganisation.project.slug }}"
+                       data-title="Reject {{ certifyingorganisation.name }}">
+                        <span class="glyphicon glyphicon-thumbs-down"></span> Reject
+                    </a>
+                    {% endif %}
+                    <a class="btn btn-default btn-mini btn-update-status tooltip-toggle"
+                        href='#'
+                        organisation_name="{{ certifyingorganisation.name }}"
+                        organisation_country="{{ certifyingorganisation.country.name }}"
+                        organisation_slug="{{ certifyingorganisation.slug }}"
+                        organisation_project_slug="{{ certifyingorganisation.project.slug }}"
+                        organisation_status="{{ certifyingorganisation.status.id }}"
+                        organisation_remarks="{{ certifyingorganisation.remarks }}"
+                        data-title="Update {{ certifyingorganisation.name }}">
+                            Update status
+                    </a>
+                {% endif %}
+                {% if user_can_invite_external_reviewer %}
+                     <a class="btn btn-default btn-mini btn-invite tooltip-toggle"
+                        href='#'
+                        data-org-slug="{{ certifyingorganisation.project.slug }}"
+                        data-title="Invite External Reviewer">
+                            Invite External Reviewer
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="timeline">
+                <ul>
+                    {% for history_data in history %}
+                    <li>
+                        <div class="time">{{ history_data.history_date }}</div>
+                        <p>
+                        {% if history_data.history_change_reason %}
+                            {{ history_data.history_change_reason }}
+                        {% else %}
+                            {% if history_data.history_type == '+' %}
+                                Created {% else %}
+                                Updated {% endif %} by {{ history_data.history_user }}
+                        {% endif %}
+                        </p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
     {% endif %}
-    </div>
+
     </div>
 
+    {% if certifyingorganisation.approved %}
     <div class="course-details">
     <div class="menu-wrapper menu-wrapper-head">
     <table>
@@ -263,12 +577,13 @@
     <table>
     <tr><td>
         <h5>No courses are defined, but you can <a
-                    class="btn btn-default btn-mini"
-                    href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'>create one</a>.</h5>
+            class="btn btn-default btn-mini"
+            href='{% url 'course-create' certifyingorganisation.project.slug certifyingorganisation.slug %}'>create one</a>.</h5>
     </td></tr>
     </table>
     </div>
     {% else %}
+
 
     <table class="course table-striped" style="width: 100%;">
     <tr>
@@ -302,7 +617,6 @@
                 {{ course.course_convener.user }}
             {% endif %}
         </td>
-
         {% if user_can_delete %}
         <td style="padding-right: 0">
              <div class="btn-group pull-right button-action">
@@ -473,7 +787,7 @@
     {% for coursetype in coursetypes %}
         <tr style="border-bottom: 1px solid #e9e9e9;">
             <td class="list">
-                <a href="{% url 'coursetype-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=coursetype.slug %}">
+                <a href="{% url 'coursetype-detail' project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}">
                     {{ coursetype.name }}</a>
             </td>
 
@@ -481,12 +795,12 @@
                 <td width="20%">
                     <div class="btn-group pull-right button-action">
                         <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                           href='{% url "coursetype-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=coursetype.slug %}'
+                           href='{% url "coursetype-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
                            data-title="Delete {{ coursetype.name }}">
                             <span class="glyphicon glyphicon-minus"></span>
                         </a>
                         <a class="btn btn-default btn-xs tooltip-toggle"
-                           href='{% url "coursetype-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=coursetype.slug %}'
+                           href='{% url "coursetype-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug pk=coursetype.pk %}'
                            data-title="Edit {{ coursetype.name }}">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a>
@@ -536,41 +850,222 @@
     </td></tr>
 
     {% for courseconvener in courseconveners %}
-        <tr style="border-bottom: 1px solid #e9e9e9;">
-        <td class="list">
-        <div class="col-lg-10">
-            {% if courseconvener.user.first_name %}
-                {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }}
-            {% else %}
-                {{ courseconvener.user }}
-            {% endif %}
-        </div>
-        </td>
-
-        {% if user_can_delete %}
-        <td>
-            <div class="btn-group pull-right button-action">
-                <a class="btn btn-default btn-xs btn-delete tooltip-toggle"
-                   href='{% url "courseconvener-delete" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
-                   data-title="Delete {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}>">
-                    <span class="glyphicon glyphicon-minus"></span>
-                </a>
-                <a class="btn btn-default btn-xs tooltip-toggle"
-                   href='{% url "courseconvener-update" project_slug=certifyingorganisation.project.slug organisation_slug=certifyingorganisation.slug slug=courseconvener.slug %}'
-                   data-title="Edit {{ courseconvener.user.first_name }} {{ courseconvener.user.last_name }} <{{ courseconvener.user }}>">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </a>
-            </div>
-        </td>
-        {% endif %}
-        </tr>
+      {% include 'certifying_organisation/includes/convenor_list.html' %}
     {%  endfor %}
     </table>
     </div>
     </div>
     </div>
 
+
+    {% endif %}
+
     <script>
+        let pendingListUrl = "{% url "pending-certifyingorganisation-list" certifyingorganisation.project.slug %}";
+        const urlParams = new URLSearchParams(window.location.search);
+        const s = urlParams.get('s');
+
+        if (s) {
+            let $checklistForm = $('#checklistForm');
+            let checklistFormUrl = $checklistForm.attr('action');
+            $checklistForm.attr(
+                'action',
+                checklistFormUrl += '?s=' + s
+            )
+        }
+
+        function validateEmail(mail) {
+            return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)
+        }
+
+
+        $('.btn-invite').click(function () {
+            document.forms['inviteExternalReviewerForm'].reset();
+            $('#ie-badge').hide();
+            $('#inviteReviewerModal').modal('show')
+        });
+
+        function closeInviteExternalReviewer() {
+            document.forms['inviteExternalReviewerForm'].reset();
+            $('#inviteReviewerModal').modal('hide')
+        }
+
+        $('#inviteReviewerModal').submit(function (e) {
+            e.preventDefault();
+            $('#btn-submit-invite').click();
+        })
+
+        function submitInviteExternalReviewer(elm) {
+
+            let url = "{% url "invite-external-reviewer" certifyingorganisation.project.slug certifyingorganisation.slug %}";
+
+            // Check email
+            let emailInput = $('[name=reviewer-email]');
+            let nameInput = $('[name=reviewer-name]');
+            let submitButton = $(elm);
+            let cancelButton = submitButton.prev();
+            let email = emailInput.val();
+            let emailValid = validateEmail(email);
+            let name = nameInput.val();
+            if (!emailValid) {
+                alert('Please enter a valid email address.')
+                return
+            }
+            if (!name) {
+                alert('Please enter external reviewer name.')
+                return
+            }
+
+            nameInput.attr('disabled', true);
+            emailInput.attr('disabled', true);
+            submitButton.attr('disabled', true);
+            cancelButton.attr('disabled', true);
+
+            let badge = $('#ie-badge');
+            badge.removeClass('badge-success');
+            badge.removeClass('badge-danger');
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    'email': email,
+                    'name': name
+                },
+                dataType: 'json',
+                success: function(data){
+                    document.forms['inviteExternalReviewerForm'].reset();
+                    if (data['created']) {
+                        badge.addClass('badge-success');
+                        badge.html('Reviewer successfully invited!');
+                        $('#list-external-reviewer').append(
+                            `<li>${email}</li>`
+                        )
+                    } else {
+                        badge.html('Reviewer is already invited.')
+                    }
+
+                    badge.show();
+
+                    nameInput.attr('disabled', false);
+                    emailInput.attr('disabled', false);
+                    submitButton.attr('disabled', false);
+                    cancelButton.attr('disabled', false);
+                },
+                error: function () {
+                    badge.addClass('badge-error');
+                    badge.html('Error inviting reviewer');
+                    badge.show();
+
+                    nameInput.attr('disabled', false);
+                    emailInput.attr('disabled', false);
+                    submitButton.attr('disabled', false);
+                    cancelButton.attr('disabled', false);
+                }
+            });
+        }
+
+        function closeRejectionForm() {
+            $('.rejection-form-info').html('');
+            document.forms['rejectionForm'].reset();
+            $('#rejectionModal').modal('hide')
+        }
+        function closeUpdateStatusForm() {
+            $('.status-form-info').html('');
+            document.forms['updateStatusForm'].reset();
+            $('#updateStatusModal').modal('hide')
+        }
+        function closeChecklistModal() {
+            $('#checklistModal').modal('hide')
+        }
+
+        function submitChecklistForm() {
+            document.getElementById('checklistForm').submit();
+        }
+
+        function submitRejectionForm() {
+            let organisation_slug = $('[name=rejected-organisation-slug]').val();
+            let organisation_project_slug = $('[name=rejected-organisation-project-slug]').val();
+            $.ajax({
+                url: '/{{ LANGUAGE_CODE }}/' + organisation_project_slug + '/reject-certifyingorganisation/' + organisation_slug + '/',
+                data: {
+                    'remarks': $('[name=status]').val()
+                },
+                success: function(){
+                     location.href = pendingListUrl;
+                }
+            });
+        }
+        function submitUpdateStatusForm() {
+            var organisation_slug = $('[name=status-organisation-slug]').val();
+            var organisation_project_slug = $('[name=status-organisation-project-slug]').val();
+            let url = '/{{ LANGUAGE_CODE }}/' + organisation_project_slug + '/update-status-certifyingorganisation/' + organisation_slug + '/'
+            if (s) {
+                url += `?s=${s}`
+            }
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    'status': $('[name=update-status]').val(),
+                    'remarks': $('[name=update-remarks]').val()
+                },
+                dataType: 'json',
+                success: function(data){
+                    if (data['status'] === 'rejected') {
+                        location.href = pendingListUrl;
+                    } else {
+                        location.reload()
+                    }
+                }
+            });
+        }
+
+        $('.btn-reject').click(function () {
+            $('#rejected-organisation-name').html($(this).attr('organisation_name'));
+            $('#rejected-organisation-country').html($(this).attr('organisation_country'));
+            $('[name=rejected-organisation-slug]').val($(this).attr('organisation_slug'));
+            $('[name=rejected-organisation-project-slug]').val($(this).attr('organisation_project_slug'));
+            $('#rejectionModal').modal('show')
+        });
+
+        $('.btn-checklist-form').click(function () {
+            $('#checklistModal').modal('show');
+        });
+
+
+         $('.btn-update-status').click(function () {
+            var initial_status = $(this).attr('organisation_status');
+            var project_slug = $(this).attr('organisation_project_slug');
+            let url = '/{{ LANGUAGE_CODE }}/' + project_slug + '/get-status-list/';
+            if (s) {
+                url += `?s=${s}`
+            }
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    var $selectStatus = $('[name="update-status"]');
+                    $selectStatus.empty();
+                    $selectStatus.append('<option value="">--------------------------</option>');
+                    for(var i=0; i<data.length; i++){
+                        if(data[i].id === parseInt(initial_status)){
+                            $selectStatus.append('<option value=' + data[i].id + ' selected>' + data[i].name + '</option>')
+                        }else {
+                            $selectStatus.append('<option value=' + data[i].id + '>' + data[i].name + '</option>')
+                        }
+
+                    }
+                }
+            });
+            $('#status-organisation-name').html($(this).attr('organisation_name'));
+            $('#status-organisation-country').html($(this).attr('organisation_country'));
+            $('[name=status-organisation-slug]').val($(this).attr('organisation_slug'));
+            $('[name=status-organisation-project-slug]').val(project_slug);
+            $('[name=update-remarks]').val($(this).attr('organisation_remarks') !== 'None' ? $(this).attr('organisation_remarks') : '');
+            $('#updateStatusModal').modal('show')
+        });
+
         $('.btn-delete').hover(
             function (){
                 $(this).removeClass('btn-default').addClass('btn-danger')

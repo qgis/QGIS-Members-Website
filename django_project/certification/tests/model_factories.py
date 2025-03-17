@@ -5,6 +5,8 @@ import factory
 
 from certification.models import (
     Certificate,
+    CertificateType,
+    ProjectCertificateType,
     Attendee,
     Course,
     CourseType,
@@ -13,7 +15,8 @@ from certification.models import (
     TrainingCenter,
     CourseAttendee,
     Status,
-    CertifyingOrganisationCertificate
+    CertifyingOrganisationCertificate,
+    Checklist, OrganisationChecklist, ExternalReviewer,
 )
 from core.model_factories import UserF
 from base.tests.model_factories import ProjectF
@@ -81,6 +84,19 @@ class CourseTypeF(factory.django.DjangoModelFactory):
     author = factory.SubFactory(UserF)
 
 
+class CertificateTypeF(factory.django.DjangoModelFactory):
+    """CertificateType model factory."""
+
+    class Meta:
+        model = CertificateType
+
+    name = factory.sequence(lambda n: 'Test certificate type name %s' % n)
+    description = factory.sequence(
+        lambda n: 'Description certificate type %s' % n)
+    wording = factory.sequence(
+        lambda n: 'Wording certificate type %s' % n)
+
+
 class CourseF(factory.django.DjangoModelFactory):
     """Course model factory."""
 
@@ -97,6 +113,7 @@ class CourseF(factory.django.DjangoModelFactory):
     course_type = factory.SubFactory(CourseTypeF)
     training_center = factory.SubFactory(TrainingCenterF)
     author = factory.SubFactory(UserF)
+    certificate_type = factory.SubFactory(CertificateTypeF)
 
 
 class AttendeeF(factory.django.DjangoModelFactory):
@@ -124,6 +141,16 @@ class CourseAttendeeF(factory.django.DjangoModelFactory):
     attendee = factory.SubFactory(AttendeeF)
 
 
+class ProjectCertificateTypeF(factory.django.DjangoModelFactory):
+    """ProjectCertificateType model factory."""
+
+    class Meta:
+        model = ProjectCertificateType
+
+    project = factory.SubFactory(ProjectF)
+    certificate_type = factory.SubFactory(CertificateTypeF)
+
+
 class CertificateF(factory.django.DjangoModelFactory):
     """Certificate model factory."""
 
@@ -144,3 +171,36 @@ class StatusF(factory.django.DjangoModelFactory):
 
     name = factory.sequence(lambda n: u'Test status %s' % n)
     project = factory.SubFactory(ProjectF)
+
+
+class ChecklistF(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Checklist
+
+    question = factory.sequence(lambda n: u'Test question %s' % n)
+    project = factory.SubFactory(ProjectF)
+
+
+class OrganisationChecklistF(factory.django.DjangoModelFactory):
+    class Meta:
+        model = OrganisationChecklist
+
+    checklist = factory.SubFactory(ChecklistF)
+    organisation = factory.SubFactory(CertifyingOrganisationF)
+    checklist_question = factory.sequence(
+        lambda n: 'Question %s' % n)
+
+
+class ExternalReviewerF(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ExternalReviewer
+
+    certifying_organisation = factory.SubFactory(
+        CertifyingOrganisationF
+    )
+    session_key = factory.Sequence(
+        lambda n: 'session %s' % n
+    )
+    email = factory.Sequence(
+        lambda n: 'email%s@email.com' % n
+    )

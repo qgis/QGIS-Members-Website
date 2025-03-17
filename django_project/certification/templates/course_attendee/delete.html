@@ -21,7 +21,7 @@
                     <a class="btn btn-danger btn-sm tooltip-toggle"
                        href="#"
                        onClick="$('#delete-confirmation').submit()"
-                       data-title="Delete {{ courseattendee.attendee.firstname }} {{ courseattendee.attendee.surname }}">
+                       data-title="Delete {{ courseattendee.attendee.firstname }} {{ courseattendee.attendee.surname |default_if_none:"" }}">
                         <span class="glyphicon glyphicon-minus"></span>
                     </a>
                     <a class="btn btn-default btn-sm tooltip-toggle"

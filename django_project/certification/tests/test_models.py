@@ -1,9 +1,12 @@
 # coding=utf-8
 """Test for models."""
 
+from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from certification.tests.model_factories import (
     CertificateF,
+    CertificateTypeF,
     AttendeeF,
     CourseF,
     CourseTypeF,
@@ -11,8 +14,17 @@ from certification.tests.model_factories import (
     CertifyingOrganisationF,
     TrainingCenterF,
     CourseAttendeeF,
-    StatusF
+    StatusF, ExternalReviewerF, ChecklistF
 )
+from certification.models.certificate_type import CertificateType
+from core.model_factories import UserF
+
+
+class SetUpMixin:
+    def setUp(self):
+        """Set up before each test."""
+        # Delete CertificateType created from migration 0007_certificate_type
+        CertificateType.objects.all().delete()
 
 
 class TestCertifyingOrganisation(TestCase):
@@ -38,6 +50,8 @@ class TestCertifyingOrganisation(TestCase):
         self.assertTrue(model.organisation_phone is not None)
         self.assertTrue(model.approved is not None)
         self.assertTrue(model.project is not None)
+        self.assertTrue(model.creation_date is not None)
+        self.assertTrue(model.update_date is not None)
 
     def test_Certifying_Organisation_delete(self):
         """Test course type model creation."""
@@ -94,17 +108,11 @@ class TestCertifyingOrganisation(TestCase):
             self.assertEqual(model.__dict__.get(key), val)
 
 
-class TestCertificate(TestCase):
+class CertificateSetUp(SetUpMixin, TestCase):
     """Test certificate model."""
-
-    def setUp(self):
-        """Set up before test."""
-
-        pass
 
     def test_Certificate_create(self):
         """Test certificate model creation."""
-
         model = CertificateF.create()
 
         # check if PK exists.
@@ -118,6 +126,65 @@ class TestCertificate(TestCase):
 
         # check if deleted.
         self.assertTrue(model.pk is None)
+
+
+
+class CertificateTypeSetUp(SetUpMixin, TestCase):
+    """Test Certificate models."""
+
+    def test_CRUD_CertificateType(self):
+        # initial
+        self.assertEqual(CertificateType.objects.all().count(), 0)
+
+        # create model
+        model = CertificateTypeF.create()
+        self.assertEqual(CertificateType.objects.all().count(), 1)
+
+        # read model
+        self.assertIsNotNone(model.id)
+        self.assertIn('Test certificate type name', model.name)
+        self.assertIn('Description certificate type', model.description)
+        self.assertIn('Wording certificate type', model.wording)
+        self.assertEqual(model.__str__(), model.name)
+
+        #
+        model.name = 'Update certificate type  name'
+        model.save()
+        self.assertEqual(model.name, 'Update certificate type  name')
+
+        model.delete()
+        self.assertIsNone(model.id)
+        self.assertEqual(CertificateType.objects.all().count(), 0)
+
+    def test_name_field_must_be_unique(self):
+        CertificateTypeF.create(name="We are twin")
+        msg = ('duplicate key value violates unique constraint '
+               '"certification_certificatetype_name_key"')
+        with self.assertRaisesMessage(IntegrityError, msg):
+            CertificateTypeF.create(name="We are twin")
+
+    def test_order_field_must_be_unique(self):
+        CertificateTypeF.create(order=1)
+        msg = ('duplicate key value violates unique constraint '
+               '"certification_certificatetype_order_key"')
+        with self.assertRaisesMessage(IntegrityError, msg):
+            CertificateTypeF.create(order=1)
+
+    def test_order_field_can_be_null(self):
+        model_1 = CertificateTypeF.create(order=1)
+        model_2 = CertificateTypeF.create(order=2)
+
+        self.assertEqual(model_1.order, 1)
+        self.assertEqual(model_2.order, 2)
+
+        model_1.order = None
+        model_1.save()
+
+        model_2.order = 1
+        model_2.save()
+
+        self.assertEqual(model_1.order, None)
+        self.assertEqual(model_2.order, 1)
 
 
 class TestAttendee(TestCase):
@@ -299,6 +366,18 @@ class TestCourseType(TestCase):
             self.assertEqual(model.__dict__.get(key), val)
             self.assertTrue(model.name == 'new Course Type name')
 
+    def test_create_CourseType_non_unique_slug(self):
+        """Test create CourseType instances with the same name.
+
+        The duplicate slug must be allowed.
+        """
+        long_name = 'Very long long course type name, more than 50 characters'
+        course_type_1 = CourseTypeF.create(name=long_name)
+        self.assertEqual(len(course_type_1.slug), 50)
+        course_type_2 = CourseTypeF.create(name=long_name)
+        self.assertEqual(course_type_1.slug, course_type_2.slug)
+        self.assertNotEqual(course_type_1.pk, course_type_2.pk)
+
 
 class TestCourseConvener(TestCase):
     """Test course convener model."""
@@ -324,6 +403,7 @@ class TestCourseConvener(TestCase):
             self.assertEqual(model.__dict__.get(key), val)
             self.assertTrue(model.title == 'new Course Convener Title')
             self.assertTrue(model.degree == 'new Course Convener Degree')
+            self.assertTrue(model.is_active)
 
         # check if PK exists.
         self.assertTrue(model.pk is not None)
@@ -403,3 +483,91 @@ class TestStatus(TestCase):
         for key, val in new_model_data.items():
             self.assertEqual(model.__dict__.get(key), val)
             self.assertTrue(model.name == 'new Status name')
+
+
+class TestValidateEmailAddress(TestCase):
+    """Test validate_email_address function."""
+
+    def test_validation_failed_must_raise_ValidationError(self):
+        from certification.models import validate_email_address
+        email = 'email@wrongdomain'
+        msg = f'{email} is not a valid email address'
+        with self.assertRaisesMessage(ValidationError, msg):
+            validate_email_address(email)
+
+
+class TestExternalReviewer(TestCase):
+
+    def test_External_Reviewer_create(self):
+        """Test external reviewer model creation."""
+
+        model = ExternalReviewerF.create()
+
+        # check if PK exists.
+        self.assertTrue(model.pk is not None)
+
+    def test_External_Reviewer_expire(self):
+        from django.contrib.sessions.backends.db import SessionStore
+
+        s = SessionStore()
+        s.create()
+        model = ExternalReviewerF.create(
+            session_key=s.session_key
+        )
+
+        self.assertFalse(model.session_expired)
+
+        model_with_no_session = ExternalReviewerF.create()
+        self.assertTrue(model_with_no_session.session_expired)
+        self.assertTrue(
+            str(model),
+            model.email
+        )
+
+
+class TestChecklist(TestCase):
+    """Test checklist model."""
+
+    def setUp(self):
+        """Set up before test."""
+
+        pass
+
+    def test_Checklist_create(self):
+        """Test checklist model creation."""
+
+        model = ChecklistF.create()
+
+        history = model.history.earliest()
+        user = UserF.create()
+        history.history_user = user
+        history.save()
+
+        # check if PK exists.
+        self.assertTrue(model.pk is not None)
+
+        # check if model attributes exists.
+        self.assertEqual(model.creator, user)
+
+        self.assertEqual(
+            str(model),
+            model.question
+        )
+
+        self.assertEqual(
+            model.target,
+            ''
+        )
+
+        history.delete()
+
+        self.assertIsNone(model.creator)
+
+    def test_Checklist_delete(self):
+        """Test checklist model deletion."""
+
+        model = ChecklistF.create()
+        model.delete()
+
+        # check if deleted.
+        self.assertTrue(model.pk is None)

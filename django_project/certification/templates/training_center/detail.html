@@ -1,6 +1,6 @@
 {% extends "project_base.html" %}
 {% load custom_markup %}
-{% load staticfiles %}
+{% load static %}
 
 {% block title %}Training Center - {{ block.super }}{% endblock %}
 
@@ -88,9 +88,11 @@
         <span class="grey-italic col-lg-4">Phone</span><span class="col-lg-8">{{ trainingcenter.phone }}<br/></span>
     </div>
 
+    {% if trainingcenter.location.x %}
     <div class="map-wrapper">
         <div id="map"></div>
     </div>
+    {% endif %}
 
     <script>
         $('.btn-delete').hover(

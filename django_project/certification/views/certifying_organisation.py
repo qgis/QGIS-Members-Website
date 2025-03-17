@@ -1,11 +1,17 @@
 # coding=utf-8
+import ast
+
+from django.db.models.functions import Lower
+from rest_framework.views import APIView
+
 from base.models import Project
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.utils.html import escape
 from django.urls import reverse
 from django.shortcuts import get_list_or_404
-from django.db.models import Q
-from django.http import HttpResponse
+from django.db.models import Q, Prefetch
+from django.http import HttpResponse, request
 from django.views.generic import (
     ListView,
     CreateView,
@@ -17,7 +23,9 @@ from django.views.generic import (
 from django.http import HttpResponseRedirect, Http404
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, UserPassesTestMixin
+from django_datatables_view.base_datatable_view import BaseDatatableView
+from django.contrib.sessions.models import Session
 from pure_pagination.mixins import PaginationMixin
 from ..models import (
     CertifyingOrganisation,
@@ -26,9 +34,12 @@ from ..models import (
     CourseConvener,
     Course,
     CourseAttendee,
-    CertifyingOrganisationCertificate)
+    CertifyingOrganisationCertificate,
+    Checklist, OrganisationChecklist,
+    REVIEWER, ORGANIZATION_OWNER, ExternalReviewer)
 from ..forms import CertifyingOrganisationForm
 from certification.utilities import check_slug
+from ..serializers.checklist_serializer import ChecklistSerializer
 
 
 class JSONResponseMixin(object):
@@ -82,8 +93,44 @@ class CertifyingOrganisationMixin(object):
     form_class = CertifyingOrganisationForm
 
 
+class CertifyingOrganisationUserTestMixin(UserPassesTestMixin, APIView):
+    """Mixin class to provide update access to certifying organisation"""
+    external_reviewer = None
+
+    def test_func(self, user):
+        certifying_organisation = (
+            CertifyingOrganisation.objects.get(
+                slug=self.kwargs.get('slug', None))
+        )
+
+        session = self.request.GET.get('s', None)
+
+        if (
+            user.is_staff or
+            user in
+            certifying_organisation.project.certification_managers.all() or
+            user == certifying_organisation.project.owner
+        ):
+            return True
+
+        if user.is_anonymous and session:
+            try:
+                session = Session.objects.get(
+                    pk=session
+                )
+                self.external_reviewer = ExternalReviewer.objects.get(
+                    session_key=session.pk,
+                    certifying_organisation=certifying_organisation
+                )
+                return not self.external_reviewer.session_expired
+            except (Session.DoesNotExist, ExternalReviewer.DoesNotExist):
+                pass
+
+        return False
+
+
 class JSONCertifyingOrganisationListView(
-        CertifyingOrganisationMixin, JSONResponseMixin, ListView):
+    CertifyingOrganisationMixin, JSONResponseMixin, ListView):
     context_object_name = 'certifyingorganisation'
 
     def dispatch(self, request, *args, **kwargs):
@@ -121,9 +168,9 @@ class JSONCertifyingOrganisationListView(
 
 
 class CertifyingOrganisationListView(
-        CertifyingOrganisationMixin,
-        PaginationMixin,
-        ListView):
+    CertifyingOrganisationMixin,
+    PaginationMixin,
+    ListView):
     """List view for Certifying Organisation."""
 
     context_object_name = 'certifyingorganisations'
@@ -150,10 +197,11 @@ class CertifyingOrganisationListView(
         if project_slug:
             context['the_project'] = Project.objects.get(slug=project_slug)
             context['project'] = context['the_project']
-            context['certificate_lists'] = \
+            context['certificate_lists'] = (
                 CertifyingOrganisationCertificate.objects.filter(
                     certifying_organisation__project=context['the_project']
-            ).values_list('certifying_organisation', flat=True)
+                ).values_list('certifying_organisation', flat=True)
+            )
         return context
 
     def get_queryset(self, queryset=None):
@@ -181,8 +229,8 @@ class CertifyingOrganisationListView(
 
 
 class CertifyingOrganisationDetailView(
-        CertifyingOrganisationMixin,
-        DetailView):
+    CertifyingOrganisationMixin,
+    DetailView):
     """Detail view for Certifying Organisation."""
 
     context_object_name = 'certifyingorganisation'
@@ -201,52 +249,133 @@ class CertifyingOrganisationDetailView(
         context = super(
             CertifyingOrganisationDetailView, self).get_context_data(**kwargs)
 
-        # lets set some default permission flags for checks in template.
-        context['user_can_create'] = False
-        context['user_can_delete'] = False
-
-        certifying_organisation = context['certifyingorganisation']
-        context['trainingcenters'] = TrainingCenter.objects.filter(
-            certifying_organisation=certifying_organisation)
-        context['num_trainingcenter'] = context['trainingcenters'].count()
-        context['coursetypes'] = CourseType.objects.filter(
-            certifying_organisation=certifying_organisation)
-        context['num_coursetype'] = context['coursetypes'].count()
-        context['courseconveners'] = CourseConvener.objects.filter(
-            certifying_organisation=certifying_organisation)
-        context['num_courseconvener'] = context['courseconveners'].count()
-        context['courses'] = Course.objects.filter(
-            certifying_organisation=certifying_organisation).order_by(
-            '-start_date'
-        )
-        context['num_course'] = context['courses'].count()
+        certifying_organisation = self.object
         project_slug = self.kwargs.get('project_slug', None)
-        context['attendee'] = CourseAttendee.objects.filter(
-            course__in=context['courses'],
-            attendee__certifying_organisation=certifying_organisation
-        )
-        context['num_attendees'] = context['attendee'].count()
+
+        # Check session key
+        session_key = self.request.GET.get('s', None)
+        session = None
+        if session_key:
+            try:
+                session = Session.objects.get(pk=session_key)
+            except Session.DoesNotExist:
+                pass
+
+        external_reviewers = ExternalReviewer.objects.filter(
+            certifying_organisation=certifying_organisation
+        ).order_by('id')
+        context['external_reviewers'] = []
+        for external_reviewer in external_reviewers:
+            if not external_reviewer.session_expired:
+                context['external_reviewers'].append(
+                    external_reviewer
+                )
+
+        if certifying_organisation.approved:
+            context['trainingcenters'] = TrainingCenter.objects.filter(
+                certifying_organisation=certifying_organisation)
+            context['num_trainingcenter'] = context['trainingcenters'].count()
+            context['coursetypes'] = CourseType.objects.filter(
+                certifying_organisation=certifying_organisation)
+            context['num_coursetype'] = context['coursetypes'].count()
+            context['courseconveners'] = CourseConvener.objects.filter(
+                certifying_organisation=certifying_organisation
+            ).prefetch_related('course_set')
+            context['num_courseconvener'] = context['courseconveners'].count()
+            context['courses'] = Course.objects.filter(
+                certifying_organisation=certifying_organisation).order_by(
+                '-start_date'
+            )
+            context['num_course'] = context['courses'].count()
+            context['attendee'] = CourseAttendee.objects.filter(
+                course__in=context['courses'],
+                attendee__certifying_organisation=certifying_organisation
+            )
+            context['num_attendees'] = context['attendee'].count()
+
         context['project_slug'] = project_slug
         context['the_project'] = Project.objects.get(slug=project_slug)
+
+        context['available_status'] = (
+            context['the_project'].status_set.all().values_list(
+                Lower('name'), flat=True
+            )
+        )
         context['project'] = context['the_project']
 
-        if self.request.user.is_staff:
-            context['user_can_create'] = True
-            context['user_can_delete'] = True
+        user_can_create = False
+        user_can_delete = False
+        user_can_update_status = False
+        user_can_invite_external_reviewer = False
 
-        if self.request.user in context[
-            'the_project'].certification_managers.all():
-            context['user_can_create'] = True
-            context['user_can_delete'] = True
-
-        if self.request.user == context['project'].owner:
-            context['user_can_create'] = True
-            context['user_can_delete'] = True
+        if (
+            self.request.user.is_staff or
+            self.request.user in context[
+                'the_project'].certification_managers.all() or
+            self.request.user == context['project'].owner
+        ):
+            user_can_create = True
+            user_can_delete = True
+            user_can_update_status = True
+            user_can_invite_external_reviewer = True
 
         if self.request.user in \
                 certifying_organisation.organisation_owners.all():
-            context['user_can_create'] = True
-            context['user_can_delete'] = True
+            if (
+                certifying_organisation.approved or
+                certifying_organisation.rejected or
+                (
+                    certifying_organisation.status and
+                    certifying_organisation.status.name.lower() == 'pending'
+                )
+            ):
+                user_can_create = True
+                user_can_delete = True
+
+        if session:
+            try:
+                external_reviewer = ExternalReviewer.objects.get(
+                    session_key=session.session_key,
+                    certifying_organisation=certifying_organisation
+                )
+                if not external_reviewer.session_expired:
+                    user_can_update_status = True
+            except ExternalReviewer.DoesNotExist:
+                pass
+
+        context['user_can_delete'] = user_can_delete
+        context['user_can_create'] = user_can_create
+        context['user_can_update_status'] = user_can_update_status
+        context['user_can_invite_external_reviewer'] = (
+            user_can_invite_external_reviewer
+        )
+
+        checklist_questions = Checklist.objects.filter(
+            project=context['the_project'],
+            target=REVIEWER,
+            active=True
+        ).prefetch_related(
+            Prefetch(
+                'organisationchecklist_set',
+                queryset=OrganisationChecklist.objects.filter(
+                    organisation=certifying_organisation
+                ))
+        )
+        context['available_checklist'] = ChecklistSerializer(
+            checklist_questions, many=True).data
+
+        context['submitted_checklist'] = OrganisationChecklist.objects.filter(
+            organisation=certifying_organisation,
+        )
+
+        context['checked_checklist'] = context['submitted_checklist'].filter(
+            checklist__in=checklist_questions,
+            checked=True
+        ).count()
+
+        # Get history data
+        context['history'] = certifying_organisation.history.all()
+
         return context
 
     def get_queryset(self):
@@ -257,7 +386,7 @@ class CertifyingOrganisationDetailView(
         :rtype: QuerySet
         """
 
-        qs = CertifyingOrganisation.approved_objects.all()
+        qs = CertifyingOrganisation.objects.filter(rejected=False)
         return qs
 
     def get_object(self, queryset=None):
@@ -298,9 +427,9 @@ class CertifyingOrganisationDetailView(
 
 # noinspection PyAttributeOutsideInit
 class CertifyingOrganisationDeleteView(
-        LoginRequiredMixin,
-        CertifyingOrganisationMixin,
-        DeleteView):
+    LoginRequiredMixin,
+    CertifyingOrganisationMixin,
+    DeleteView):
     """Delete view for Certifying Organisation."""
 
     context_object_name = 'certifyingorganisation'
@@ -325,7 +454,7 @@ class CertifyingOrganisationDeleteView(
         self.project_slug = self.kwargs.get('project_slug', None)
         self.project = Project.objects.get(slug=self.project_slug)
         return super(
-            CertifyingOrganisationDeleteView, self)\
+            CertifyingOrganisationDeleteView, self) \
             .get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -347,7 +476,7 @@ class CertifyingOrganisationDeleteView(
         self.project_slug = self.kwargs.get('project_slug', None)
         self.project = Project.objects.get(slug=self.project_slug)
         return super(
-            CertifyingOrganisationDeleteView, self)\
+            CertifyingOrganisationDeleteView, self) \
             .post(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -408,15 +537,15 @@ class CustomSuccessMessageMixin(object):
 
 # noinspection PyAttributeOutsideInit
 class CertifyingOrganisationCreateView(
-        CustomSuccessMessageMixin,
-        LoginRequiredMixin,
-        CertifyingOrganisationMixin,
-        CreateView):
+    CustomSuccessMessageMixin,
+    LoginRequiredMixin,
+    CertifyingOrganisationMixin,
+    CreateView):
     """Create view for Certifying Organisation."""
 
     context_object_name = 'certifyingorganisation'
     template_name = 'certifying_organisation/create.html'
-    success_message = 'Your organisation is successfully registered. '\
+    success_message = 'Your organisation is successfully registered. ' \
                       'It is now waiting for an approval.'
     message_extra_tags = 'organisation_submitted'
 
@@ -450,6 +579,12 @@ class CertifyingOrganisationCreateView(
         context['certifyingorganisations'] = \
             self.get_queryset().filter(project=self.project)
         context['the_project'] = self.project
+        context['available_checklist'] = ChecklistSerializer(
+            Checklist.objects.filter(
+                project=context['the_project'],
+                target=ORGANIZATION_OWNER,
+                active=True
+            ), many=True).data
         return context
 
     def form_valid(self, form):
@@ -477,6 +612,7 @@ class CertifyingOrganisationCreateView(
                     'project_name': self.project.name,
                     'site': site,
                     'project_slug': self.project_slug,
+                    'org': self.object.slug,
                     'organisation_name': self.object.name,
                     'organisation_country': self.object.country.name,
                 }
@@ -492,8 +628,8 @@ class CertifyingOrganisationCreateView(
                     u'Country: {organisation_country}\n'
                     u'You may review and approve the organisation by '
                     u'following this link:\n'
-                    u'{site}/en/{project_slug}/pending-certifyingorganisation/'
-                    u'list/\n\n'
+                    u'{site}/en/{project_slug}/certifyingorganisation/{org}/'
+                    u'\n\n'
                     u'Sincerely,\n\n\n\n\n'
                     u'------------------------------------------------------\n'
                     u'This is an auto-generated email from the system.'
@@ -562,9 +698,9 @@ class CertifyingOrganisationCreateView(
 
 # noinspection PyAttributeOutsideInit
 class CertifyingOrganisationUpdateView(
-        LoginRequiredMixin,
-        CertifyingOrganisationMixin,
-        UpdateView):
+    LoginRequiredMixin,
+    CertifyingOrganisationMixin,
+    UpdateView):
     """Update view for Certifying Organisation."""
 
     context_object_name = 'certifyingorganisation'
@@ -581,9 +717,18 @@ class CertifyingOrganisationUpdateView(
             CertifyingOrganisationUpdateView, self).get_form_kwargs()
         self.project_slug = self.kwargs.get('project_slug', None)
         self.project = Project.objects.get(slug=self.project_slug)
+        show_owner_message = False
+        certifying_organisation = self.object
+        if (
+                certifying_organisation and
+                self.request.user in
+                certifying_organisation.organisation_owners.all()):
+            show_owner_message = True
         kwargs.update({
             'user': self.request.user,
-            'project': self.project
+            'project': self.project,
+            'form_title': 'Update Certifying Organisation',
+            'show_owner_message': show_owner_message
         })
         return kwargs
 
@@ -599,6 +744,7 @@ class CertifyingOrganisationUpdateView(
 
         context = super(
             CertifyingOrganisationUpdateView, self).get_context_data(**kwargs)
+        context['certifyingorganisation'] = self.object
         context['certifyingorganisations'] = self.get_queryset() \
             .filter(project=self.project)
         context['the_project'] = self.project
@@ -651,11 +797,94 @@ class CertifyingOrganisationUpdateView(
                 'this name is already exists!')
 
 
+class CertifyingOrganisationJson(BaseDatatableView):
+    model = CertifyingOrganisation
+    columns = ['name', 'creation_date', 'update_date',
+               'org_name', 'can_approve', 'project_slug',
+               'org_slug', 'country_name', 'can_edit',
+               'status', 'remarks']
+    order_columns = ['name']
+    max_display_length = 100
+
+    def get_initial_queryset(self):
+        return CertifyingOrganisation.objects.all()
+
+    def render_column(self, row, column):
+        # We want to render user as a custom column
+        if column == 'org_name':
+            return escape('{0}'.format(row.name))
+        elif column == 'status' or column == 'remarks':
+            column_value = getattr(row, column)
+            return escape('{0}'.format(column_value if column_value else ''))
+        elif column == 'project_slug':
+            return escape('{0}'.format(row.project.slug))
+        elif column == 'org_slug':
+            return escape('{0}'.format(row.slug))
+        elif column == 'country_name':
+            return escape('{0}'.format(row.country.name))
+        elif column == 'creation_date':
+            return escape('{0}'.format(row.creation_date))
+        elif column == 'update_date':
+            return escape('{0}'.format(row.update_date))
+        elif column == 'can_approve':
+            return (
+                not row.approved and self.request.user.is_staff or
+                self.request.user == row.project.owner or
+                self.request.user in row.project.certification_managers.all()
+            )
+        elif column == 'can_edit':
+            return (
+                not row.approved and self.request.user.is_staff or
+                self.request.user == row.project.owner or
+                self.request.user == row.organisation_owners.all() or
+                self.request.user in row.project.certification_managers.all()
+            )
+        else:
+            return super(CertifyingOrganisationJson, self
+                         ).render_column(row, column)
+
+    def _validate_param(self, param_value):
+        """
+        Handle empty or invalid param value
+        """
+        try:
+            param = ast.literal_eval(param_value)
+            if not isinstance(param, bool):
+                param = False
+        except (ValueError, SyntaxError):
+            param = False
+        return param
+
+
+    def filter_queryset(self, qs):
+        search = self.request.GET.get('search[value]', None)
+        ready = self._validate_param(
+            self.request.GET.get('ready', 'False'))
+        approved = self._validate_param(
+            self.request.GET.get('approved', 'False'))
+        rejected = self._validate_param(
+            self.request.GET.get('rejected', 'False'))
+
+        qs = qs.filter(rejected=rejected, approved=approved)
+
+        if approved:
+            qs = qs.filter(enabled=True)
+        else:
+            if not ready:
+                qs = qs.filter(status__name__icontains='pending')
+            else:
+                qs = qs.exclude(status__name__icontains='pending')
+
+        if search:
+            qs = qs.filter(name__istartswith=search)
+        return qs
+
+
 class PendingCertifyingOrganisationListView(
-        LoginRequiredMixin,
-        CertifyingOrganisationMixin,
-        PaginationMixin,
-        ListView):
+    LoginRequiredMixin,
+    CertifyingOrganisationMixin,
+    PaginationMixin,
+    ListView):
     """List view for pending certifying organisation."""
 
     context_object_name = 'certifyingorganisations'
@@ -684,10 +913,12 @@ class PendingCertifyingOrganisationListView(
         :rtype: dict
         """
 
-        context = super(PendingCertifyingOrganisationListView, self)\
+        context = super(PendingCertifyingOrganisationListView, self) \
             .get_context_data(**kwargs)
         context['num_certifyingorganisations'] = self.get_queryset().count()
-        context['unapproved'] = True
+        context['pending'] = (
+            self.request.GET.get('ready', '').lower() == 'false'
+        )
         context['project_slug'] = self.project_slug
         if self.project_slug:
             context['the_project'] = \
@@ -728,9 +959,48 @@ class PendingCertifyingOrganisationListView(
         return self.queryset
 
 
+def send_approved_email(
+        certifying_organisation: CertifyingOrganisation,
+        site: request):
+    for organisation_owner in \
+            certifying_organisation.organisation_owners.all():
+        data = {
+            'owner_firstname': organisation_owner.first_name,
+            'owner_lastname': organisation_owner.last_name,
+            'organisation_name': certifying_organisation.name,
+            'project_name': certifying_organisation.project.name,
+            'project_owner_firstname':
+                certifying_organisation.project.owner.first_name,
+            'project_owner_lastname':
+                certifying_organisation.project.owner.last_name,
+            'site': site,
+            'project_slug': certifying_organisation.project.slug,
+        }
+        send_mail(
+            u'Projecta - Your organisation is approved',
+            u'Dear {owner_firstname} {owner_lastname},\n\n'
+            u'Congratulations!\n'
+            u'Your certifying organisation has been approved. The '
+            u'following is the details of the newly approved organisation:'
+            u'\n'
+            u'Name of organisation: {organisation_name}\n'
+            u'Project: {project_name}\n'
+            u'You may now start creating your training center, '
+            u'course type, course convener and course.\n'
+            u'For further information please visit: '
+            u'{site}/en/{project_slug}/about/\n\n'
+            u'Sincerely,\n'
+            u'{project_owner_firstname} {project_owner_lastname}'.format(
+                **data),
+            certifying_organisation.project.owner.email,
+            [organisation_owner.email],
+            fail_silently=False,
+        )
+
+
 class ApproveCertifyingOrganisationView(
-        CertifyingOrganisationMixin,
-        RedirectView):
+    CertifyingOrganisationMixin,
+    RedirectView):
     """Redirect view for approving Certifying Organisation."""
 
     permanent = False
@@ -767,40 +1037,11 @@ class ApproveCertifyingOrganisationView(
         certifyingorganisation.save()
 
         site = self.request.get_host()
-        for organisation_owner in \
-                certifyingorganisation.organisation_owners.all():
-            data = {
-                'owner_firstname': organisation_owner.first_name,
-                'owner_lastname': organisation_owner.last_name,
-                'organisation_name': certifyingorganisation.name,
-                'project_name': certifyingorganisation.project.name,
-                'project_owner_firstname':
-                    certifyingorganisation.project.owner.first_name,
-                'project_owner_lastname':
-                    certifyingorganisation.project.owner.last_name,
-                'site': site,
-                'project_slug': project_slug,
-            }
-            send_mail(
-                u'Projecta - Your organisation is approved',
-                u'Dear {owner_firstname} {owner_lastname},\n\n'
-                u'Congratulations!\n'
-                u'Your certifying organisation has been approved. The '
-                u'following is the details of the newly approved organisation:'
-                u'\n'
-                u'Name of organisation: {organisation_name}\n'
-                u'Project: {project_name}\n'
-                u'You may now start creating your training center, '
-                u'course type, course convener and course.\n'
-                u'For further information please visit: '
-                u'{site}/en/{project_slug}/about/\n\n'
-                u'Sincerely,\n'
-                u'{project_owner_firstname} {project_owner_lastname}'
-                .format(**data),
-                certifyingorganisation.project.owner.email,
-                [organisation_owner.email],
-                fail_silently=False,
-            )
+
+        send_approved_email(
+            certifyingorganisation,
+            site
+        )
 
         return reverse(self.pattern_name, kwargs={
             'project_slug': project_slug
@@ -824,6 +1065,45 @@ class AboutView(TemplateView):
         project_slug = self.kwargs.get('project_slug')
         context['the_project'] = Project.objects.get(slug=project_slug)
         return context
+
+
+def send_rejection_email(certifying_organisation, site, schema='http'):
+    """Send notification to owner that the organisation has been rejected"""
+    for organisation_owner in \
+            certifying_organisation.organisation_owners.all():
+        data = {
+            'owner_firstname': organisation_owner.first_name,
+            'owner_lastname': organisation_owner.last_name,
+            'organisation_name': certifying_organisation.name,
+            'project_name': certifying_organisation.project.name,
+            'project_owner_firstname':
+                certifying_organisation.project.owner.first_name,
+            'project_owner_lastname':
+                certifying_organisation.project.owner.last_name,
+            'site': site,
+            'project_slug': certifying_organisation.project.slug,
+            'status': certifying_organisation.status,
+            'schema': schema
+        }
+        send_mail(
+            u'Projecta - Your organisation is not approved',
+            u'Dear {owner_firstname} {owner_lastname},\n\n'
+            u'We are sorry that your certifying organisation '
+            u'has not been approved. \nThe '
+            u'following is the details of your organisation:'
+            u'\n\n'
+            u'Name of organisation: {organisation_name}\n'
+            u'Project: {project_name}\n'
+            u'Status: {status}\n\n'
+            u'For further information please visit: '
+            u'{schema}://{site}/en/{project_slug}/about/\n\n'
+            u'Sincerely,\n'
+            u'{project_owner_firstname} {project_owner_lastname}'.format(
+                **data),
+            certifying_organisation.project.owner.email,
+            [organisation_owner.email],
+            fail_silently=False,
+        )
 
 
 def reject_certifying_organisation(request, **kwargs):
@@ -857,41 +1137,12 @@ def reject_certifying_organisation(request, **kwargs):
 
         schema = request.is_secure() and "https" or "http"
         site = request.get_host()
-        for organisation_owner in \
-                certifyingorganisation.organisation_owners.all():
-            data = {
-                'owner_firstname': organisation_owner.first_name,
-                'owner_lastname': organisation_owner.last_name,
-                'organisation_name': certifyingorganisation.name,
-                'project_name': certifyingorganisation.project.name,
-                'project_owner_firstname':
-                    certifyingorganisation.project.owner.first_name,
-                'project_owner_lastname':
-                    certifyingorganisation.project.owner.last_name,
-                'site': site,
-                'project_slug': project_slug,
-                'status': certifyingorganisation.status,
-                'schema': schema
-            }
-            send_mail(
-                u'Projecta - Your organisation is not approved',
-                u'Dear {owner_firstname} {owner_lastname},\n\n'
-                u'We are sorry that your certifying organisation '
-                u'has not been approved. \nThe '
-                u'following is the details of your organisation:'
-                u'\n\n'
-                u'Name of organisation: {organisation_name}\n'
-                u'Project: {project_name}\n'
-                u'Status: {status}\n\n'
-                u'For further information please visit: '
-                u'{schema}://{site}/en/{project_slug}/about/\n\n'
-                u'Sincerely,\n'
-                u'{project_owner_firstname} {project_owner_lastname}'
-                .format(**data),
-                certifyingorganisation.project.owner.email,
-                [organisation_owner.email],
-                fail_silently=False,
-            )
+
+        send_rejection_email(
+            certifyingorganisation,
+            site,
+            schema
+        )
 
         url = reverse(pattern_name, kwargs={
             'project_slug': project_slug
@@ -899,80 +1150,3 @@ def reject_certifying_organisation(request, **kwargs):
         return HttpResponseRedirect(url)
     else:
         return HttpResponse('Please use GET method.')
-
-
-class RejectedCertifyingOrganisationListView(
-        LoginRequiredMixin,
-        CertifyingOrganisationMixin,
-        PaginationMixin,
-        ListView):
-    """List view for pending certifying organisation."""
-
-    context_object_name = 'certifyingorganisations'
-    template_name = 'certifying_organisation/rejected-list.html'
-    paginate_by = 10
-
-    def __init__(self):
-        """
-        We overload __init__ in order to declare self.project and
-        self.project_slug. Both are then defined in self.get_queryset
-        which is the first method called. This means we can then reuse the
-        values in self.get_context_data.
-        """
-
-        super(RejectedCertifyingOrganisationListView, self).__init__()
-        self.project = None
-        self.project_slug = None
-
-    def get_context_data(self, **kwargs):
-        """Get the context data which is passed to a template.
-
-        :param kwargs: Any arguments to pass to the superclass.
-        :type kwargs: dict
-
-        :returns: Context data which will be passed to the template.
-        :rtype: dict
-        """
-
-        context = super(RejectedCertifyingOrganisationListView, self)\
-            .get_context_data(**kwargs)
-        context['project_slug'] = self.project_slug
-        if self.project_slug:
-            context['the_project'] = \
-                Project.objects.get(slug=self.project_slug)
-            context['project'] = context['the_project']
-        context['num_certifyingorganisations'] = \
-            context['certifyingorganisations'].count()
-        return context
-
-    # noinspection PyAttributeOutsideInit
-    def get_queryset(self):
-        """Get the queryset for this view.
-
-        :returns: A queryset which is filtered to only show unapproved
-        Certifying Organisation.
-        :rtype: QuerySet
-        :raises: Http404
-        """
-
-        if self.queryset is None:
-            self.project_slug = self.kwargs.get('project_slug', None)
-            if self.project_slug:
-                self.project = Project.objects.get(slug=self.project_slug)
-                if self.request.user.is_staff:
-                    queryset = \
-                        CertifyingOrganisation.objects.filter(
-                            project=self.project, rejected=True)
-                else:
-                    queryset = \
-                        CertifyingOrganisation.unapproved_objects.filter(
-                            Q(rejected=True) & Q(project=self.project) &
-                            (Q(project__owner=self.request.user) |
-                             Q(organisation_owners=self.request.user) |
-                             Q(project__certification_managers=
-                               self.request.user))).distinct()
-                return queryset
-            else:
-                raise Http404(
-                    'Sorry! We could not find your Certifying Organisation!')
-        return self.queryset

@@ -1,5 +1,5 @@
 {% extends "project_base.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load custom_markup %}
 {% load thumbnail %}
 {% block title %}{{ project.name }}{% endblock %}
@@ -62,8 +62,10 @@
                 <div class="panel panel-default custom-panel screenshot-panel left-panel">
                  <div class="slider-display-container">
                 {% for screenshot in screenshots %}
+                    {% if screenshot.screenshot %}
                     <img class="content-slides slider-animate-opacity"
                                  src="{{ screenshot.screenshot.url }}" height="400px" width="auto" style="margin: 0 auto">
+                    {% endif %}
                 {% endfor %}
                      <button class="slider-button slider-display-left" onclick="plusDivs(-1)">&#10094;</button>
                      <button class="slider-button slider-display-right" onclick="plusDivs(1)">&#10095;</button>
@@ -77,6 +79,7 @@
             {% endif %}
         </div>
         <div class="col-md-4">
+          {% if project.is_sustaining_members %}
             <div class="panel panel-default custom-panel clickable-panel" onclick="window.location='members/list/';">
                 <h3>Sustaining Members</h3>
             {% if sponsors %}
@@ -91,7 +94,12 @@
                         {% endifchanged %}
                             <a href="{% url 'sponsor-detail' project_slug=sponsor.project.slug slug=sponsor.slug %}">
                                 <img class="img-rounded tooltip-toggle"
-                                 src="{% thumbnail sponsor.sponsor.logo 50x50 %}"
+                                     {% thumbnail sponsor.sponsor.logo 50x50 as logo %}
+                                        {% if logo %}
+                                            src="{% thumbnail sponsor.sponsor.logo 50x50 %}"
+                                        {% else %}
+                                            src="{{ sponsor.sponsor.logo.url }}" width="50" height="50"
+                                     {% endif %}
                                  data-title="{{ sponsor.sponsor.name }}">
                              </a>
                     {% endif %}
@@ -110,6 +118,8 @@
                 {% endif %}
             {% endif %}
             </div>
+          {% endif %}
+          {% if project.is_lessons %}
             <div class="panel panel-default custom-panel clickable-panel" onclick="window.location='{% url 'section-list' project_slug=project.slug %}';">
                 <h3>Lessons</h3>
                 {% if sections %}
@@ -138,6 +148,8 @@
                     {% endif %}
                 {% endif %}
             </div>
+          {% endif %}
+          {% if project.is_certification %}
             <div class="panel panel-default custom-panel clickable-panel" onclick="window.location='certifyingorganisation/list/';">
                 <h3>Certification</h3>
                 {% if organisations %}
@@ -164,6 +176,8 @@
                     {% endif %}
                 {% endif %}
             </div>
+          {% endif %}
+          {% if project.is_changelogs %}
             <div class="panel panel-default custom-panel clickable-panel" onclick="window.location='version/list/';">
                 <h3>Release Changelogs</h3>
                 {% if versions %}
@@ -195,6 +209,8 @@
                     {% endif %}
                 {% endif %}
             </div>
+          {% endif %}
+          {% if project.is_teams %}
             <div class="panel panel-default custom-panel clickable-panel" onclick="window.location='committees/';">
                 <h3>Project Teams</h3>
                 {% if committees %}
@@ -225,6 +241,7 @@
                     {% endif %}
                 {% endif %}
             </div>
+          {% endif %}
         </div>
 
     </div>

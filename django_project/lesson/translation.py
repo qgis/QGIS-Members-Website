@@ -7,6 +7,7 @@ from lesson.models.mixins import TranslationMixin
 
 from lesson.models.answer import Answer
 from lesson.models.further_reading import FurtherReading
+from lesson.models.license import License
 from lesson.models.section import Section
 from lesson.models.specification import Specification
 from lesson.models.worksheet import Worksheet
@@ -28,6 +29,11 @@ class FurtherReadingTranslation(TranslationMixinTranslation):
     fields = ('text', )
 
 
+@register(License)
+class LicenseTranslation(TranslationMixinTranslation):
+    fields = ('description', )
+
+
 @register(Section)
 class SectionTranslation(TranslationMixinTranslation):
     fields = ('name', 'notes')
@@ -35,7 +41,7 @@ class SectionTranslation(TranslationMixinTranslation):
 
 @register(Specification)
 class SpecificationTranslation(TranslationMixinTranslation):
-    fields = ('title', 'value', 'notes')
+    fields = ('title', 'value', 'title_notes', 'value_notes')
 
 
 @register(Worksheet)

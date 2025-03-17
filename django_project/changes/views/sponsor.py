@@ -5,6 +5,7 @@ import os
 import time
 import logging
 
+from django.conf import settings
 from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
@@ -186,6 +187,66 @@ class SponsorListView(SponsorMixin, PaginationMixin, ListView):
                     project=project,
                     sponsor__active=True
                 ).order_by('-sponsorship_level__value')
+                return queryset
+            else:
+                raise Http404('Sorry! We could not find your Sponsor!')
+        return self.queryset
+
+
+class FutureSponsorListView(
+    LoginRequiredMixin, SponsorMixin, PaginationMixin, ListView):
+    """List view for Sponsor."""
+    context_object_name = 'sponsors'
+    template_name = 'sponsor/future-list.html'
+    paginate_by = 1000
+
+    def get_context_data(self, **kwargs):
+        """Get the context data which is passed to a template.
+
+        :param kwargs: Any arguments to pass to the superclass.
+        :type kwargs: dict
+
+        :returns: Context data which will be passed to the template.
+        :rtype: dict
+        """
+
+        context = super(FutureSponsorListView, self).get_context_data(**kwargs)
+        context['num_sponsors'] = context['sponsors'].count()
+        context['unapproved'] = False
+        project_slug = self.kwargs.get('project_slug', None)
+        context['project_slug'] = project_slug
+        if project_slug:
+            project = Project.objects.get(slug=project_slug)
+            # Checking user permissions.
+            if self.request.user.is_staff or \
+                    self.request.user == project.owner or \
+                    self.request.user in project.sponsorship_managers.all()\
+                    or self.request.user == project.project_representative:
+                pass
+            else:
+                raise Http404
+
+            context['project'] = Project.objects.get(slug=project_slug)
+            context['levels'] = SponsorshipLevel.objects.filter(
+                project=project)
+        return context
+
+    def get_queryset(self, queryset=None):
+        """Get the queryset for this view.
+
+        :param queryset: A query set
+        :type queryset: QuerySet
+
+        :returns: Sponsor Queryset which is filtered by project
+        :rtype: QuerySet
+        :raises: Http404
+        """
+        if self.queryset is None:
+            project_slug = self.kwargs.get('project_slug', None)
+            if project_slug:
+                project = Project.objects.get(slug=project_slug)
+                queryset = SponsorshipPeriod.approved_objects.filter(
+                    project=project).order_by('-sponsorship_level__value')
                 return queryset
             else:
                 raise Http404('Sorry! We could not find your Sponsor!')
@@ -736,7 +797,7 @@ def generate_sponsor_cloud(request, **kwargs):
             if max_y <= y:
                 max_y = y + xy_size
             background.paste(
-                im, box=(x, y + ((xy_size - height) / 2)), mask=im)
+                im, box=(x, y + int((xy_size - height) / 2)), mask=im)
             x += xy_size
 
     image_path = 'none'
@@ -749,7 +810,8 @@ def generate_sponsor_cloud(request, **kwargs):
             (0, 0, max_x, max_y)).save(
             filepath + '{}.png'.format(project_name))
 
-        image_path = '/images/sponsors/{}.png'.format(project_name)
+        image_path = \
+            settings.MEDIA_URL + 'images/sponsors/{}.png'.format(project_name)
 
     return render(
         request, 'sponsor/sponsor_cloud.html',

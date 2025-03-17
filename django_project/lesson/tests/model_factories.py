@@ -6,6 +6,8 @@ import factory
 from base.tests.model_factories import ProjectF
 
 from lesson.models import (
+    FurtherReading,
+    License,
     Section,
     Specification,
     Worksheet,
@@ -61,5 +63,28 @@ class SpecificationF(factory.django.DjangoModelFactory):
         lambda n: u'Test title %s' % n)
     value = factory.sequence(
         lambda n: u'Test value %s' % n)
-    notes = factory.sequence(
-        lambda n: u'Test section notes %s' % n)
+    title_notes = factory.sequence(
+        lambda n: u'Test section title notes %s' % n)
+    value_notes = factory.sequence(
+        lambda n: u'Test section value notes %s' % n)
+
+
+class LicenseF(factory.django.DjangoModelFactory):
+    """License model factory"""
+
+    class Meta:
+        model = License
+
+    name = 'Test License'
+    file = factory.django.FileField(byte=b'test license content')
+
+
+class FurtherReadingF(factory.django.DjangoModelFactory):
+    """Further Reading model factory."""
+
+    class Meta:
+        model = FurtherReading
+
+    text = ('Test Further Reading. <a href="https://github.com/kartoza/'
+            'prj.app">Projecta Repository</a>')
+    worksheet = factory.SubFactory(WorksheetF)

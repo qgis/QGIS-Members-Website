@@ -26,6 +26,9 @@ class TestSpecification(TestCase):
         # check if model title exists.
         self.assertTrue(model.title is not None)
 
+        # check if __str__ method returns the correct value
+        self.assertEqual(str(model), model.title)
+
     def test_Specification_delete(self):
         """Test specification model deletion."""
 
@@ -41,7 +44,8 @@ class TestSpecification(TestCase):
         model = SpecificationF.create(
             title=u'Title 1',
             value=u'Value 1',
-            notes=u'Notes 1'
+            title_notes=u'Notes 1',
+
         )
 
         self.assertTrue(model.title == 'Title 1')
@@ -53,7 +57,7 @@ class TestSpecification(TestCase):
         new_model_data = {
             'title': u'new title',
             'value': u'new value',
-            'notes': u'new notes'
+            'title_notes': u'new notes'
         }
         model.__dict__.update(new_model_data)
         model.save()

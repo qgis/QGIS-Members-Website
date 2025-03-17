@@ -3,12 +3,12 @@
 
 """
 
+import datetime
 import os
 from django.conf.global_settings import MEDIA_ROOT
 from django.urls import reverse
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 import logging
@@ -19,6 +19,7 @@ from .certifying_organisation import CertifyingOrganisation
 from .course_type import CourseType
 from certification.utilities import check_slug
 from .training_center import TrainingCenter
+from certification.models.certificate_type import CertificateType
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +54,13 @@ class Course(models.Model):
     start_date = models.DateField(
         _('Start date'),
         help_text=_('Course start date'),
-        default=timezone.now
+        default=datetime.date.today
     )
 
     end_date = models.DateField(
         _('End date'),
         help_text=_('Course end date'),
-        default=timezone.now
+        default=datetime.date.today
     )
 
     slug = models.CharField(
@@ -85,6 +86,8 @@ class Course(models.Model):
                                         on_delete=models.CASCADE)
     certifying_organisation = models.ForeignKey(CertifyingOrganisation,
                                                 on_delete=models.CASCADE)
+    certificate_type = models.ForeignKey(
+        CertificateType, on_delete=models.PROTECT, null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     objects = models.Manager()
 
@@ -134,3 +137,12 @@ class Course(models.Model):
             'organisation_slug': self.certifying_organisation.slug,
             'project_slug': self.certifying_organisation.project.slug
         })
+
+    @property
+    def editable(self):
+        today = datetime.datetime.today().date()
+        delta = self.end_date + datetime.timedelta(days=7)
+        if today > delta:
+            return False
+        else:
+            return True

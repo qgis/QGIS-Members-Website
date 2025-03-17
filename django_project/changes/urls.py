@@ -17,6 +17,7 @@ from .feeds.sponsor import (
     JSONSponsorFeed,
     JSONPastSponsorFeed
 )
+from changes.api_views.lock_version import LockVersion, UnlockVersion
 from .views import (
     # Category
     CategoryDetailView,
@@ -27,6 +28,7 @@ from .views import (
     CategoryOrderSubmitView,
     JSONCategoryListView,
     CategoryUpdateView,
+
     # Version
     VersionMarkdownView,
     VersionDetailView,
@@ -36,8 +38,10 @@ from .views import (
     VersionListView,
     VersionUpdateView,
     VersionDownload,
+    VersionDownloadMd,
     VersionDownloadGnu,
     VersionSponsorDownload,
+
     # Entry
     EntryDetailView,
     EntryDeleteView,
@@ -59,6 +63,7 @@ from .views import (
     ApproveSponsorView,
     RejectSponsorView,
     GenerateSponsorPDFView,
+    FutureSponsorListView,
     SustainingMembership,
     SustainingMemberUpdateView,
     SustainingMemberPeriodCreateView,
@@ -89,7 +94,8 @@ from .views import (
     generate_sponsor_cloud,
     FetchGithubPRs,
     FetchRepoLabels,
-    FetchCategory
+    FetchCategory,
+    download_all_referenced_images,
 )
 from changes.views.sustaining_member import (
     SustainingMemberCreateView
@@ -137,6 +143,10 @@ urlpatterns = [
     url(regex='^(?P<project_slug>[\w-]+)/version/list/$',
         view=VersionListView.as_view(),
         name='version-list'),
+    url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/'
+              'download-referenced-images/$',
+        view=download_all_referenced_images,
+        name='download-referenced-images'),
     url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/markdown/$',
         view=VersionMarkdownView.as_view(),
         name='version-markdown'),
@@ -158,12 +168,21 @@ urlpatterns = [
     url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/download/$',
         view=VersionDownload.as_view(),
         name='version-download'),
+    url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/md/$',
+        view=VersionDownloadMd.as_view(),
+        name='version-download-md'),
     url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/gnu/$',
         view=VersionDownloadGnu.as_view(),
         name='version-download-gnu'),
     url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/downloadmember/$',
         view=VersionSponsorDownload.as_view(),
         name='version-sponsor-download'),
+    url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/locked/$',
+        view=LockVersion.as_view(),
+        name='version-locked'),
+    url(regex='^(?P<project_slug>[\w-]+)/version/(?P<slug>[\w.-]+)/unlocked/$',
+        view=UnlockVersion.as_view(),
+        name='version-unlocked'),
 
     # Changelog entry management
     url(regex='^entry/(?P<pk>\d+)$',
@@ -260,6 +279,9 @@ urlpatterns = [
     url(regex='^(?P<project_slug>[\w-]+)/members/list/$',
         view=SponsorListView.as_view(),
         name='sponsor-list'),
+    url(regex='^(?P<project_slug>[\w-]+)/future-members/list/$',
+        view=FutureSponsorListView.as_view(),
+        name='future-sponsor-list'),
     url(regex='^(?P<project_slug>[\w-]+)/members/world-map/$',
         view=SponsorWorldMapView.as_view(),
         name='sponsor-world-map'),

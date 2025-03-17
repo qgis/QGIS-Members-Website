@@ -2,6 +2,8 @@
 """Urls for certification apps."""
 
 from django.conf.urls import url
+
+from .api_views.checklist import UpdateChecklistReviewer
 from .views import (
     # Certifying Organisation.
     CertifyingOrganisationCreateView,
@@ -10,9 +12,9 @@ from .views import (
     CertifyingOrganisationListView,
     CertifyingOrganisationUpdateView,
     PendingCertifyingOrganisationListView,
+    CertifyingOrganisationJson,
     ApproveCertifyingOrganisationView,
     reject_certifying_organisation,
-    RejectedCertifyingOrganisationListView,
 
     # Course Type.
     CourseTypeCreateView,
@@ -31,6 +33,14 @@ from .views import (
     CourseDeleteView,
     CourseDetailView,
 
+    # Certificate type and checklist
+    CertificationManagementView,
+    update_project_certificate_view,
+    ActivateChecklist,
+    ArchiveChecklist,
+    UpdateChecklistOrder,
+    CertificateChecklistCreateView,
+
     # Training Center.
     TrainingCenterCreateView,
     TrainingCenterDetailView,
@@ -40,6 +50,7 @@ from .views import (
     # Attendee.
     AttendeeCreateView,
     CsvUploadView,
+    AttendeeUpdateView,
 
     # Course Attendee.
     CourseAttendeeCreateView,
@@ -54,7 +65,9 @@ from .views import (
     email_all_attendees,
     regenerate_certificate,
     regenerate_all_certificate,
+    generate_all_certificate,
     preview_certificate,
+    CertificateRevokeView,
 
     # Certificate for certifying organisation.
     OrganisationCertificateCreateView,
@@ -67,7 +80,10 @@ from .views import (
 
     # About.
     AboutView,
-    TopUpView
+    TopUpView,
+
+    CheckoutSessionSuccessView,
+    CreateCheckoutSessionView
 )
 from .api_views.course import (
     GetUpcomingCourseProject,
@@ -81,6 +97,8 @@ from .api_views.training_center import (
     GetTrainingCenterProjectLocation,
     GetTrainingCenterOrganisationLocation
 )
+from .api_views.invite_reviewer import InviteReviewerApiView
+from .api_views.external_reviewer import UpdateExternalReviewerText
 
 
 urlpatterns = [
@@ -94,6 +112,10 @@ urlpatterns = [
               'list/$',
         view=PendingCertifyingOrganisationListView.as_view(),
         name='pending-certifyingorganisation-list'),
+    url(regex='^(?P<project_slug>[\w-]+)/'
+              'certifyingorganisation-json/$',
+        view=CertifyingOrganisationJson.as_view(),
+        name='certifyingorganisation-list-json'),
     url(regex='^(?P<project_slug>[\w-]+)/approve-certifyingorganisation/'
               '(?P<slug>[\w-]+)/$',
         view=ApproveCertifyingOrganisationView.as_view(),
@@ -106,10 +128,6 @@ urlpatterns = [
               '(?P<slug>[\w-]+)/$',
         view=UpdateStatusOrganisation.as_view(),
         name='certifyingorganisation-update-status'),
-    url(regex='^(?P<project_slug>[\w-]+)/'
-              'certifyingorganisation/rejected-list/$',
-        view=RejectedCertifyingOrganisationListView.as_view(),
-        name='certifyingorganisation-rejected-list'),
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/list/$',
         view=CertifyingOrganisationListView.as_view(),
         name='certifyingorganisation-list'),
@@ -136,16 +154,16 @@ urlpatterns = [
         name='coursetype-create'),
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/'
               '(?P<organisation_slug>[\w-]+)/coursetype/'
-              '(?P<slug>[\w-]+)/update/$',
+              '(?P<pk>[0-9]+)/update/$',
         view=CourseTypeUpdateView.as_view(),
         name='coursetype-update'),
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/'
               '(?P<organisation_slug>[\w-]+)/coursetype/'
-              '(?P<slug>[\w-]+)/delete/$',
+              '(?P<pk>[0-9]+)/delete/$',
         view=CourseTypeDeleteView.as_view(),
         name='coursetype-delete'),
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/'
-              '(?P<organisation_slug>[\w-]+)/coursetype/(?P<slug>[\w-]+)/$',
+              '(?P<organisation_slug>[\w-]+)/coursetype/(?P<pk>[0-9]+)/$',
         view=CourseTypeDetailView.as_view(),
         name='coursetype-detail'),
 
@@ -192,6 +210,11 @@ urlpatterns = [
               '(?P<slug>[\w-]+)/create-attendee/$',
         view=AttendeeCreateView.as_view(),
         name='attendee-create'),
+    url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/'
+              '(?P<organisation_slug>[\w-]+)/course/'
+              '(?P<course_slug>[\w-]+)/attendee/(?P<pk>[\w-]+)/update/$',
+        view=AttendeeUpdateView.as_view(),
+        name='attendee-update'),
 
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/'
               '(?P<organisation_slug>[\w-]+)/course/'
@@ -227,6 +250,37 @@ urlpatterns = [
         view=OrganisationCertificateDetailView.as_view(),
         name='detail-certificate-organisation'),
 
+    # Certificate Type and Checklist.
+    url(regex='^(?P<project_slug>[\w-]+)/certification-management/$',
+        view=CertificationManagementView.as_view(),
+        name='certification-management-view'),
+    url(regex='^(?P<project_slug>[\w-]+)/activate-checklist/$',
+        view=ActivateChecklist.as_view(),
+        name='activate-checklist'),
+    url(regex='^(?P<project_slug>[\w-]+)/archive-checklist/$',
+        view=ArchiveChecklist.as_view(),
+        name='archive-checklist'),
+    url(regex='^(?P<project_slug>[\w-]+)/update-checklist-order/$',
+        view=UpdateChecklistOrder.as_view(),
+        name='update-checklist-order'),
+    url(regex='^(?P<project_slug>[\w-]+)/certificate-types/update/$',
+        view=update_project_certificate_view,
+        name='certificate-type-update'),
+    url(regex='^(?P<project_slug>[\w-]+)/certificate-checklist/create/',
+        view=CertificateChecklistCreateView.as_view(),
+        name='certificate-checklist-create'),
+    url(regex='^(?P<project_slug>[\w-]+)/update-checklist-reviewer/'
+              '(?P<slug>[\w-]+)/',
+        view=UpdateChecklistReviewer.as_view(),
+        name='update-checklist-reviewer'),
+    url(regex='^(?P<project_slug>[\w-]+)/invite-external-reviewer/'
+              '(?P<slug>[\w-]+)/',
+        view=InviteReviewerApiView.as_view(),
+        name='invite-external-reviewer'),
+    url(regex='^(?P<project_slug>[\w-]+)/update-external-reviewer-text/',
+        view=UpdateExternalReviewerText.as_view(),
+        name='update-external-reviewer-text'),
+
     # Certificate.
     url(regex='^(?P<project_slug>[\w-]+)/certifyingorganisation/'
               '(?P<organisation_slug>[\w-]+)/course/'
@@ -254,6 +308,10 @@ urlpatterns = [
         certificate_pdf_view, name='print-certificate'),
     url(r'^(?P<project_slug>[\w-]+)/certifyingorganisation/'
         '(?P<organisation_slug>[\w-]+)/course/'
+        '(?P<course_slug>[\w-]+)/revoke/(?P<pk>[\w-]+)/$',
+        CertificateRevokeView.as_view(), name='revoke-certificate'),
+    url(r'^(?P<project_slug>[\w-]+)/certifyingorganisation/'
+        '(?P<organisation_slug>[\w-]+)/course/'
         '(?P<course_slug>[\w-]+)/download_zip/$',
         download_certificates_zip, name='download_zip_all'),
     url(r'^(?P<project_slug>[\w-]+)/certifyingorganisation/'
@@ -268,6 +326,10 @@ urlpatterns = [
         '(?P<organisation_slug>[\w-]+)/course/'
         '(?P<course_slug>[\w-]+)/regenerate-all-certificate/$',
         regenerate_all_certificate, name='regenerate-all-certificate'),
+    url(r'^(?P<project_slug>[\w-]+)/certifyingorganisation/'
+        '(?P<organisation_slug>[\w-]+)/course/'
+        '(?P<course_slug>[\w-]+)/generate-all-certificate/$',
+        generate_all_certificate, name='generate-all-certificate'),
     url(r'^(?P<project_slug>[\w-]+)/certifyingorganisation/'
         '(?P<organisation_slug>[\w-]+)/preview-certificate/$',
         preview_certificate, name='preview-certificate'),
@@ -326,4 +388,14 @@ urlpatterns = [
               '(?P<organisation_slug>[\w-]+)/feed/past-course/$',
         view=GetPastCourseOrganisation.as_view(),
         name='feed-past-course'),
+
+    # Checkout
+    url(
+        '^checkout/$',
+        CreateCheckoutSessionView.as_view(),
+        name="checkout",
+    ),
+    url("^checkout-success/$",
+        CheckoutSessionSuccessView.as_view(),
+        name="checkout-success"),
 ]

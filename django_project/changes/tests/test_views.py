@@ -1,9 +1,12 @@
 # coding=utf-8
 # flake8: noqa
 
+import datetime
 import json
+from datetime import timedelta
 from mock import mock
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.test.client import Client
@@ -772,6 +775,23 @@ class TestVersionViews(TestCase):
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     @mock.patch('pypandoc.convert', side_effect=mocked_convert)
+    def test_VersionDownloadMd(self, mocked_convert):
+        other_project = ProjectF.create(name='testproject2')
+        version_same_name_from_other_project = VersionF.create(
+            project=other_project,
+            name='1.0.1'
+        )
+        response = self.client.get(reverse('version-download-md', kwargs={
+            'slug': version_same_name_from_other_project.slug,
+            'project_slug': other_project.slug
+        }))
+        self.assertEqual(
+            response.context.get('version'),
+            version_same_name_from_other_project)
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(VALID_DOMAIN=['testserver', ])
+    @mock.patch('pypandoc.convert', side_effect=mocked_convert)
     def test_VersionDownload_login_notfound(self, mocked_convert):
         self.client.login(username='timlinux', password='password')
         response = self.client.get(reverse('version-download', kwargs={
@@ -784,6 +804,16 @@ class TestVersionViews(TestCase):
             'project_slug': None
         }))
         self.assertEqual(response.status_code, 404)
+
+    @override_settings(VALID_DOMAIN=['testserver', ])
+    def test_download_all_referenced_images(self):
+        self.client.login(username='timlinux', password='password')
+        response = self.client.get(
+            reverse('download-referenced-images', kwargs={
+                'slug': self.version.slug,
+                'project_slug': self.project.slug
+            }))
+        self.assertEqual(response.status_code, 200)
 
 
 class TestVersionViewsWithAnonymousUserForCRUD(TestCase):
@@ -1308,6 +1338,8 @@ class TestSponsorViews(TestCase):
         logging.disable(logging.CRITICAL)
         self.project = ProjectF.create()
         self.sponsor = SponsorF.create(project=self.project)
+        self.current_sponsor = SponsorF.create(project=self.project)
+        self.future_sponsor = SponsorF.create(project=self.project)
         self.user = UserF.create(**{
             'username': 'timlinux',
             'password': 'password',
@@ -1320,6 +1352,40 @@ class TestSponsorViews(TestCase):
         # a work around for that - sett #581
         self.user.set_password('password')
         self.user.save()
+
+        self.non_staff_user = UserF.create(**{
+            'username': 'non-staff',
+            'password': 'password',
+            'is_staff': False
+        })
+        self.non_staff_user.set_password('password')
+        self.non_staff_user.save()
+
+        self.sponsorship_level = SponsorshipLevelF.create(
+            project=self.project,
+            name='Gold')
+        self.today = datetime.date.today()
+        self.past_sponsorship_period = SponsorshipPeriodF.create(
+            project=self.project,
+            sponsor=self.sponsor,
+            sponsorship_level=self.sponsorship_level,
+            start_date=self.today - timedelta(days=200),
+            end_date=self.today - timedelta(days=100),
+            approved=True)
+        self.current_sponsorship_period = SponsorshipPeriodF.create(
+            project=self.project,
+            sponsor=self.current_sponsor,
+            sponsorship_level=self.sponsorship_level,
+            start_date=self.today,
+            end_date=self.today + timedelta(days=700),
+            approved=True)
+        self.future_sponsorship_period = SponsorshipPeriodF.create(
+            project=self.project,
+            sponsor=self.future_sponsor,
+            sponsorship_level=self.sponsorship_level,
+            start_date=self.today + timedelta(days=200),
+            end_date=self.today + timedelta(days=700),
+            approved=True)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def tearDown(self):
@@ -1339,6 +1405,29 @@ class TestSponsorViews(TestCase):
             'project_slug': self.project.slug
         }))
         self.assertEqual(response.status_code, 200)
+
+    @override_settings(VALID_DOMAIN=['testserver', ])
+    def test_FutureSponsorListView_no_login(self):
+        response = self.client.get(reverse('future-sponsor-list', kwargs={
+            'project_slug': self.project.slug
+        }))
+        self.assertEqual(response.status_code, 302)
+
+    @override_settings(VALID_DOMAIN=['testserver', ])
+    def test_FutureSponsorListView_with_staff_login(self):
+        self.client.login(username='timlinux', password='password')
+        response = self.client.get(reverse('future-sponsor-list', kwargs={
+            'project_slug': self.project.slug
+        }))
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(VALID_DOMAIN=['testserver', ])
+    def test_FutureSponsorListView_with_non_staff_login(self):
+        self.client.login(username='non-staff', password='password')
+        response = self.client.get(reverse('future-sponsor-list', kwargs={
+            'project_slug': self.project.slug
+        }))
+        self.assertEqual(response.status_code, 404)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorWorldMapView(self):
@@ -1398,6 +1487,47 @@ class TestSponsorViews(TestCase):
             'project_slug': self.project.slug
         }), post_data)
         self.assertEqual(response.status_code, 302)
+
+    @override_settings(VALID_DOMAIN=['testserver', ])
+    def test_SponsorCreate_with_svg_logo(self):
+        svg = ('<?xml version="1.0" standalone="no"?>'
+               '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"'
+               '"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+               '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"'
+               'width="32.000000pt" height="32.000000pt" viewBox="0 0 '
+               '32.000000 32.000000"'
+               'preserveAspectRatio="xMidYMid meet"' >
+               ''
+               '<g transform="translate(0.000000,32.000000) '
+               'scale(0.100000,-0.100000)"'
+               'fill="#000000" stroke="none">'
+               '<path d="M95 291 c-41 -18 -77 -68 -82 -113 -10 '
+               '-99 84 -178 183 -154 25 7 26'
+               '8 9 26 -11 12 -31 20 -50 20 -47 0 -85 41 -85 92 '
+               '0 51 43 98 90 98 44 0 90'
+               '-47 90 -93 0 -34 33 -78 48 -63 4 4 7 32 7 62 0 49'
+               ' -3 57 -37 91 -33 33 -43'
+               '37 -95 40 -32 1 -67 -1 -78 -6z"/>'
+               '<path d="M140 156 c0 -13 7 -29 15 -36 13 -10 15 -9 '
+               '15 9 0 13 6 21 16 21 14'
+               '0 14 3 4 15 -20 24 -50 19 -50 -9z"/>'
+               '<path d="M190 107 c0 -32 59 -87 93 -87 39 0 35 25 -12 '
+               '71 -44 45 -81 52 -81'
+               '16z"/>'
+               '</g>'
+               '</svg>')
+        logo = SimpleUploadedFile('qgis.svg', svg)
+        self.client.login(username='timlinux', password='password')
+        post_data = {
+            'name': u'New Test Sponsor',
+            'project': self.project.id,
+            'sort_number': 0,
+            'logo': logo
+        }
+        response = self.client.post(reverse('sponsor-create', kwargs={
+            'project_slug': self.project.slug
+        }), post_data)
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorDeleteView_with_login(self):

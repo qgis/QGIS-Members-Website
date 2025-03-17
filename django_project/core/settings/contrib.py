@@ -28,6 +28,7 @@ INSTALLED_APPS += [
     'djstripe',
     'preferences',
     'pinax.notifications',
+    'tinymce',  # rich text editor
 ]
 
 # Add preferences to context_processors
@@ -79,7 +80,7 @@ DEFAULT_FILE_STORAGE = (
 PIPELINE_TEMPLATE_FUNC = '_.template'
 
 # enable cached storage - requires uglify.js (node.js)
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
 
 # Contributed / third party js libs for pipeline compression
 # For hand rolled js for this app, use project.py
@@ -109,6 +110,8 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+SIMPLE_HISTORY_HISTORY_CHANGE_REASON_USE_TEXT_FIELD = True
+
 INSTALLED_APPS += [
     'allauth',
     'allauth.account',
@@ -119,7 +122,7 @@ INSTALLED_APPS += [
 
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
-        'SCOPE': ['user:email', 'public_repo', 'read:org']
+        'SCOPE': ['user:email', 'read:org']
     }
 }
 
@@ -138,3 +141,6 @@ STRIPE_LIVE_MODE = False  # Change to True in production
 # Get it from the section in the Stripe dashboard where you added the
 # webhook endpoint
 DJSTRIPE_WEBHOOK_SECRET = os.environ.get('DJSTRIPE_WEBHOOK_SECRET', 'whsec_x')
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = "djstripe_id"
+
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'tim@kartoza.com')

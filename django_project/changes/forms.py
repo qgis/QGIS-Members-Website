@@ -17,6 +17,7 @@ from .models import (
     SponsorshipPeriod,
     SponsorshipLevel
 )
+from changes.utils.svgimagefile import SVGAndImageFormField
 
 
 class CategoryForm(forms.ModelForm):
@@ -97,6 +98,12 @@ class VersionForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(VersionForm, self).save(commit=False)
+        try:
+            version = Version.objects.get(pk=instance.pk)
+        except Version.DoesNotExist:
+            version = None
+        if version:
+            instance.release_date = version.release_date
         instance.author = self.user
         instance.project = self.project
         instance.approved = False
@@ -113,7 +120,7 @@ class EntryForm(forms.ModelForm):
             'category', 'title', 'description',
             'image_file', 'image_credits', 'video',
             'funded_by', 'funder_url', 'developed_by',
-            'developer_url'
+            'developer_url', 'github_PR_url'
         )
 
     def __init__(self, *args, **kwargs):
@@ -138,6 +145,7 @@ class EntryForm(forms.ModelForm):
                 Field('funder_url', css_class='form-control'),
                 Field('developed_by', css_class='form-control'),
                 Field('developer_url', css_class='form-control'),
+                Field('github_PR_url', css_class='form-control'),
                 css_id='entry-form')
         )
         self.helper.layout = layout
@@ -188,6 +196,9 @@ class SponsorForm(forms.ModelForm):
             'invoice_number',
             'project',
         )
+        field_classes = {
+            'logo': SVGAndImageFormField
+        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')

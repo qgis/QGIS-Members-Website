@@ -21,6 +21,12 @@ class TestSection(TestCase):
         # check if model title exists.
         self.assertTrue(model.title is not None)
 
+        # check if __str__ method returns the correct value
+        self.assertEqual(str(model), model.module)
+
+        # check if published default False
+        self.assertFalse(model.published)
+
     def test_Worksheet_delete(self):
         """Test worksheet model deletion."""
 
@@ -58,7 +64,15 @@ class TestSection(TestCase):
             'exercise_goal': u'new goal',
             'exercise_task': u'new task',
             'more_about_text': u'new more text',
-            'more_about_image': u'new more image'
+            'more_about_image': u'new more image',
+            'published': True,
+            'page_break_before_exercise': True,
+            'page_break_before_requirement_table': True,
+            'page_break_before_exercise_image': True,
+            'page_break_before_more_about': True,
+            'page_break_before_question': True,
+            'page_break_before_youtube_link': True,
+            'page_break_before_further_reading': True
         }
         model.__dict__.update(new_model_data)
         model.save()

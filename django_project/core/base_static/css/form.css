@@ -210,10 +210,17 @@
     box-shadow: None;
 }
 
-#project-form {
-    padding-top: 70px;
-}
-
 .form-actions {
     padding-bottom: 50px;
+}
+
+@media (min-width:768px) {
+    .sidebar-offcanvas {
+        float: right !important;
+    }
+    .sidebar-offcanvas .list-group {
+        height: 80vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 }

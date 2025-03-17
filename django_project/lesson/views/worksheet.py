@@ -8,7 +8,7 @@ from io import BytesIO
 from collections import OrderedDict
 from django.conf import settings
 from django.urls import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views.generic import (
     DetailView,
     CreateView,
@@ -16,13 +16,13 @@ from django.views.generic import (
     DeleteView,
     ListView,
 )
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 
 from braces.views import LoginRequiredMixin
 from weasyprint import HTML
 
-from lesson.forms.worksheet import WorksheetForm
+from lesson.forms.worksheet import WorksheetForm, WorksheetUpdateForm
 from lesson.models.answer import Answer
 from lesson.models.further_reading import FurtherReading
 from lesson.models.specification import Specification
@@ -90,8 +90,25 @@ class WorksheetDetailView(
         context['file_title'] = \
             context['worksheet'].section.name \
             + '-' + context['worksheet'].module
-        context['file_title'] = context['file_title'].encode("utf8")
+
+        context['funded_by'] = self.object.funder_info_html()
         return context
+
+    def get(self, request, *args, **kwargs):
+        object = self.get_object()
+
+        # permission
+        user_can_edit = False
+        if self.request.user in object.section.project.lesson_managers.all():
+            user_can_edit = True
+        if self.request.user == object.section.project.owner:
+            user_can_edit = True
+        if self.request.user.is_staff:
+            user_can_edit = True
+
+        if not object.published and not user_can_edit:
+            return HttpResponseRedirect(reverse('account_login'))
+        return super(WorksheetDetailView, self).get(request, *args, **kwargs)
 
 
 class WorksheetPrintView(WorksheetDetailView):
@@ -109,7 +126,8 @@ class WorksheetPrintView(WorksheetDetailView):
         # return response
         pdf_response = HttpResponse(content_type='application/pdf')
         pdf_response['Content-Disposition'] = \
-            'filename={}. {}'.format(numbering, context['file_title'])
+            'filename={}. {}.pdf'.format(
+                numbering, context['file_title'])
         # Need to improve for URL outside of the dev env.
         html_object = HTML(
             string=response.content,
@@ -133,10 +151,11 @@ class WorksheetPDFZipView(WorksheetDetailView):
         response = super(WorksheetPDFZipView, self).render_to_response(
             context, **response_kwargs)
         response.render()
+        file_title = context['file_title']
         # return response
         pdf_response = HttpResponse(content_type='application/pdf')
         pdf_response['Content-Disposition'] = \
-            'attachment; filename={}'.format(context['file_title'])
+            'attachment; filename={}'.format(file_title)
         # Need to improve for URL outside of the dev env.
         html_object = HTML(
             string=response.content,
@@ -146,13 +165,13 @@ class WorksheetPDFZipView(WorksheetDetailView):
 
         filenames = []
         with open('/tmp/{}. {}.pdf'.format(
-                numbering, context['file_title']), 'wb') as pdf:
+                numbering, file_title), 'wb') as pdf:
             pdf.write(pdf_response.content)
 
         filenames.append(
-            '/tmp/{}. {}.pdf'.format(numbering, context['file_title']))
+            '/tmp/{}. {}.pdf'.format(numbering, file_title))
 
-        zip_subdir = '{}. {}'.format(numbering, context['file_title'])
+        zip_subdir = '{}. {}'.format(numbering, file_title)
 
         s = BytesIO()
         zf = zipfile.ZipFile(s, "w")
@@ -168,7 +187,25 @@ class WorksheetPDFZipView(WorksheetDetailView):
             zip_data_path = settings.MEDIA_ROOT + data_path[6:]
             zip_path = os.path.join(
                 zip_subdir,
-                '{}. {}.zip'.format(numbering, context['file_title']))
+                '{}. {}.zip'.format(numbering, file_title))
+            # if external_data is a zipfile, extract it before zip it
+            try:
+                external_file_zf = zipfile.ZipFile(zip_data_path)
+                for name in external_file_zf.namelist():
+                    if name.endswith('/'):
+                        continue
+                    if name.startswith('__MACOSX'):
+                        continue
+                    f = external_file_zf.read(name)
+                    zf.writestr(name, f)
+            except Exception:
+                zf.write(zip_data_path, zip_path)
+
+        # license
+        if context['worksheet'].license:
+            data_path = context['worksheet'].license.file.url
+            zip_data_path = settings.MEDIA_ROOT + data_path[6:]
+            zip_path = os.path.join(zip_subdir, 'license.txt')
             zf.write(zip_data_path, zip_path)
 
         zf.close()
@@ -177,8 +214,58 @@ class WorksheetPDFZipView(WorksheetDetailView):
             s.getvalue(), content_type="application/x-zip-compressed")
         zip_response['Content-Disposition'] = \
             'attachment; filename={}. {}.zip'.format(
-                numbering, context['file_title'])
+                numbering, file_title)
         return zip_response
+
+
+class WorksheetDownloadSampleDataView(WorksheetDetailView):
+    def render_to_response(self, context, **response_kwargs):
+        context = self.get_context_data()
+        file_title = (f"{context['worksheet'].section.name}"
+                      f"-{context['worksheet'].module}")
+        s = BytesIO()
+        zf = zipfile.ZipFile(s, "w")
+
+        if context['worksheet'].external_data:
+            data_path = context['worksheet'].external_data.url
+            zip_data_path = settings.MEDIA_ROOT + data_path[6:]
+
+            try:
+                external_file_zf = zipfile.ZipFile(zip_data_path)
+                for name in external_file_zf.namelist():
+                    if name.endswith('.zip'):
+                        try:
+                            filebytes = BytesIO(external_file_zf.read(name))
+                            subzip = zipfile.ZipFile(filebytes)
+                            for name_subzip in subzip.namelist():
+                                if name_subzip.endswith('/'):
+                                    continue
+                                if name_subzip.startswith('__MACOSX'):
+                                    continue
+                                f_subzip = subzip.read(name_subzip)
+                                zf.writestr(name_subzip, f_subzip)
+                        except Exception:
+                            pass
+                    else:
+                        if name.endswith('/'):
+                            continue
+                        if name.startswith('__MACOSX'):
+                            continue
+                        f = external_file_zf.read(name)
+                        zf.writestr(name, f)
+
+            except Exception:
+                zf.write(zip_data_path, file_title)
+
+            zf.close()
+
+            zip_response = HttpResponse(
+                s.getvalue(), content_type="application/x-zip-compressed")
+            zip_response['Content-Disposition'] = \
+                'attachment; filename={}.zip'.format(file_title)
+            return zip_response
+        else:
+            raise Http404("Sample data does not exist")
 
 
 class WorksheetCreateView(LoginRequiredMixin, WorksheetMixin, CreateView):
@@ -221,6 +308,7 @@ class WorksheetUpdateView(LoginRequiredMixin, WorksheetMixin, UpdateView):
     context_object_name = 'worksheet'
     template_name = 'update.html'
     update_label = _('Update worksheet')
+    form_class = WorksheetUpdateForm
 
     def get_form_kwargs(self):
         """Get keyword arguments from form.
@@ -229,6 +317,7 @@ class WorksheetUpdateView(LoginRequiredMixin, WorksheetMixin, UpdateView):
         :rtype: dict
         """
         kwargs = super(WorksheetUpdateView, self).get_form_kwargs()
+        self.numbering = self.request.GET.get('q', '')
         slug = self.kwargs.get('section_slug', None)
         kwargs['section'] = get_object_or_404(Section, slug=slug)
         return kwargs
@@ -242,11 +331,12 @@ class WorksheetUpdateView(LoginRequiredMixin, WorksheetMixin, UpdateView):
         :returns: URL
         :rtype: HttpResponse
         """
-        return reverse('worksheet-detail', kwargs={
+        url = reverse('worksheet-detail', kwargs={
             'pk': self.object.pk,
             'project_slug': self.object.section.project.slug,
             'section_slug': self.object.section.slug,
         })
+        return '%s?q=%s' % (url, self.numbering)
 
 
 class WorksheetDeleteView(
@@ -355,6 +445,10 @@ class WorksheetModuleQuestionAnswers(WorksheetMixin,
         section_slug = self.kwargs.get('section_slug', None)
         project = get_object_or_404(Project, slug=project_slug)
 
+        context['project_slug'] = project_slug
+        context['section_slug'] = section_slug
+        context['worksheet_pk'] = self.object.pk
+
         context['sections'] = Section.objects.filter(project=project,
                                                      slug=section_slug)
         for section in context['sections']:
@@ -382,12 +476,34 @@ class WorksheetModuleQuestionAnswers(WorksheetMixin,
         return context
 
 
+class WorksheetModuleQuestionAnswersPDF(WorksheetModuleQuestionAnswers):
+    """Rendering PDF Question-Answer module"""
+
+    template_name = 'worksheet/question_answers_pdf.html'
+
+    def render_to_response(self, context, **response_kwargs):
+        project_slug = self.kwargs.get('project_slug', None)
+        project = get_object_or_404(Project, slug=project_slug)
+        response = super(WorksheetModuleQuestionAnswersPDF,
+                         self).render_to_response(context, **response_kwargs)
+        response.render()
+        pdf_response = HttpResponse(content_type='application/pdf')
+        pdf_response['Content-Disposition'] = (
+                'filename=%s.pdf' % project.name)
+        html_object = HTML(
+            string=response.content,
+            base_url='file://',
+        )
+        html_object.write_pdf(pdf_response)
+        return pdf_response
+
+
 def download_multiple_worksheet(request, **kwargs):
     """Download pdf and sample zip file from multiple worksheets."""
 
     project_slug = kwargs.pop('project_slug')
     project = Project.objects.get(slug=project_slug)
-    worksheets_obj = request.GET.get('worksheet')
+    worksheets_obj = request.GET.get('worksheet', '{}')
     worksheets = json.loads(worksheets_obj)
 
     def get_context_data(pk):
@@ -449,11 +565,12 @@ def download_multiple_worksheet(request, **kwargs):
 
         pk = int(pk)
         worksheet = Worksheet.objects.get(pk=pk)
-        pdf_title = '{}. {}'.format(numbering, worksheet.module.encode("utf8"))
+        pdf_title = '{}. {}'.format(numbering, worksheet.module)
         context = get_context_data(pk)
         context['section_number'] = numbering.split('.')[0]
         context['module_number'] = numbering
-        response = render_to_response('worksheet/print.html', context=context)
+        response = render(
+            request, 'worksheet/print.html', context=context)
 
         pdf_response = HttpResponse(content_type='application/pdf')
         pdf_response['Content-Disposition'] = \
@@ -484,6 +601,14 @@ def download_multiple_worksheet(request, **kwargs):
             zip_path = os.path.join(zip_subdir, pdf_title + '.zip')
             zf.write(zip_data_path, zip_path)
 
+        # license
+        if worksheet.license:
+            data_path = context['worksheet'].license.file.url
+            zip_data_path = settings.MEDIA_ROOT + data_path[6:]
+            zip_path = os.path.join(zip_subdir,
+                                    context['worksheet'].license.name + '.txt')
+            zf.write(zip_data_path, zip_path)
+
     zf.close()
 
     downloaded_module = ''
@@ -499,5 +624,5 @@ def download_multiple_worksheet(request, **kwargs):
         s.getvalue(), content_type="application/x-zip-compressed")
     zip_response['Content-Disposition'] = \
         'attachment; filename={}-worksheet {}.zip'.format(
-            project.name.encode('utf8'), downloaded_module)
+            project.name, downloaded_module)
     return zip_response

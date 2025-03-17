@@ -1,7 +1,7 @@
 {% extends "project_base.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
-{% load staticfiles %}
+{% load static %}
 {% block title %}Sustaining Members - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
@@ -43,6 +43,11 @@
 
                 {% if user.is_authenticated %}
                     {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all %}
+                        <a class="btn btn-default btn-mini tooltip-toggle icon"
+                           href='{% url "future-sponsor-list" project_slug %}'
+                           data-title="Future Sponsor List">
+                            <i class="fa fa-money"></i>
+                        </a>
                         <a class="btn btn-default btn-mini tooltip-toggle icon"
                            href='{% url "sponsor-create" project_slug %}'
                            data-title="Create New Sustaining Member">
@@ -113,12 +118,22 @@
                             {% if sponsor.sponsor.sponsor_url %}
                                 <a href="{{ sponsor.sponsor.sponsor_url }}">
                                 <img class="img-responsive img-rounded pull-right"
-                                     src="{% thumbnail sponsor.sponsor.logo 50x50 crop %}"/>
-                            </a>
+                                     {% thumbnail sponsor.sponsor.logo 50x50 as logo %}
+                                        {% if logo %}
+                                            src="{% thumbnail sponsor.sponsor.logo 50x50 %}"
+                                        {% else %}
+                                            src="{{ sponsor.sponsor.logo.url }}" width="50" height="50"
+                                     {% endif %}/>
+                                  </a>
                             {% else %}
                                 <a href="{{ sponsor.sponsor.logo.url }}">
                                     <img class="img-responsive img-rounded pull-right"
-                                         src="{% thumbnail sponsor.sponsor.logo 50x50 crop %}"/>
+                                     {% thumbnail sponsor.sponsor.logo 50x50 as logo %}
+                                        {% if logo %}
+                                            src="{% thumbnail sponsor.sponsor.logo 50x50 %}"
+                                        {% else %}
+                                            src="{{ sponsor.sponsor.logo.url }}" width="50" height="50"
+                                     {% endif %}/>
                                 </a>
                             {% endif %}
                         {% endif %}
@@ -159,7 +174,7 @@
 
 
     {% for sponsor in sponsors %}
-        {% if not sponsor.current_sponsor %}
+        {% if not sponsor.current_sponsor and not sponsor.future_sponsor %}
             {% ifchanged sponsor.sponsorship_level %}
                 <h3 class="text-muted"><img
                             src="{% thumbnail sponsor.sponsorship_level.logo 50x50 %}"/> {{ sponsor.sponsorship_level }}
@@ -170,7 +185,12 @@
                         {% if sponsor.sponsor.logo %}
                             <a href="{{ sponsor.sponsor.logo.url }}">
                                 <img class="img-responsive img-rounded pull-right"
-                                     src="{% thumbnail sponsor.sponsor.logo 50x50 crop %}"/>
+                                     {% thumbnail sponsor.sponsor.logo 50x50 as logo %}
+                                        {% if logo %}
+                                            src="{% thumbnail sponsor.sponsor.logo 50x50 %}"
+                                        {% else %}
+                                            src="{{ sponsor.sponsor.logo.url }}" width="50" height="50"
+                                     {% endif %}/>
                             </a>
                         {% endif %}
                     </div>

@@ -5,21 +5,29 @@ import datetime
 from io import BytesIO
 import os
 import zipfile
+
+import stripe
 from PIL import Image
 import re
 from decimal import Decimal
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import (
-    Http404, HttpResponse, HttpResponseRedirect, FileResponse
+    Http404, HttpResponse, HttpResponseRedirect, FileResponse,
+    HttpResponseForbidden
 )
-from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic import (
+    CreateView, DetailView, TemplateView, DeleteView)
 from django.conf import settings
 from django.urls import reverse
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
+from django.utils.translation import ugettext as _
 from braces.views import LoginRequiredMixin
+from djstripe.enums import PaymentIntentStatus
+from djstripe.models import Customer, PaymentIntent
+from djstripe import settings as djstripe_settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.utils import ImageReader
@@ -29,12 +37,14 @@ import djstripe.models
 import djstripe.settings
 from ..models import (
     Certificate,
+    CertificateType,
     Course,
     Attendee,
     CertifyingOrganisation,
     CourseConvener,
     TrainingCenter,
-    CourseType
+    CourseType,
+    CourseAttendee
 )
 from ..forms import CertificateForm
 from base.models.project import Project
@@ -42,6 +52,8 @@ from changes import (
     NOTICE_TOP_UP_SUCCESS
 )
 from helpers.notification import send_notification
+
+stripe.api_key = djstripe_settings.STRIPE_SECRET_KEY
 
 
 class CertificateMixin(object):
@@ -230,7 +242,8 @@ class CertificateDetailView(DetailView):
 
 
 def generate_pdf(
-        pathname, project, course, attendee, certificate, current_site):
+        pathname, project, course, attendee, certificate, current_site,
+        wording='Has attended and completed the course:'):
     """Create the PDF object, using the response object as its file."""
 
     # Register new font
@@ -341,10 +354,10 @@ def generate_pdf(
     page.drawCentredString(
         center, 400, '%s %s' % (
             attendee.firstname,
-            attendee.surname))
+            attendee.surname if attendee.surname else ''))
     page.setFont('Noto-Regular', 16)
     page.drawCentredString(
-        center, 370, 'Has attended and completed the course:')
+        center, 370, wording)
     page.setFont('Noto-Bold', 20)
     page.drawCentredString(
             center, 335, course.course_type.name)
@@ -415,7 +428,7 @@ def generate_pdf(
     page.drawString(
         margin_left, (margin_bottom - 20),
         'You can verify this certificate by visiting '
-        'http://{}/en/{}/certificate/{}/.'
+        'https://{}/en/{}/certificate/{}/.'
         ''.format(current_site, project.slug, certificate.certificateID))
 
     # Close the PDF object cleanly.
@@ -452,7 +465,9 @@ def certificate_pdf_view(request, **kwargs):
             os.makedirs(makepath)
 
         generate_pdf(
-            pathname, project, course, attendee, certificate, current_site)
+            pathname, project, course, attendee, certificate, current_site,
+            course.certificate_type.wording
+        )
         try:
             return FileResponse(open(pathname, 'rb'),
                                 content_type='application/pdf')
@@ -589,23 +604,22 @@ def email_all_attendees(request, **kwargs):
         for attendee in attendee_list_object:
             # Send email to each attendee with the link to his certificate.
             data = {
-                'firstname': attendee.firstname.encode('utf-8'),
-                'lastname': attendee.surname.encode('utf-8'),
+                'firstname': attendee.firstname,
+                'lastname': attendee.surname if attendee.surname else '',
                 'coursetype': course.course_type,
                 'start_date': course.start_date.strftime('%d %B %Y'),
                 'end_date': course.end_date.strftime('%d %B %Y'),
                 'training_center': course.training_center,
-                'organisation': course.certifying_organisation.name.encode(
-                    'utf-8'),
+                'organisation': course.certifying_organisation.name,
                 'domain': site,
                 'project_slug': course.certifying_organisation.project.slug,
                 'organisation_slug': course.certifying_organisation.slug,
                 'course_slug': course.slug,
                 'pk': attendee.pk,
                 'convener_firstname':
-                    course.course_convener.user.first_name.encode('utf-8'),
+                    course.course_convener.user.first_name,
                 'convener_lastname':
-                    course.course_convener.user.last_name.encode('utf-8')}
+                    course.course_convener.user.last_name}
 
             send_mail(
                 'Certificate from {} Course'.format(course.course_type),
@@ -619,12 +633,12 @@ def email_all_attendees(request, **kwargs):
                 'Certifying organisation: {organisation}\n\n'
                 'You may print the certificate '
                 'by visiting:\n'
-                'http://{domain}/en/{project_slug}/certifyingorganisation/'
+                'https://{domain}/en/{project_slug}/certifyingorganisation/'
                 '{organisation_slug}/course/'
                 '{course_slug}/print/{pk}/\n\n'
                 'Sincerely,\n{convener_firstname} {convener_lastname}'
                 ''.format(**data),
-                course.course_convener.user.email,
+                settings.DEFAULT_FROM_EMAIL,
                 [attendee.email],
                 fail_silently=False,
             )
@@ -688,7 +702,9 @@ def regenerate_certificate(request, **kwargs):
 
         current_site = request.META['HTTP_HOST']
         generate_pdf(
-            pathname, project, course, attendee, certificate, current_site)
+            pathname, project, course, attendee, certificate, current_site,
+            course.certificate_type.wording
+        )
         try:
             return FileResponse(open(pathname, 'rb'),
                                 content_type='application/pdf')
@@ -703,6 +719,67 @@ def regenerate_certificate(request, **kwargs):
             'attendee': attendee,
             'id': certificate.certificateID,
             'course': course})
+
+
+def generate_all_certificate(request, **kwargs):
+    """Generate all certificates within a course."""
+
+    project_slug = kwargs.pop('project_slug', None)
+    course_slug = kwargs.pop('course_slug', None)
+    organisation_slug = kwargs.get('organisation_slug', None)
+    course = Course.objects.get(slug=course_slug)
+    project = Project.objects.get(slug=project_slug)
+    certifying_organisation = \
+        CertifyingOrganisation.objects.get(slug=organisation_slug)
+
+    # Checking user permissions.
+    if request.user.is_staff or request.user == project.owner or \
+            request.user in project.certification_managers.all() or \
+            request.user in certifying_organisation.organisation_owners.all() \
+            or request.user == project.project_representative:
+        pass
+    else:
+        raise Http404
+
+    course_attendees = CourseAttendee.objects.filter(course=course)
+    for course_attendee in course_attendees:
+
+        try:
+            certificate = Certificate.objects.get(
+                author=request.user,
+                attendee=course_attendee.attendee,
+                course=course,
+            )
+        except Certificate.DoesNotExist:
+
+            remaining_credits = \
+                certifying_organisation.organisation_credits - \
+                certifying_organisation.project.certificate_credit
+
+            is_paid = False
+            if remaining_credits >= 0:
+                is_paid = True
+
+            certificate = Certificate.objects.create(
+                author=request.user,
+                attendee=course_attendee.attendee,
+                course=course,
+                is_paid=is_paid
+            )
+
+            if certificate and (remaining_credits >= 0):
+                certifying_organisation.organisation_credits = \
+                    remaining_credits
+                certifying_organisation.save()
+
+    url = reverse('course-detail', kwargs={
+        'project_slug': project_slug,
+        'organisation_slug': organisation_slug,
+        'slug': course_slug
+    })
+
+    messages.success(request, 'All certificates are generated', 'generate')
+    return HttpResponseRedirect(url)
 
 
 def regenerate_all_certificate(request, **kwargs):
@@ -779,7 +856,8 @@ def regenerate_all_certificate(request, **kwargs):
                     '/home/web/media',
                     'pdf/{}/{}'.format(project_folder, filename))
             generate_pdf(
-                pathname, project, course, key, value, current_site)
+                pathname, project, course, key, value, current_site,
+                course.certificate_type.wording)
 
         messages.success(request, 'All certificates are updated', 'regenerate')
         return HttpResponseRedirect(url)
@@ -850,6 +928,7 @@ def preview_certificate(request, **kwargs):
     organisation_slug = kwargs.pop('organisation_slug')
 
     convener_id = request.POST.get('course_convener', None)
+    certificate_type_id = request.POST.get('certificate_type', None)
     if convener_id is not None:
         # Get all posted data.
         course_convener = CourseConvener.objects.get(id=convener_id)
@@ -884,8 +963,21 @@ def preview_certificate(request, **kwargs):
 
         current_site = request.META['HTTP_HOST']
 
-        generate_pdf(
-            response, project, course, attendee, certificate, current_site)
+        if certificate_type_id:
+            try:
+                certificate_type = CertificateType.objects.get(
+                    id=certificate_type_id)
+                generate_pdf(
+                    response, project, course, attendee, certificate,
+                    current_site, certificate_type.wording
+                )
+            except CertificateType.DoesNotExist:
+                generate_pdf(
+                    response, project, course, attendee, certificate,
+                    current_site)
+        else:
+            generate_pdf(
+                response, project, course, attendee, certificate, current_site)
 
     else:
         # When preview page is refreshed, the data is gone so user needs to
@@ -1063,3 +1155,375 @@ class TopUpView(TemplateView):
                 'slug': self.organisation_slug
             })
         )
+
+
+class CertificateRevokeView(
+        LoginRequiredMixin,
+        CertificateMixin,
+        DeleteView):
+    """Revoke view for Certificate."""
+
+    context_object_name = 'certificate'
+    template_name = 'certificate/delete.html'
+
+    def get_object(self, queryset=None):
+        """
+        Returns the object the view is displaying.
+
+        By default this requires `self.queryset` and a `pk` or `slug` argument
+        in the URLconf, but subclasses can override this to return any object.
+        """
+        # Use a custom queryset if provided; this is required for subclasses
+        # like DateDetailView
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        # Next, try looking up by primary key.
+        pk = self.kwargs.get(self.pk_url_kwarg, None)
+        slug = self.kwargs.get(self.slug_url_kwarg, None)
+        if pk is not None:
+            queryset = queryset.filter(attendee__pk=pk)
+
+        # Next, try looking up by slug.
+        if slug is not None and (pk is None or self.query_pk_and_slug):
+            slug_field = self.get_slug_field()
+            queryset = queryset.filter(**{slug_field: slug})
+
+        # If none of those are defined, it's an error.
+        if pk is None and slug is None:
+            raise AttributeError("Generic detail view %s must be called with "
+                                 "either an object pk or a slug."
+                                 % self.__class__.__name__)
+
+        try:
+            # Get the single item from the filtered queryset
+            obj = queryset.get()
+        except queryset.model.DoesNotExist:
+            raise Http404(_("No %(verbose_name)s found matching the query") %
+                          {'verbose_name': queryset.model._meta.verbose_name})
+        return obj
+
+    def get(self, request, *args, **kwargs):
+        """Get the course_slug and course attendee pk from the URL
+        and define the course.
+
+        :param request: HTTP request object
+        :type request: HttpRequest
+
+        :param args: Positional arguments
+        :type args: tuple
+
+        :param kwargs: Keyword arguments
+        :type kwargs: dict
+
+        :returns: Unaltered request object
+        :rtype: HttpResponse
+        """
+
+        self.course_slug = self.kwargs.get('course_slug', None)
+        self.pk = self.kwargs.get('pk', None)
+        self.course = Course.objects.get(slug=self.course_slug)
+
+        if not self.course.editable:
+            return HttpResponseForbidden('Course is not editable.')
+
+        return super(
+            CertificateRevokeView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Post the project_slug, organisation_slug, course_slug from the URL.
+
+        :param request: HTTP request object
+        :type request: HttpRequest
+
+        :param args: Positional arguments
+        :type args: tuple
+
+        :param kwargs: Keyword arguments
+        :type kwargs: dict
+
+        :returns: Unaltered request object
+        :rtype: HttpResponse
+        """
+
+        self.project_slug = self.kwargs.get('project_slug', None)
+        self.organisation_slug = self.kwargs.get('organisation_slug', None)
+        self.course_slug = self.kwargs.get('course_slug', None)
+        self.course = Course.objects.get(slug=self.course_slug)
+
+        return super(
+            CertificateRevokeView, self).post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        """Define the redirect URL.
+
+        After successful deletion  of the object, the User will be redirected
+        to the Course detail page.
+
+        :returns: URL
+        :rtype: HttpResponse
+        """
+
+        return reverse('course-detail', kwargs={
+            'project_slug': self.project_slug,
+            'organisation_slug': self.organisation_slug,
+            'slug': self.course_slug
+        })
+
+    def get_queryset(self):
+        """Get the queryset for this view.
+
+        :returns: Course Attendee queryset filtered by Course
+        :rtype: QuerySet
+        :raises: Http404
+        """
+
+        if not self.request.user.is_authenticated:
+            raise Http404
+        qs = Certificate.objects.filter(course=self.course)
+        return qs
+
+    def delete(self, request, *args, **kwargs):
+
+        # Update organisation credits every time a certificate is revoked.
+        organisation = \
+            CertifyingOrganisation.objects.get(
+                slug=self.organisation_slug)
+        remaining_credits = \
+            organisation.organisation_credits + \
+            organisation.project.certificate_credit
+        organisation.organisation_credits = remaining_credits
+        organisation.save()
+
+        # Delete existing certificate
+        certificate = self.get_object()
+        filename = "{}.{}".format(certificate.certificateID, "pdf")
+        project_folder = (
+            organisation.project.name.lower()).replace(' ', '_')
+        pathname = \
+            os.path.join(
+                '/home/web/media',
+                'pdf/{}/{}'.format(project_folder, filename))
+        found = os.path.exists(pathname)
+        if found:
+            os.remove(pathname)
+
+        return super(
+            CertificateRevokeView, self).delete(request, *args, **kwargs)
+
+
+class CheckoutSessionSuccessView(TemplateView):
+    """
+    Template View for showing Checkout Payment Success
+    """
+
+    template_name = "checkout_success.html"
+
+    def get(self, request, *args, **kwargs):
+        session = (
+            stripe.checkout.Session.retrieve(
+                self.request.GET.get('session_id'))
+        )
+        if session['payment_status'] == 'paid':
+            try:
+                payment_intent = PaymentIntent.objects.get(
+                    id=session['id']
+                )
+                if (
+                        payment_intent.status ==
+                        PaymentIntentStatus.requires_payment_method):
+                    user = self.request.user
+
+                    organisation = CertifyingOrganisation.objects.get(
+                        id=session['metadata']['organisation_id']
+                    )
+                    total_credits = int(
+                        session['metadata']['credits_quantity']
+                    )
+                    cost_of_credits = payment_intent.amount / 100
+
+                    organisation.organisation_credits += total_credits
+                    organisation.save()
+                    organisation_owners = (
+                        organisation.organisation_owners.all()
+                    )
+
+                    project = organisation.project
+
+                    send_notification(
+                        users=[self.request.user] + list(organisation_owners),
+                        label=NOTICE_TOP_UP_SUCCESS,
+                        extra_context={
+                            'author': self.request.user,
+                            'top_up_credits': total_credits,
+                            'currency': (
+                                project.get_credit_cost_currency_display()
+                            ),
+                            'payment_amount': cost_of_credits,
+                            'certifying_organisation': organisation,
+                            'total_credits': organisation.organisation_credits
+                        },
+                        request_user=user
+                    )
+
+                    messages.success(
+                        self.request,
+                        'Your purchase of <b>{}</b>'
+                        ' credits has been'
+                        ' successful'.format(
+                            total_credits
+                        ),
+                        'credits_top_up'
+                    )
+
+                    payment_intent.status = PaymentIntentStatus.succeeded
+                    payment_intent.save()
+                    return HttpResponseRedirect(
+                        reverse("certifyingorganisation-detail", kwargs={
+                            'project_slug': organisation.project.slug,
+                            'slug': organisation.slug
+                        }))
+            except PaymentIntent.DoesNotExist:
+                pass
+
+            return HttpResponseRedirect('/')
+
+
+class CreateCheckoutSessionView(LoginRequiredMixin, TemplateView):
+    """
+     * Create a Stripe Checkout Session (for a new and a returning customer)
+     * Add SUBSCRIBER_CUSTOMER_KEY to metadata to populate customer
+     * Fill out Payment Form and Complete Payment
+    Redirects the User to Stripe Checkout Session.
+    This does a logged in purchase for a new and a returning customer using
+    Stripe Checkout
+    """
+
+    template_name = "checkout.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Creates and returns a Stripe Checkout Session
+        """
+        # Get Parent Context
+        context = super().get_context_data(**kwargs)
+
+        org_id = self.request.GET.get('org', None)
+        unit = int(self.request.GET.get('unit', '0'))
+        total = int(self.request.GET.get('total', '0')) * 100
+        unit_amount = int(total / unit) if unit > 0 else 0
+
+        try:
+            org = CertifyingOrganisation.objects.get(id=org_id)
+        except CertifyingOrganisation.DoesNotExist:
+            raise Http404()
+
+        if unit == 0 or total == 0:
+            raise Http404()
+
+        description = f'Top up credits for {org.name}'
+
+        # to initialise Stripe.js on the front end
+        context[
+            "STRIPE_PUBLIC_KEY"
+        ] = djstripe_settings.STRIPE_PUBLIC_KEY
+
+        success_url = self.request.build_absolute_uri(
+            reverse("checkout-success")
+        )
+        success_url += '?session_id={CHECKOUT_SESSION_ID}'
+
+        cancel_url = self.request.build_absolute_uri(reverse("top-up", kwargs={
+            'project_slug': org.project.slug,
+            'organisation_slug': org.slug
+        }))
+
+        try:
+            logo = self.request.build_absolute_uri(org.project.image_file.url)
+        except ValueError:
+            logo = ''
+
+        # get the id of the Model instance of
+        # djstripe_settings.get_subscriber_model()
+        # here we have assumed it is the Django User model.
+        # It could be a Team, Company model too.
+        # note that it needs to have an email field.
+        id = self.request.user.id
+        metadata = {
+            f"{djstripe_settings.SUBSCRIBER_CUSTOMER_KEY}": id,
+            "organisation_id": org.id,
+            "credits_quantity": unit
+        }
+
+        try:
+            # Retrieve the Stripe Customer.
+            customer = Customer.objects.get(subscriber=self.request.user)
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                customer=customer.id,
+                payment_intent_data={
+                    "setup_future_usage": "off_session",
+                    "metadata": metadata,
+                },
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "eur",
+                            "unit_amount": unit_amount,
+                            "product_data": {
+                                "name": "Top up credits",
+                                "images": [logo],
+                                "description": description,
+                            },
+                        },
+                        "quantity": unit,
+                    },
+                ],
+                mode="payment",
+                success_url=success_url,
+                cancel_url=cancel_url,
+                metadata=metadata,
+            )
+
+        except Customer.DoesNotExist:
+            print("Customer Object not in DB.")
+
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                payment_intent_data={
+                    "setup_future_usage": "off_session",
+                    "metadata": metadata,
+                },
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "eur",
+                            "unit_amount": unit_amount,
+                            "product_data": {
+                                "name": "Top up credits",
+                                "images": [logo],
+                                "description": description,
+                            },
+                        },
+                        "quantity": unit,
+                    },
+                ],
+                mode="payment",
+                success_url=success_url,
+                cancel_url=cancel_url,
+                metadata=metadata,
+            )
+
+        # Create payment intent
+        PaymentIntent.objects.create(
+            id=session.id,
+            amount=total,
+            amount_received=0,
+            amount_capturable=0,
+            payment_method_types=['card'],
+            status=PaymentIntentStatus.requires_payment_method
+        )
+
+        context["CHECKOUT_SESSION_ID"] = session.id
+
+        return context
