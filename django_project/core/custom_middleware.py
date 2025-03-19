@@ -19,7 +19,6 @@ from base.models import Project, Version, Domain, ProjectFlatpage
 from changes.models import (
     SponsorshipLevel, SponsorshipPeriod, Sponsor
 )
-from certification.models import CertifyingOrganisation
 
 
 class NavContextMiddleware(MiddlewareBase):
@@ -53,9 +52,6 @@ class NavContextMiddleware(MiddlewareBase):
                     project=context.get('project')).exists())
             context['has_pending_sponsor_period'] = (
                 SponsorshipPeriod.unapproved_objects.filter(
-                    project=context.get('project')).exists())
-            context['has_pending_organisations'] = (
-                CertifyingOrganisation.unapproved_objects.filter(
                     project=context.get('project')).exists())
 
             # Check if user is a sustaining member manager

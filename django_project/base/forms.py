@@ -14,10 +14,12 @@ from crispy_forms.layout import (
 )
 from .models import (
     Project, ProjectScreenshot, Domain, Organisation, ProjectFlatpage)
-from certification.forms import MultiSelectWidget
 
 logger = logging.getLogger(__name__)
 
+
+class MultiSelectWidget(forms.SelectMultiple):
+    template_name = 'widgets/multiselect.html'
 
 class ProjectScreenshotForm(forms.ModelForm):
     """Form to input a screenshot linked to a project."""

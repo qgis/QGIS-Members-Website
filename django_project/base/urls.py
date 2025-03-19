@@ -5,42 +5,9 @@ from django.views.static import serve
 from django.conf import settings
 
 from .views import (
-    # Project
-    ProjectDetailView,
-    ProjectDeleteView,
-    ProjectCreateView,
-    ProjectListView,
-    ProjectUpdateView,
-    PendingProjectListView,
-    ApproveProjectView,
-    ProjectBallotListView,
-    GithubProjectView,
-    GithubListView,
-    GithubOrgsView,
-    GithubSubmitView,
     custom_404,
-    project_sponsor_programme,
-    preview_certificate,
-
-    DomainNotFound,
-    RegisterDomainView,
-    DomainThankYouView,
-    DomainListView,
-    PendingDomainListView,
-    ApproveDomainView,
-    DomainDeleteView,
-    DomainUpdateView,
-
-    CreateOrganisationView,
-    OrganisationListView,
-    ApproveOrganisationView,
-    PendingOrganisationListView,
-    OrganisationDeleteView,
-    OrganisationUpdateView,
-
     UserDetailView,
     UserUpdateView,
-    project_flatpage
 )
 from .api_views.stripe_intent import StripeIntent
 
