@@ -153,7 +153,7 @@ class SponsorshipLevelListView(
         :raises: Http404
         """
         if self.queryset is None:
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if project_slug:
                 project = Project.objects.get(slug=project_slug)
                 queryset = \

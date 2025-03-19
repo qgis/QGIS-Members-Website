@@ -20,12 +20,12 @@
     <div class="col-lg-2">
       <div class="btn-group pull-right">
         <a class="btn btn-default btn-sm tooltip-toggle"
-           href='{% url "sponsorshiplevel-delete" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'
+           href='{% url "sponsorshiplevel-delete" slug=sponsorshiplevel.slug %}'
            data-title="Delete {{ sponsorshiplevel.name }}">
           <span class="glyphicon glyphicon-minus"></span>
         </a>
         <a class="btn btn-default btn-sm tooltip-toggle"
-           href='{% url "sponsorshiplevel-update" project_slug=sponsorshiplevel.project.slug slug=sponsorshiplevel.slug %}'
+           href='{% url "sponsorshiplevel-update" slug=sponsorshiplevel.slug %}'
            data-title="Edit {{ sponsorshiplevel.name }}">
           <span class="glyphicon glyphicon-pencil"></span>
         </a>
