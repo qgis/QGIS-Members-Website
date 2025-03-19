@@ -71,7 +71,7 @@ class SustainingMemberCreateView(LoginRequiredMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         project = Project.objects.get(
-            slug=self.kwargs.get('project_slug')
+            slug='qgis'
         )
         active_memberships = active_sustaining_membership(
             self.request.user,
@@ -79,9 +79,7 @@ class SustainingMemberCreateView(LoginRequiredMixin, CreateView):
         )
         if active_memberships.exists():
             return redirect(reverse(
-                'sustaining-membership', kwargs={
-                    'project_slug': self.kwargs.get('project_slug')
-                }
+                'sustaining-membership', kwargs={}
             ))
         return super(SustainingMemberCreateView, self).get(
             request, *args, **kwargs
@@ -92,14 +90,12 @@ class SustainingMemberCreateView(LoginRequiredMixin, CreateView):
             **kwargs
         )
         context['the_project'] = Project.objects.get(
-            slug=self.kwargs.get('project_slug')
+            slug='qgis'
         )
         return context
 
     def get_success_url(self):
-        return reverse('sustaining-membership', kwargs={
-            'project_slug': self.form_object.project.slug
-        })
+        return reverse('sustaining-membership', kwargs={})
 
     def post(self, request, *args, **kwargs):
         """
@@ -131,7 +127,7 @@ class SustainingMemberCreateView(LoginRequiredMixin, CreateView):
         """Check if form is valid."""
         if form.is_valid():
             project = Project.objects.get(
-                slug=self.kwargs.get('project_slug')
+                slug='qgis'
             )
             self.form_object = form.save(commit=False)
             self.form_object.author = self.request.user
@@ -165,7 +161,7 @@ class SustainingMembership(LoginRequiredMixin, DetailView):
         :rtype: dict
         """
         context = super(SustainingMembership, self).get_context_data(**kwargs)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         context['project_slug'] = project_slug
         sustaining_member = self.get_object()
         today = date.today()
@@ -205,7 +201,7 @@ class SustainingMembership(LoginRequiredMixin, DetailView):
         """Return the a Sustaining Membership object.
         It must match with project_slug and the user"""
         try:
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             project = Project.objects.get(slug=project_slug)
             sustaining_member = get_object_or_404(
                 Sponsor,
@@ -258,7 +254,7 @@ class SustainingMemberUpdateView(LoginRequiredMixin, UpdateView):
         projects which user created (staff gets all projects)
         :rtype: QuerySet
         """
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         queryset = Sponsor.objects.all()
         if self.request.user.is_staff:
@@ -288,7 +284,7 @@ class SustainingMemberUpdateView(LoginRequiredMixin, UpdateView):
         if queryset is None:
             queryset = self.get_queryset()
             member_id = self.kwargs.get('member_id', None)
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if member_id and project_slug:
                 project = Project.objects.get(slug=project_slug)
                 obj = queryset.filter(
@@ -309,9 +305,7 @@ class SustainingMemberUpdateView(LoginRequiredMixin, UpdateView):
         """
         if self.request.GET.get('next', None):
             return self.request.GET.get('next')
-        return reverse('sustaining-membership', kwargs={
-            'project_slug': self.form_object.project.slug
-        })
+        return reverse('sustaining-membership', kwargs={})
 
     def form_valid(self, form):
         """Check if form is valid."""
@@ -319,7 +313,7 @@ class SustainingMemberUpdateView(LoginRequiredMixin, UpdateView):
             self.form_object = form.save(commit=False)
             self.form_object.author = self.request.user
             self.form_object.project = Project.objects.get(
-                slug=self.kwargs.get('project_slug')
+                slug='qgis'
             )
             sponsorship_managers = (
                    self.form_object.project.sponsorship_managers.all().exclude(
@@ -368,9 +362,7 @@ class SustainingMemberPeriodCreateView(
        :returns: URL
        :rtype: HttpResponse
        """
-        return reverse('sustaining-membership', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sustaining-membership', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -394,7 +386,7 @@ class SustainingMemberPeriodCreateView(
                 "(or use the dj-stripe webhooks)"
             )
 
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         project = Project.objects.get(slug=project_slug)
         member_id = self.kwargs.get('member_id', None)
         member = Sponsor.objects.get(id=member_id)
@@ -484,7 +476,7 @@ class SustainingMemberPeriodCreateView(
         :rtype: HttpResponseRedirect
         """
         member_id = self.kwargs.get('member_id', None)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         source_id = self.request.POST.get('stripe-source-id')
         sponsor = Sponsor.objects.get(id=member_id)
         if not sponsor.approved:
@@ -565,9 +557,7 @@ class SustainingMemberPeriodUpdateView(
        :returns: URL
        :rtype: HttpResponse
        """
-        return reverse('sustaining-membership', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sustaining-membership', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -582,7 +572,7 @@ class SustainingMemberPeriodUpdateView(
                 SustainingMemberPeriodUpdateView,
                 self).get_context_data(**kwargs)
 
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         project = Project.objects.get(slug=project_slug)
         member_id = self.kwargs.get('member_id', None)
         member = Sponsor.objects.get(id=member_id)
@@ -619,7 +609,7 @@ class SustainingMemberPeriodUpdateView(
         :rtype: QuerySet
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         qs = SponsorshipPeriod.objects.all()
         if self.request.user.is_staff:
@@ -648,7 +638,7 @@ class SustainingMemberPeriodUpdateView(
         if queryset is None:
             queryset = self.get_queryset()
             member_id = self.kwargs.get('member_id', None)
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if member_id and project_slug:
                 project = Project.objects.get(slug=project_slug)
                 obj = queryset.get(
@@ -727,7 +717,7 @@ class SustainingMemberPeriodUpdateView(
         )
         if subscription:
             project = Project.objects.get(
-                slug=self.kwargs.get('project_slug')
+                slug='qgis'
             )
             sponsorship_managers = project.sponsorship_managers.all()
             # Send a notification
@@ -737,7 +727,7 @@ class SustainingMemberPeriodUpdateView(
                       ] + list(sponsorship_managers),
                 label=NOTICE_SUBSCRIPTION_UPDATED,
                 extra_context={
-                    'the_project_slug': self.kwargs.get('project_slug'),
+                    'the_project_slug': 'qgis',
                     'sustaining_member': self.object.sponsor.name,
                     'sustaining_member_level': self.object.sponsorship_level,
                     'author': self.request.user,
