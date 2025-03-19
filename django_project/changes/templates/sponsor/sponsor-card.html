@@ -36,14 +36,14 @@
                 {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all or user == sponsor.sponsor.author %}
                   <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
                     data-tooltip="Edit"
-                    href='{% url "sponsor-update" project_slug=sponsor.project.slug slug=sponsor.slug %}'>
+                    href='{% url "sponsor-update" slug=sponsor.slug %}'>
                     <span class="icon"><i class="fas fa-pencil-alt"></i></span>
                   </a>
                 {% endif %}
               {% endif %}
               <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
                 data-tooltip="View"
-                href='{% url "sponsor-detail" project_slug=sponsor.project.slug slug=sponsor.slug %}'>
+                href='{% url "sponsor-detail" slug=sponsor.slug %}'>
                 <span class="icon"><i class="fas fa-eye"></i></span>
               </a>
             </div>
@@ -74,7 +74,7 @@
           <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
             <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
               data-tooltip="View"
-              href='{% url "sponsor-detail" project_slug=sponsor.project.slug slug=sponsor.slug %}'>
+              href='{% url "sponsor-detail" slug=sponsor.slug %}'>
               <span class="icon"><i class="fas fa-eye"></i></span>
             </a>
           </div>

@@ -28,52 +28,52 @@
             {% if unapproved %}Unapproved {% endif %}Sponsors
                 <div class="pull-right btn-group">
                     <a class="btn btn-default btn-mini tooltip-toggle icon"
-                           href='{% url "sponsor-list" project_slug %}'
+                           href='{% url "sponsor-list" %}'
                            data-title="Current Sponsor List">
                             <i class="glyphicon glyphicon-euro"></i>
                         </a>
                 {% if user.is_authenticated %}
                     {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all %}
                         <a class="btn btn-default btn-mini tooltip-toggle icon"
-                           href='{% url "sponsor-create" project_slug %}'
+                           href='{% url "sponsor-create" %}'
                            data-title="Create New Sponsor">
                             {% show_button_icon "add" %}
                         </a>
                     {% endif %}
                     {% if not unapproved %}
                         <a class="btn btn-default btn-mini tooltip-toggle icon"
-                           href='{% url "pending-sponsor-list" project_slug %}'
+                           href='{% url "pending-sponsor-list" %}'
                            data-title="View Pending sponsorship period">
                             <span class="glyphicon glyphicon-time"></span>
                         </a>
                     {% endif %}
                   <a class="btn btn-default btn-mini tooltip-toggle icon"
-                       href='{% url "sponsor-cloud" project_slug %}'
+                       href='{% url "sponsor-cloud" %}'
                        data-title="Generate Current Sponsor Cloud">
                         <i class="glyphicon glyphicon-cloud"></i>
                     </a>
                 {% endif %}
                     <a class="btn btn-default btn-mini tooltip-toggle icon"
-                       href='{% url "sponsor-programme" project_slug %}'
+                       href='https://qgis.org/funding/membership/' target="_blank"
                        data-title="View Sponsorship Programme">
                         <i class="glyphicon glyphicon-info-sign"></i></a>
                     <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "sponsor-rss-feed" project_slug %}'
+                       href='{% url "sponsor-rss-feed" %}'
                        data-title="RSS Feed for Sponsors">
                         <i class="fa fa-rss-square"></i>
                     </a>
                     <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "sponsor-atom-feed" project_slug %}'
+                       href='{% url "sponsor-atom-feed" %}'
                        data-title="Atom Feed for Sponsors">
                         <i class="fa fa-rss"></i>
                     </a>
                     <a class="btn btn-default btn-mini tooltip-toggle json-feed"
-                       href='{% url "sponsor-json-feed" project_slug %}'
+                       href='{% url "sponsor-json-feed" %}'
                        data-title="JSON Feed for Sponsors">
                         <i class="fa fa-rss-square"></i>
                     </a>
                     <a class="btn btn-default btn-mini tooltip-toggle rss-icon"
-                       href='{% url "past-sponsor-rss-feed" project_slug %}'
+                       href='{% url "past-sponsor-rss-feed" %}'
                        data-title="RSS Feed for Past Sponsors">
                         <i class="fa fa-rss-square" style="font-weight: bold"></i>
                     </a>
@@ -138,7 +138,7 @@
                     <div class="col-lg-2">
                         <div class="btn-group pull-right">
                             <a class="btn btn-default btn-mini"
-                               href='{% url "sponsor-detail" project_slug=sponsor.project.slug slug=sponsor.slug %}'>
+                               href='{% url "sponsor-detail" slug=sponsor.slug %}'>
                                 <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                         </div>

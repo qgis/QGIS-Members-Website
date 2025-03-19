@@ -2,9 +2,8 @@
 
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
-    {% url 'sponsor-programme' the_project.slug as sponsor_url %}
     <li class="{% if request.path == sponsor_url %}is-active{% endif %}">
-      <a href="{{ sponsor_url }}">
+      <a href="https://qgis.org/funding/membership/" target="_blank">
         <i class="fas fa-info-circle mr-3"></i>
         About the Programme
       </a>

@@ -28,14 +28,14 @@
                 {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
                     <div class="pull-right btn-group">
                         <a class="btn btn-default btn-mini tooltip-toggle"
-                           href='{% url "sustaining-members-rejected-list" project_slug %}'
+                           href='{% url "sustaining-members-rejected-list" %}'
                            data-title="View Rejected Sustaining Members">
                             <span class="glyphicon glyphicon-ban-circle"></span>
                         </a>
                 {% endif %}
                 {% if not unapproved %}
                     <a class="btn btn-default btn-mini tooltip-toggle"
-                       href='{% url "pending-sponsor-list" project_slug %}'
+                       href='{% url "pending-sponsor-list" %}'
                        data-title="View Pending Sponsors">
                         <span class="glyphicon glyphicon-time"></span>
                     </a>
@@ -50,7 +50,7 @@
         {% else %}
             <h3>No sustaining members are defined, but you can <a
                     class="btn btn-default btn-mini"
-                    href='{% url "sponsor-create" project_slug %}'>create one</a>.</h3>
+                    href='{% url "sponsor-create" %}'>create one</a>.</h3>
         {% endif %}
     {% endif %}
 
@@ -82,7 +82,7 @@
                     {% if not sponsor.approved %}
                         {% if user.is_staff or user == sponsor.project.owner or user in sponsor.project.sponsorship_managers.all %}
                         <a class="btn btn-default btn-mini btn-approve tooltip-toggle"
-                           href='{% url "sponsor-approve" project_slug=sponsor.project.slug slug=sponsor.slug %}' data-title="Approve {{ sponsor.name }}">
+                           href='{% url "sponsor-approve" slug=sponsor.slug %}' data-title="Approve {{ sponsor.name }}">
                             <span class="glyphicon glyphicon-thumbs-up"></span>
                         </a>
                         <a class="btn btn-default btn-mini btn-reject tooltip-toggle" data-title="Reject {{ sponsor.name }}">
@@ -90,7 +90,7 @@
                         </a>
                         {% endif %}
                         <a class="btn btn-default btn-mini"
-                           href='{% url "sponsor-detail" project_slug=sponsor.project.slug slug=sponsor.slug %}'>
+                           href='{% url "sponsor-detail" slug=sponsor.slug %}'>
                             <span class="glyphicon glyphicon-eye-open"></span>
                         </a>
                     {% endif %}
