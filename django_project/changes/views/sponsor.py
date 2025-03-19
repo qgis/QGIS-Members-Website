@@ -161,8 +161,13 @@ class SponsorListView(SponsorMixin, PaginationMixin, ListView):
         if project_slug:
             project = Project.objects.get(slug=project_slug)
             context['project'] = Project.objects.get(slug=project_slug)
-            context['levels'] = SponsorshipLevel.objects.filter(
+            levels = SponsorshipLevel.objects.filter(
                 project=project)
+            context['levels'] = levels
+            context['levels_json'] = serializers.serialize(
+                "json",
+                levels
+            )
             context['is_sustaining_member'] = active_sustaining_membership(
                 self.request.user,
                 project
@@ -247,53 +252,6 @@ class FutureSponsorListView(
                 project = Project.objects.get(slug=project_slug)
                 queryset = SponsorshipPeriod.approved_objects.filter(
                     project=project).order_by('-sponsorship_level__value')
-                return queryset
-            else:
-                raise Http404('Sorry! We could not find your Sponsor!')
-        return self.queryset
-
-
-class SponsorWorldMapView(SponsorMixin, ListView):
-    """World map view for Sponsors."""
-    context_object_name = 'sponsors'
-    template_name = 'sponsor/world-map.html'
-
-    def get_context_data(self, **kwargs):
-        """Get the context data which is passed to a template.
-
-        :param kwargs: Any arguments to pass to the superclass.
-        :type kwargs: dict
-
-        :returns: Context data which will be passed to the template.
-        :rtype: dict
-        """
-        project_slug = 'qgis'
-        context = super(SponsorWorldMapView, self).get_context_data(**kwargs)
-        if project_slug:
-            context['project'] = Project.objects.get(slug=project_slug)
-            project = Project.objects.get(slug=project_slug)
-            levels = SponsorshipLevel.objects.filter(project=project)
-            context['levels'] = serializers.serialize(
-                "json",
-                levels
-            )
-        return context
-
-    def get_queryset(self, queryset=None):
-        """Get the queryset for this view.
-
-        :param queryset: A query set
-        :type queryset: QuerySet
-
-        :returns: Sponsor Queryset which is filtered by project
-        :rtype: QuerySet
-        :raises: Http404
-        """
-        if self.queryset is None:
-            project_slug = 'qgis'
-            if project_slug:
-                project = Project.objects.get(slug=project_slug)
-                queryset = SponsorshipPeriod.objects.filter(project=project)
                 return queryset
             else:
                 raise Http404('Sorry! We could not find your Sponsor!')
