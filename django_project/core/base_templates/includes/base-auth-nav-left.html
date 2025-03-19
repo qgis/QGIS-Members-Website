@@ -1,12 +1,24 @@
 {% load thumbnail %}
 {% load i18n %}
 
-
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'version-list' %}">
+{% url 'sponsor-list' as sponsor_list_url %}
+<a class="navbar-item has-text-weight-semibold is-size-7 {% if request.path == sponsor_list_url %}is-active{% endif %}" href="{{ sponsor_list_url }}">
   <i class="fas fa-home mr-3"></i>
-  QGIS Changelog Home
+  QGIS Members Home
 </a>
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{% url 'category-list' %}">
-  <i class="fas fa-list mr-3"></i>
-  Categories
+{% if user.is_authenticated %}
+  {% url 'sponsorshiplevel-list' as level_list_url %}
+  <a class="navbar-item has-text-weight-semibold is-size-7 {% if request.path == level_list_url %}is-active{% endif %}" href="{{ level_list_url }}">
+    <i class="fas fa-layer-group mr-3"></i>
+   Levels
+  </a>
+  {% url 'sponsorshipperiod-list' as period_list_url %}
+  <a class="navbar-item has-text-weight-semibold is-size-7 {% if request.path == period_list_url %}is-active{% endif %}" href="{{ period_list_url }}">
+    <i class="fas fa-calendar-alt mr-3"></i>
+   Periods
+  </a>
+{% endif %}
+<a class="navbar-item has-text-weight-semibold is-size-7" href="https://qgis.org/funding/membership/" target="_blank">
+  <i class="fas fa-info-circle mr-3"></i>
+  About
 </a>

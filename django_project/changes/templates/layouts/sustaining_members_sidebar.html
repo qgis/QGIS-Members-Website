@@ -2,45 +2,46 @@
 
 <nav id="sidebar" class="sidebar">
   <ul class="content-wrapper">
-    {% url 'sponsor-list' as sponsor_list_url %}
+    {% if user.is_authenticated and is_sustaining_member %}
+      {% url 'sustaining-membership' as membership_url %}
+      <li class="{% if request.path == membership_url %}is-active{% endif %}">
+        <a href="{{ membership_url }}">
+          <i class="fas fa-user-check mr-3"></i>
+          Your Membership
+        </a>
+      </li>
+      {% else %}
+        {% url 'sustaining-member-create' as create_url %}
+        <li>
+          <a class="button is-success is-medium has-tooltip-bottom has-tooltip-arrow"
+          data-tooltip="Become a sustaining member!"
+          href="{{ create_url }}">
+            <i class="fas fa-award mr-3"></i>
+            Sign up!
+          </a>
+        </li>
+        <hr/>
+    {% endif %}
+    {% comment %} {% url 'sponsor-list' as sponsor_list_url %}
     <li class="{% if request.path == sponsor_list_url %}is-active{% endif %}">
       <a href="{{ sponsor_list_url }}">
         <i class="fas fa-home mr-3"></i>
         QGIS Members Home
       </a>
-    </li>
-    {% if user.is_authenticated %}
-      {% if not is_sustaining_member %}
-        {% url 'sustaining-member-create' as create_url %}
-        <li class="{% if request.path == create_url %}is-active{% endif %}">
-          <a href="{{ create_url }}">
-            <i class="fas fa-user-plus mr-3"></i>
-            Sign up
-          </a>
-        </li>
-      {% else %}
-        {% url 'sustaining-membership' as membership_url %}
-        <li class="{% if request.path == membership_url %}is-active{% endif %}">
-          <a href="{{ membership_url }}">
-            <i class="fas fa-user-check mr-3"></i>
-            Membership
-          </a>
-        </li>
-      {% endif %}
-    {% endif %}
+    </li> {% endcomment %}
     {% if user.is_authenticated %}
       {% url 'sponsorshiplevel-list' as level_list_url %}
       <li class="{% if request.path == level_list_url %}is-active{% endif %}">
         <a href="{{ level_list_url }}">
           <i class="fas fa-layer-group mr-3"></i>
-          Sustaining Member Levels
+          Levels
         </a>
       </li>
       {% url 'sponsorshipperiod-list' as period_list_url %}
       <li class="{% if request.path == period_list_url %}is-active{% endif %}">
         <a href="{{ period_list_url }}">
           <i class="fas fa-calendar-alt mr-3"></i>
-          Sustaining Member Periods
+          Periods
         </a>
       </li>
     {% endif %}
