@@ -353,9 +353,7 @@ class SponsorshipPeriodCreateView(
        :returns: URL
        :rtype: HttpResponse
        """
-        return reverse('pending-sponsorshipperiod-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('pending-sponsorshipperiod-list', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -479,9 +477,7 @@ class SponsorshipPeriodUpdateView(
         :returns: URL
         :rtype: HttpResponse
         """
-        return reverse('sponsorshipperiod-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sponsorshipperiod-list', kwargs={})
 
 
 class PendingSponsorshipPeriodListView(
@@ -577,6 +573,4 @@ class ApproveSponsorshipPeriodView(
         sponsor = get_object_or_404(sponsor_qs, slug=slug)
         sponsor.approved = True
         sponsor.save()
-        return reverse(self.pattern_name, kwargs={
-            'project_slug': project_slug
-        })
+        return reverse(self.pattern_name, kwargs={})
