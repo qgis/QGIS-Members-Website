@@ -45,10 +45,17 @@
         </a>
       </li>
     {% endif %}
+    {% url 'future-sponsor-list' as future_sponsor_list_url %}
+    <li class="{% if request.path == future_sponsor_list_url %}is-active{% endif %}">
+      <a href="{{ future_sponsor_list_url }}">
+      <i class="fas fa-user-plus mr-3"></i>
+      Future Members
+      </a>
+    </li>
     {% url 'past-sponsor-list' as past_sponsor_list_url %}
     <li class="{% if request.path == past_sponsor_list_url %}is-active{% endif %}">
       <a href="{{ past_sponsor_list_url }}">
-      <i class="fas fa-users mr-3"></i>
+      <i class="fas fa-user-clock mr-3"></i>
       Past Members
       </a>
     </li>

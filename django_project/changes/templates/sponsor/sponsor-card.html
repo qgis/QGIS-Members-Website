@@ -50,13 +50,43 @@
           </article>
         </div>
       {% endif %}
-    {% elif not list_current_sponsors and not sponsor.current_sponsor and not sponsor.future_sponsor %}
+    {% elif not list_current_sponsors and not list_future_sponsors and not sponsor.current_sponsor and not sponsor.future_sponsor %}
       <div class="
       is-parent column
       is-medium     
       is-one-fifth"
       > 
         <article class="is-child box notification past">
+          <a href="{{ sponsor.sponsor.sponsor_url }}">
+            <figure>
+                <img class="is-rounded"
+                    src="{{ sponsor.sponsor.logo.url }}"
+                />
+            </figure>
+            <h3 class="title is-5">{{ sponsor.sponsor }}</h3>
+            <article class="subtitle is-7 mb-1">
+                {{ sponsor.start_date }} - {{ sponsor.end_date }}
+            </article>
+            <article class="subtitle is-7">
+                <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
+            </article>
+          </a>
+          <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+              data-tooltip="View"
+              href='{% url "sponsor-detail" slug=sponsor.slug %}'>
+              <span class="icon"><i class="fas fa-eye"></i></span>
+            </a>
+          </div>
+        </article>
+      </div>
+    {% elif list_future_sponsors and not sponsor.current_sponsor and sponsor.future_sponsor %}
+      <div class="
+      is-parent column
+      is-medium     
+      is-one-fifth"
+      > 
+        <article class="is-child box notification fund-medium">
           <a href="{{ sponsor.sponsor.sponsor_url }}">
             <figure>
                 <img class="is-rounded"
