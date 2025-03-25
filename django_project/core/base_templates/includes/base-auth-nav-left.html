@@ -18,6 +18,11 @@
    Periods
   </a>
 {% endif %}
+{% url 'past-sponsor-list' as past_sponsor_list_url %}
+<a class="navbar-item has-text-weight-semibold is-size-7" href="{{ past_sponsor_list_url }}">
+  <i class="fas fa-users mr-3"></i>
+  Past Members
+</a>
 <a class="navbar-item has-text-weight-semibold is-size-7" href="https://qgis.org/funding/membership/" target="_blank">
   <i class="fas fa-info-circle mr-3"></i>
   About

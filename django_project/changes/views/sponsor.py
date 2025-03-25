@@ -198,6 +198,11 @@ class SponsorListView(SponsorMixin, PaginationMixin, ListView):
         return self.queryset
 
 
+class PastSponsorListView(SponsorListView):
+    """List view for Past Sponsor."""
+    template_name = 'sponsor/past-list.html'
+
+
 class FutureSponsorListView(
     LoginRequiredMixin, SponsorMixin, PaginationMixin, ListView):
     """List view for Sponsor."""

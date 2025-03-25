@@ -1,14 +1,10 @@
-{% extends "base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load thumbnail %}
 {% load custom_markup %}
 {% load static %}
 {% block title %}Sustaining Members - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
-{% endblock %}
-
-{% block pagetitle %}
-    {% include "layouts/page-title.html" %}
 {% endblock %}
 
 {% block content %}
@@ -24,7 +20,7 @@
         }
     </style>
     <h1 class="title">
-        {% if unapproved %}Unapproved {% endif %}Sustaining Members
+        Past Sustaining Members
     </h1>
     <p>
         We thank our sustaining members and donors 
@@ -123,8 +119,6 @@
         </a>
     </div>
 
-    {% include "sponsor/world-map.html" %}
-
     {% if num_sponsors == 0 %}
         {% if unapproved %}
             <h3 class="subtitle">All sustaining members are approved.</h3>
@@ -134,29 +128,11 @@
     {% endif %}
 
     {% if sponsors %}
-        <h2 class="subtitle">List of Current Sustaining Members</h2>
+        <hr/>
+        <h2 class="subtitle">List of Past Sustaining Members</h2>
     {% endif %}
-
-    <h3 class="subtitle">
-        Flagship
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=True level="flagship" %}
-
-    <h3 class="subtitle">
-      Large
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=True level="large" %}
-
-    <h3 class="subtitle">
-      Medium
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=True level="medium" %}
-    
-    <h3 class="subtitle">
-      Small
-    </h3>
-    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=True level="small" %}
-
+  
+    {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=False %}
 {% comment %} 
     <hr>
     {% include "_pagination.html" %} {% endcomment %}
