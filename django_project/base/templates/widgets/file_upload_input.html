@@ -33,7 +33,7 @@
 
 <script>
   $(document).ready(function() {
-    const fileInput = $('input[type="file"][data-target]');
+    const fileInput = $('#{{ widget.attrs.id }}');
     const fileNameSpan = $('#' + fileInput.data('target'));
 
     fileInput.on('change', function() {

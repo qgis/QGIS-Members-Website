@@ -228,7 +228,8 @@ class EntryForm(forms.ModelForm):
 
 
 class SponsorForm(forms.ModelForm):
-
+    logo = forms.ImageField(widget=FileUploadInput)
+    agreement = forms.FileField(widget=FileUploadInput, required=False)
     # noinspection PyClassicStyleClass
     class Meta:
         model = Sponsor
