@@ -7,45 +7,47 @@
 {% endblock %}
 
 {% block page_title %}
-  <h1>Sustaining Member Levels (all)</h1>
+  <h1 class="title is-4">Sustaining Member Levels (all)</h1>
 {% endblock page_title %}
 
 {% block content %}
 
-  <div class="row">
-    <div class="col-lg-10">
-      <h3>{{ sponsorshiplevel.name }}</h3>
+<div class="box box-content">
+  <div class="columns is-vcentered">
+    <div class="column is-10">
+      <h3 class="title is-5">{{ sponsorshiplevel.name }}</h3>
     </div>
     {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
-    <div class="col-lg-2">
-      <div class="btn-group pull-right">
-        <a class="btn btn-default btn-sm tooltip-toggle"
+    <div class="column is-2">
+      <div class="buttons is-right">
+        <a class="button is-danger is-outlined"
            href='{% url "sponsorshiplevel-delete" slug=sponsorshiplevel.slug %}'
-           data-title="Delete {{ sponsorshiplevel.name }}">
-          <span class="glyphicon glyphicon-minus"></span>
+           title="Delete {{ sponsorshiplevel.name }}">
+          <span class="icon"><i class="fas fa-minus"></i></span>
         </a>
-        <a class="btn btn-default btn-sm tooltip-toggle"
+        <a class="button is-light"
            href='{% url "sponsorshiplevel-update" slug=sponsorshiplevel.slug %}'
-           data-title="Edit {{ sponsorshiplevel.name }}">
-          <span class="glyphicon glyphicon-pencil"></span>
+           title="Edit {{ sponsorshiplevel.name }}">
+          <span class="icon"><i class="fas fa-pencil-alt"></i></span>
         </a>
       </div>
     </div>
     {% endif %}
   </div>
-  <div class="row">
-    <div class="col-lg-8">
-          Type : {{ sponsorshiplevel.name }} <br/>
-          Value : {{ sponsorshiplevel.value }}<br/>
-          Currency : {{ sponsorshiplevel.currency }}<br/>
+  <div class="columns">
+    <div class="column is-8">
+      <p><strong>Type:</strong> {{ sponsorshiplevel.name }}</p>
+      <p><strong>Value:</strong> {{ sponsorshiplevel.value }}</p>
+      <p><strong>Currency:</strong> {{ sponsorshiplevel.currency }}</p>
     </div>
-
-    <div class="col-lg-4">
+    <div class="column is-4">
       {% if sponsorshiplevel.logo %}
-        <img class="img-responsive img-rounded pull-right"
-             src="{{ sponsorshiplevel.logo.url }}" />
-      {%  endif %}
+        <figure class="image is-128x128 is-pulled-right">
+          <img src="{{ sponsorshiplevel.logo.url }}" alt="{{ sponsorshiplevel.name }} logo">
+        </figure>
+      {% endif %}
     </div>
   </div>
+</div>
 
 {% endblock %}

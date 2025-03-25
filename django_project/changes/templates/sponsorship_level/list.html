@@ -54,7 +54,7 @@
     {% endif %}
     <div class="columns is-multiline">
         {% for sponsorshiplevel in sponsorshiplevels %}
-            <div class="column is-medium is-half-tablet is-third-desktop is-one-quarter-widescreen is-one-quarter-fullhd">
+            <div class="column is-medium is-half-tablet is-third-desktop is-one-third-fullhd">
                 <div class="card is-flex is-flex-direction-column is-justify-content-space-between">
                     <div class="card-image">
                         {% if sponsorshiplevel.logo %}
@@ -115,6 +115,5 @@
             </div>
         {% endfor %}
     </div>
-    <hr/>
     {% include "_pagination.html" %}
 {% endblock %}

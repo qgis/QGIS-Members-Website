@@ -16,7 +16,7 @@
 {% block content %}
 
 <h1 class="title mt-0">Become a Sustaining Member</h1>
-<form method="post" enctype="multipart/form-data">
+<form method="post" class="box-content" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}
     <button type="submit" class="button is-success mt-5" id="submit-save">Submit</button>

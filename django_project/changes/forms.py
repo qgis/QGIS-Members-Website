@@ -20,6 +20,8 @@ from .models import (
 from changes.utils.svgimagefile import SVGAndImageFormField
 from crispy_bulma.widgets import FileUploadInput
 
+FileUploadInput.template_name = 'widgets/file_upload_input.html'
+
 class CategoryForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass

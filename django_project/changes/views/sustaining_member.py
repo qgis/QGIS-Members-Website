@@ -26,6 +26,8 @@ from changes import (
 from helpers.notification import send_notification
 from crispy_bulma.widgets import FileUploadInput
 
+FileUploadInput.template_name = 'widgets/file_upload_input.html'
+
 class SustainingMemberForm(forms.ModelForm):
 
     logo = forms.ImageField(widget=FileUploadInput)

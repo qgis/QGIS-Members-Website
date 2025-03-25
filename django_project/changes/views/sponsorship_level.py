@@ -282,9 +282,7 @@ class SponsorshipLevelDeleteView(
         :returns: URL
         :rtype: HttpResponse
         """
-        return reverse('sponsorshiplevel-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sponsorshiplevel-list', kwargs={})
 
     def get_queryset(self):
         """Get the queryset for this view.
@@ -321,9 +319,7 @@ class SponsorshipLevelCreateView(
        :returns: URL
        :rtype: HttpResponse
        """
-        return reverse('pending-sponsorshiplevel-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('pending-sponsorshiplevel-list', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -540,7 +536,7 @@ class ApproveSponsorshipLevelView(
     query_string = True
     pattern_name = 'sponsorshiplevel-list'
 
-    def get_redirect_url(self, project_slug, slug):
+    def get_redirect_url(self, slug):
         """Save Sponsorship Level as approved and redirect
 
         :param project_slug: The slug of the parent
