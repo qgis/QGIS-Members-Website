@@ -149,8 +149,7 @@ class SponsorshipPeriod(models.Model):
 
     def get_absolute_url(self):
         return reverse('sponsorshipperiod-detail', kwargs={
-            'slug': self.slug,
-            'project_slug': self.project.slug
+            'slug': self.slug
         })
 
     def current_sponsor(self):

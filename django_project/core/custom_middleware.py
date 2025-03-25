@@ -153,7 +153,7 @@ class CheckDomainMiddleware(MiddlewareBase):
                 request.site = custom_domain.domain
                 activate('en')
                 url = reverse('project-list')
-                home_url = reverse('home')
+                home_url = reverse('homepage')
                 if custom_domain.role == 'Project':
                     # Get current project path
                     try:
