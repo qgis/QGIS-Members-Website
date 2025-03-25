@@ -201,6 +201,7 @@ class SponsorListView(SponsorMixin, PaginationMixin, ListView):
 class PastSponsorListView(SponsorListView):
     """List view for Past Sponsor."""
     template_name = 'sponsor/past-list.html'
+    paginate_by = 30
 
 
 class FutureSponsorListView(

@@ -17,12 +17,12 @@
     <i class="fas fa-calendar-alt mr-3"></i>
    Periods
   </a>
+  {% url 'future-sponsor-list' as future_sponsor_list_url %}
+  <a class="navbar-item has-text-weight-semibold is-size-7" href="{{ future_sponsor_list_url }}">
+    <i class="fas fa-user-plus mr-3"></i>
+    Future Members
+  </a>
 {% endif %}
-{% url 'future-sponsor-list' as future_sponsor_list_url %}
-<a class="navbar-item has-text-weight-semibold is-size-7" href="{{ future_sponsor_list_url }}">
-  <i class="fas fa-user-plus mr-3"></i>
-  Future Members
-</a>
 {% url 'past-sponsor-list' as past_sponsor_list_url %}
 <a class="navbar-item has-text-weight-semibold is-size-7" href="{{ past_sponsor_list_url }}">
   <i class="fas fa-user-clock mr-3"></i>
