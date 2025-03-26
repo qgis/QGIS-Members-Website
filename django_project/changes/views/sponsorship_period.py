@@ -298,9 +298,7 @@ class SponsorshipPeriodDeleteView(
         :returns: URL
         :rtype: HttpResponse
         """
-        return reverse('sponsorshipperiod-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sponsorshipperiod-list', kwargs={})
 
     def get_queryset(self):
         """Get the queryset for this view.
@@ -317,6 +315,27 @@ class SponsorshipPeriodDeleteView(
             raise Http404
         qs = SponsorshipPeriod.objects.filter(project=self.project)
         return qs
+
+    def get_form_kwargs(self):
+        """Get keyword arguments from form.
+
+        :returns keyword argument from the form
+        :rtype: dict
+        """
+        kwargs = super(
+                SponsorshipPeriodDeleteView,
+                self).get_form_kwargs()
+        sponsor_period_slug = self.kwargs.get('slug', None)
+        self.sponsorperiod = SponsorshipPeriod.objects.get(
+            slug=sponsor_period_slug)
+        self.project_slug = 'qgis'
+        self.project = Project.objects.get(slug=self.project_slug)
+        kwargs.update({
+            'user': self.request.user,
+            'instance': self.sponsorperiod,
+            'project': self.project
+        })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.

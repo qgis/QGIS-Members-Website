@@ -392,7 +392,7 @@ class SponsorshipPeriodForm(forms.ModelForm):
         if 'instance' in kwargs and kwargs['instance']:
             form_title = (
                 '<h2 class="is-title is-size-4">'
-                f'Edit Sponsorship Period {kwargs["instance"].name}'
+                f'Edit Sponsorship Period'
                 '</h2>'
             )
         self.helper = FormHelper()

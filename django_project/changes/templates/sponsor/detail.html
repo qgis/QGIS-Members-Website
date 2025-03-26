@@ -97,13 +97,20 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    {% if user_can_edit %}
+                    <footer class="card-footer p-3">
+                        <a href="/member/{{ slug }}/update" class="button is-success is-outlined card-footer-item">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span>Update</span>
+                        </a>
+                    </footer>
+                {% endif %}
                 </div>
             {% else %}
                 <p>No description available.</p>
-            {% endif %}
-
-            {% if user_can_edit %}
-                <a href="/member/{{ slug }}/update" class="button is-success mt-5">Update Sustaining Member</a>
             {% endif %}
         </div>
     </div>
