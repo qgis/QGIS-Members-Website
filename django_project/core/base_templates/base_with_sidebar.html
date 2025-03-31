@@ -17,12 +17,6 @@
     <link rel="stylesheet" href="{% static 'font-awesome/css/fontawesome.min.css' %}" type="text/css">
     <link rel="shortcut icon" href="{% static "images/favicon.ico" %}"/>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://cdn.rawgit.com/leafo/sticky-kit/v1.1.2/jquery.sticky-kit.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-
-
     <!-- Chosen library -->
     <link rel="stylesheet" href="{% static 'chosen/chosen.min.css' %}">
     <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
@@ -115,12 +109,6 @@
             Gifffer();
         };
 
-        $('.tooltip-toggle').tooltip();
-        if ($('.panel-to-wrap').length) {
-            while ((panels = $(':not(.row)>.panel-to-wrap:lt(3)')).length) {
-                panels.wrapAll($('<div class="row"></div>'));
-            }
-        }
         if ($('.thumbnail-to-wrap').length) {
             while ((panels = $(':not(.row)>.thumbnail-to-wrap:lt(4)')).length) {
                 panels.wrapAll($('<div class="row"></div>'));
