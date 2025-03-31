@@ -121,7 +121,7 @@ class SponsorshipPeriodListView(
     """List view for Sponsorship Period."""
     context_object_name = 'sponsorshipperiods'
     template_name = 'sponsorship_period/list.html'
-    paginate_by = 30
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -162,7 +162,6 @@ class SponsorshipPeriodListView(
                     SponsorshipPeriod.approved_objects.filter(
                         project=project).order_by(
                         '-sponsorship_level__value', '-end_date')
-
                 # Retrofill amount sponsored with sponsorship level value
                 # when it is not available
                 for index, item in enumerate(queryset):
@@ -568,12 +567,11 @@ class ApproveSponsorshipPeriodView(
     query_string = True
     pattern_name = 'sponsorshipperiod-list'
 
-    def get_redirect_url(self, project_slug, slug):
+    def get_redirect_url(self, slug):
         """Save Sponsorship Period as approved and redirect
 
         :param project_slug: The slug of the parent
         Sponsor Period parent Project
-        :type project_slug: str
 
         :param slug: The slug of the Sponsor Level
         :type slug: str
