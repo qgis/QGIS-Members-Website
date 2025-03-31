@@ -33,15 +33,6 @@
     <script type="text/javascript" src="https://qgis.github.io/qgis-uni-navigation/index.js"></script>
     {% block js_head %}{% endblock js_head %}
     {% block css_head %}{% endblock css_head %}
-    {% if the_project.gitter_room %}
-        <script type="text/javascript">
-            var project_gitter_room = '{{ the_project.gitter_room }}';
-            ((window.gitter = {}).chat = {}).options = {
-                room: project_gitter_room
-            }
-        </script>
-        <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
-    {% endif %}
 
     {% stylesheet 'project' %}
 
