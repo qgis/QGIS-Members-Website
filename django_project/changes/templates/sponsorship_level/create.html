@@ -1,4 +1,4 @@
-{% extends "layouts/sustaining_members_base.html" %}
+{% extends "base_with_sidebar.html" %}
 
 {% load crispy_forms_tags %}
 
@@ -16,9 +16,9 @@
 {% block content %}
 
 <section id="forms">
-<div class='container'>
-  {% crispy form %}
-</div>
+  <div class='box-content'>
+    {% crispy form %}
+  </div>
 </section>
 
 {% endblock %}

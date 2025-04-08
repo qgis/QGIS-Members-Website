@@ -1,58 +1,71 @@
-{% extends "layouts/sustaining_members_base.html" %}
+{% extends "base_with_sidebar.html" %}
 {% load custom_markup %}
 
-{% block title %}Sponsorship Period - {{ block.super }}{% endblock %}
-
-{% block extra_head %}
-{% endblock %}
+{% block title %}Sponsorship Period - {{ sponsorshipperiod.sponsor.name }}{% endblock %}
 
 {% block page_title %}
-  <h1>Sustaining Member Periods (all)</h1>
+  <h1 class="title">Sustaining Member Periods (all)</h1>
 {% endblock page_title %}
 
 {% block content %}
-
-  <div class="row">
-    <div class="col-lg-10">
-      <h3>{{ sponsorshipperiod.sponsor.name }}</h3>
+  <div class="columns">
+    <div class="column is-10">
+      <h1>{{ sponsorshipperiod.sponsor.name }}</h1>
     </div>
-    <div class="col-lg-2">
-      <div class="btn-group pull-right">
-        <a class="btn btn-default btn-sm tooltip-toggle"
-           href='{% url "sponsorshipperiod-delete" project_slug=sponsorshipperiod.project.slug slug=sponsorshipperiod.slug %}'
-           data-title="Delete {{ sponsorshipperiod.sponsor.name }}">
-          <span class="glyphicon glyphicon-minus"></span>
-        </a>
-        <a class="btn btn-default btn-sm tooltip-toggle"
-           href='{% url "sponsorshipperiod-update" project_slug=sponsorshipperiod.project.slug slug=sponsorshipperiod.slug %}'
-           data-title="Edit {{ sponsorshipperiod.sponsor.name }}">
-          <span class="glyphicon glyphicon-pencil"></span>
-        </a>
+    <div class="column is-2 has-text-right">
+    </div>
+  </div>
+
+  <div class="columns">
+    <div class="column is-6">
+      {% if sponsorshipperiod.sponsor.logo %}
+        <figure class="image">
+          <img src="{{ sponsorshipperiod.sponsor.logo.url }}" alt="Sponsor Logo">
+        </figure>
+      {% endif %}
+    </div>
+    <div class="column is-6">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">
+            <span class="icon"><i class="fas fa-info-circle"></i></span>
+            Sponsorship Period Details
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <p><strong>Sustaining Membership Level:</strong> {{ sponsorshipperiod.sponsorship_level }}</p>
+            <p><strong>Start Date:</strong> {{ sponsorshipperiod.start_date }}</p>
+            <p><strong>End Date:</strong> {{ sponsorshipperiod.end_date }}</p>
+            <p><strong>Amount Paid:</strong> 
+              {% if sponsorshipperiod.amount_sponsored != None %}
+                {{ sponsorshipperiod.amount_sponsored }} {{ sponsorshipperiod.currency }}
+              {% else %}
+                n/a
+              {% endif %}
+            </p>
+            {% if sponsorshipperiod.sponsorshiplevel.logo %}
+              <figure class="image">
+                <img src="{{ sponsorshipperiod.sponsorshiplevel.logo.url }}" alt="Sponsorship Level Logo">
+              </figure>
+            {% endif %}
+          </div>
+        </div>
+        <footer class="card-footer p-3">
+          <a class="button is-danger is-outlined card-footer-item" 
+            href='{% url "sponsorshipperiod-delete" slug=sponsorshipperiod.slug %}' 
+            title="Delete {{ sponsorshipperiod.sponsor.name }}">
+            <span class="icon"><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+          </a>
+          <a class="button is-light card-footer-item ml-3" 
+            href='{% url "sponsorshipperiod-update" slug=sponsorshipperiod.slug %}' 
+            title="Edit {{ sponsorshipperiod.sponsor.name }}">
+            <span class="icon"><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+          </a>
+        </footer>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-lg-8">
-          Sustaining Membership Level : {{ sponsorshipperiod.sponsorship_level }}<br/>
-          Start Date : {{ sponsorshipperiod.start_date }}<br/>
-          End Date : {{ sponsorshipperiod.end_date }}<br/>
-          Amount Paid :
-            {% if sponsorshipperiod.amount_sponsored != None %}
-                {{ sponsorshipperiod.amount_sponsored }} {{ sponsorshipperiod.currency }}<br/>
-            {% else %}
-                n/a
-            {% endif %}
-        {% if sponsorshipperiod.sponsorshiplevel.logo %}
-        <img class="img-responsive img-rounded"
-             src="{{ sponsorshipperiod.sponsorshiplevel.logo.url }}" width="100" />
-      {%  endif %}
-    </div>
-  <div class="col-lg-4">
-      {% if sponsorshipperiod.sponsor.logo %}
-        <img class="img-responsive img-rounded pull-right"
-             src="{{ sponsorshipperiod.sponsor.logo.url }}" />
-      {%  endif %}
-    </div>
-  </div>
-
 {% endblock %}

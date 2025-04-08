@@ -35,8 +35,8 @@ class RssSponsorFeed(Feed):
         :raises: Http404
         """
         self.years_limit = request.GET.get('years_limit', '')
-        project_slug = kwargs.get('project_slug', None)
-        self.domain_path_url = request.build_absolute_uri(reverse('home'))
+        project_slug = 'qgis'
+        self.domain_path_url = request.build_absolute_uri(reverse('homepage'))
         return get_object_or_404(Project, slug=project_slug)
 
     def title(self, obj):
@@ -71,7 +71,7 @@ class RssSponsorFeed(Feed):
         :returns: Url of the latest sponsor.
         :rtype: str
         """
-        return obj.get_absolute_url()
+        return reverse('homepage')
 
     def items(self, obj):
         """Return latest sponsors of the project.
@@ -226,8 +226,8 @@ class JSONSponsorFeed(Feed):
         :raises: Http404
         """
         self.years_limit = request.GET.get('years_limit', '')
-        project_slug = kwargs.get('project_slug', None)
-        self.domain_path_url = request.build_absolute_uri(reverse('home'))
+        project_slug = 'qgis'
+        self.domain_path_url = request.build_absolute_uri(reverse('homepage'))
         return get_object_or_404(Project, slug=project_slug)
 
     def title(self, obj):
@@ -262,7 +262,7 @@ class JSONSponsorFeed(Feed):
         :returns: Url of the latest sponsor.
         :rtype: str
         """
-        return obj.get_absolute_url()
+        return reverse('homepage')
 
     def items(self, obj):
         """Return latest sponsors of the project.

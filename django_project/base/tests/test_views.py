@@ -42,7 +42,7 @@ class TestViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_ProjectListView(self):
         client = Client()
-        response = client.get(reverse('home'))
+        response = client.get(reverse('homepage'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'project/list.html', u'base/project_list.html'
@@ -81,7 +81,7 @@ class TestViews(TestCase):
             'organisation': self.test_organisation.id,
         }
         response = client.post(reverse('project-create'), post_data)
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('homepage'))
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_ProjectCreate_no_login(self):

@@ -1,0 +1,83 @@
+{% load thumbnail %}
+
+{% regroup sponsors by sponsorship_level as level_list %}
+
+{% for level in level_list %}
+  <div class="sponsorship-level-section">
+    <h3 class="subtitle mt-3">{{ level.grouper }}</h3>
+    
+    <table class="table is-fullwidth is-hoverable">
+      <thead>
+        <tr>
+          <th>Logo</th>
+          <th>Organization</th>
+          <th>Amount Contributed</th>
+          <th>Membership Period</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sponsor in level.list %}
+        <tr>
+          <td>
+            {% if sponsor.sponsor.logo %}
+              <a href="{{ sponsor.sponsor.logo.url }}" aria-label="{{ sponsor.sponsor }} logo">
+                {% thumbnail sponsor.sponsor.logo "30x30" format="PNG" as logo %}
+                  <img src="{{ logo.url }}" 
+                       width="{{ logo.width }}" 
+                       height="{{ logo.height }}" 
+                       alt="{{ sponsor.sponsor }} logo">
+                {% endthumbnail %}
+              </a>
+            {% else %}
+              <span class="has-text-grey">No logo</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="truncate-td">{{ sponsor.sponsor }}</span>
+          </td>
+          <td>
+            {% if sponsor.amount_sponsored %}
+              {{ sponsor.amount_sponsored }} {{ sponsor.currency }}
+            {% else %}
+              <span class="has-text-grey">n/a</span>
+            {% endif %}
+          </td>
+          <td>{{ sponsor.start_date|date:"Y-m-d" }} – {{ sponsor.end_date|date:"Y-m-d" }}</td>
+          <td>
+            {% if not sponsor.approved %}
+              {% if user.is_staff or user == sponsor.project.owner or user in sponsor.project.sponsorship_managers.all %}
+                <a class="button is-small is-success" 
+                   href='{% url "sponsorshipperiod-approve" slug=sponsor.slug %}'
+                   title="Approve">
+                  <span class="icon"><i class="fas fa-thumbs-up"></i></span>
+                </a>
+                <a class="button is-small is-danger is-outlined" 
+                   href='{% url "sponsorshipperiod-delete" slug=sponsor.slug %}'
+                   title="Delete">
+                  <span class="icon"><i class="fas fa-trash"></i></span>
+                </a>
+                <a class="button is-small is-light" 
+                   href='{% url "sponsorshipperiod-update" slug=sponsor.slug %}'
+                   title="Edit">
+                  <span class="icon"><i class="fas fa-edit"></i></span>
+                </a>
+              {% endif %}
+            {% else %}
+              <a class="button is-small is-light" 
+                 href='{% url "sponsorshipperiod-detail" slug=sponsor.slug %}'
+                 title="View details">
+                <span class="icon"><i class="fas fa-eye"></i></span>
+              </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% empty %}
+  <div class="notification is-light">
+    No sponsors found.
+  </div>
+{% endfor %}

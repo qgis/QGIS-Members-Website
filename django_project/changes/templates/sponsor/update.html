@@ -1,4 +1,4 @@
-{% extends "layouts/sustaining_members_base.html" %}
+{% extends "base_with_sidebar.html" %}
 
 {% load crispy_forms_tags %}
 
@@ -16,15 +16,15 @@
 {% block content %}
 
     <section id="forms">
-        <h3>Update Sustaining Member for {{ project.name }}</h3>
-        <hr/>
-        <form method="post" enctype="multipart/form-data">
+        <h1>Update Sustaining Member for {{ project.name }}</h1>
+        <form method="post" class="box-content" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}
             <div class="vertical-space"></div>
-            <div class="form-actions">
-                <input type="submit" name="submit" value="Submit"
-                       class="btn btn-primary" id="submit-save">
+            <div class="field is-grouped">
+                <div class="control">
+                    <button type="submit" name="submit" class="button is-success" id="submit-save">Submit</button>
+                </div>
             </div>
         </form>
     </section>

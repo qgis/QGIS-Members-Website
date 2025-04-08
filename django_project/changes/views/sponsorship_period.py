@@ -121,7 +121,7 @@ class SponsorshipPeriodListView(
     """List view for Sponsorship Period."""
     context_object_name = 'sponsorshipperiods'
     template_name = 'sponsorship_period/list.html'
-    paginate_by = 1000
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -134,12 +134,11 @@ class SponsorshipPeriodListView(
         """
         context = super(SponsorshipPeriodListView,
                         self).get_context_data(**kwargs)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         project = Project.objects.get(slug=project_slug)
         context['num_sponsorshipperiods'] = \
             self.get_queryset().count()
         context['unapproved'] = False
-        project_slug = self.kwargs.get('project_slug', None)
         context['project_slug'] = project_slug
         if project_slug:
             context['project'] = project
@@ -156,14 +155,13 @@ class SponsorshipPeriodListView(
         :raises: Http404
         """
         if self.queryset is None:
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if project_slug:
                 project = Project.objects.get(slug=project_slug)
                 queryset = \
                     SponsorshipPeriod.approved_objects.filter(
                         project=project).order_by(
                         '-sponsorship_level__value', '-end_date')
-
                 # Retrofill amount sponsored with sponsorship level value
                 # when it is not available
                 for index, item in enumerate(queryset):
@@ -210,7 +208,7 @@ class SponsorshipPeriodDetailView(SponsorshipPeriodMixin, DetailView):
         if queryset is None:
             queryset = self.get_queryset()
             slug = self.kwargs.get('slug', None)
-            project_slug = self.kwargs.get('project_slug', None)
+            project_slug = 'qgis'
             if slug and project_slug:
                 project = Project.objects.get(slug=project_slug)
                 obj = queryset.get(project=project, slug=slug)
@@ -230,7 +228,7 @@ class SponsorshipPeriodDetailView(SponsorshipPeriodMixin, DetailView):
         """
         context = super(SponsorshipPeriodDetailView,
                         self).get_context_data(**kwargs)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         if project_slug:
             context['project'] = Project.objects.get(slug=project_slug)
         return context
@@ -260,7 +258,7 @@ class SponsorshipPeriodDeleteView(
         :returns: Unaltered request object
         :rtype: HttpResponse
         """
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.sponsor_period_slug = self.kwargs.get('slug', None)
         self.project = Project.objects.get(slug=self.project_slug)
         self.sponsorperiod = SponsorshipPeriod.objects.get(
@@ -284,7 +282,7 @@ class SponsorshipPeriodDeleteView(
         :returns: Unaltered request object
         :rtype: HttpResponse
         """
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         return super(
                 SponsorshipPeriodDeleteView,
@@ -299,9 +297,7 @@ class SponsorshipPeriodDeleteView(
         :returns: URL
         :rtype: HttpResponse
         """
-        return reverse('sponsorshipperiod-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sponsorshipperiod-list', kwargs={})
 
     def get_queryset(self):
         """Get the queryset for this view.
@@ -319,6 +315,27 @@ class SponsorshipPeriodDeleteView(
         qs = SponsorshipPeriod.objects.filter(project=self.project)
         return qs
 
+    def get_form_kwargs(self):
+        """Get keyword arguments from form.
+
+        :returns keyword argument from the form
+        :rtype: dict
+        """
+        kwargs = super(
+                SponsorshipPeriodDeleteView,
+                self).get_form_kwargs()
+        sponsor_period_slug = self.kwargs.get('slug', None)
+        self.sponsorperiod = SponsorshipPeriod.objects.get(
+            slug=sponsor_period_slug)
+        self.project_slug = 'qgis'
+        self.project = Project.objects.get(slug=self.project_slug)
+        kwargs.update({
+            'user': self.request.user,
+            'instance': self.sponsorperiod,
+            'project': self.project
+        })
+        return kwargs
+
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
 
@@ -330,7 +347,7 @@ class SponsorshipPeriodDeleteView(
         """
         context = super(SponsorshipPeriodDeleteView,
                         self).get_context_data(**kwargs)
-        project_slug = self.kwargs.get('project_slug', None)
+        project_slug = 'qgis'
         if project_slug:
             context['project'] = Project.objects.get(slug=project_slug)
         return context
@@ -354,9 +371,7 @@ class SponsorshipPeriodCreateView(
        :returns: URL
        :rtype: HttpResponse
        """
-        return reverse('pending-sponsorshipperiod-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('pending-sponsorshipperiod-list', kwargs={})
 
     def get_context_data(self, **kwargs):
         """Get the context data which is passed to a template.
@@ -395,7 +410,7 @@ class SponsorshipPeriodCreateView(
         :rtype: dict
         """
         kwargs = super(SponsorshipPeriodCreateView, self).get_form_kwargs()
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         kwargs.update({
             'user': self.request.user,
@@ -425,7 +440,7 @@ class SponsorshipPeriodUpdateView(
         sponsor_period_slug = self.kwargs.get('slug', None)
         self.sponsorperiod = SponsorshipPeriod.objects.get(
             slug=sponsor_period_slug)
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         kwargs.update({
             'user': self.request.user,
@@ -459,7 +474,7 @@ class SponsorshipPeriodUpdateView(
         :rtype: QuerySet
         """
 
-        self.project_slug = self.kwargs.get('project_slug', None)
+        self.project_slug = 'qgis'
         self.project = Project.objects.get(slug=self.project_slug)
         qs = SponsorshipPeriod.objects.all()
         if self.request.user.is_staff:
@@ -480,9 +495,7 @@ class SponsorshipPeriodUpdateView(
         :returns: URL
         :rtype: HttpResponse
         """
-        return reverse('sponsorshipperiod-list', kwargs={
-            'project_slug': self.object.project.slug
-        })
+        return reverse('sponsorshipperiod-list', kwargs={})
 
 
 class PendingSponsorshipPeriodListView(
@@ -533,7 +546,7 @@ class PendingSponsorshipPeriodListView(
         :raises: Http404
         """
         if self.queryset is None:
-            self.project_slug = self.kwargs.get('project_slug', None)
+            self.project_slug = 'qgis'
             if self.project_slug:
                 self.project = Project.objects.get(slug=self.project_slug)
                 queryset = SponsorshipPeriod.unapproved_objects.filter(
@@ -554,12 +567,11 @@ class ApproveSponsorshipPeriodView(
     query_string = True
     pattern_name = 'sponsorshipperiod-list'
 
-    def get_redirect_url(self, project_slug, slug):
+    def get_redirect_url(self, slug):
         """Save Sponsorship Period as approved and redirect
 
         :param project_slug: The slug of the parent
         Sponsor Period parent Project
-        :type project_slug: str
 
         :param slug: The slug of the Sponsor Level
         :type slug: str
@@ -578,6 +590,4 @@ class ApproveSponsorshipPeriodView(
         sponsor = get_object_or_404(sponsor_qs, slug=slug)
         sponsor.approved = True
         sponsor.save()
-        return reverse(self.pattern_name, kwargs={
-            'project_slug': project_slug
-        })
+        return reverse(self.pattern_name, kwargs={})

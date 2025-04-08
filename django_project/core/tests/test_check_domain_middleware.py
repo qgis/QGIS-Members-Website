@@ -23,7 +23,7 @@ class TestCheckDomainMiddleware(TestCase):
         client = Client(SERVER_NAME='testserver')
         client.post(
             '/set_language/', data={'language': 'en'})
-        response = client.get(reverse('home'))
+        response = client.get(reverse('homepage'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'project/list.html', u'base/project_list.html'
@@ -36,7 +36,7 @@ class TestCheckDomainMiddleware(TestCase):
         client = Client(SERVER_NAME='testserver')
         client.post(
             '/set_language/', data={'language': 'en'})
-        response = client.get(reverse('home'))
+        response = client.get(reverse('homepage'))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
