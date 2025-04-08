@@ -22,25 +22,27 @@
 {% endblock page_title %}
 
 {% block content %}
-    <div class="buttons">
+    <div class="buttons is-right">
         {% if user.is_authenticated %}
             {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
-                <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                   href='{% url "sustaining-members-rejected-list" %}'
-                   data-tooltip="View Rejected Sustaining Members">
-                    <span class="icon">
-                        <i class="fas fa-ban"></i>
-                    </span>
-                </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "sustaining-members-rejected-list" %}'
+               data-tooltip="View Rejected Sustaining Members">
+                <span class="icon">
+                <i class="fas fa-ban"></i>
+                </span>
+                <span>Rejected Members</span>
+            </a>
             {% endif %}
             {% if not unapproved %}
-                <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                   href='{% url "pending-sponsor-list" %}'
-                   data-tooltip="View Pending Sponsors">
-                    <span class="icon">
-                        <i class="fas fa-hourglass-half"></i>
-                    </span>
-                </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "pending-sponsor-list" %}'
+               data-tooltip="View Pending Sponsors">
+                <span class="icon">
+                <i class="fas fa-hourglass-half"></i>
+                </span>
+                <span>Pending Sponsors</span>
+            </a>
             {% endif %}
         {% endif %}
     </div>

@@ -29,6 +29,29 @@
         QGIS Members Home
       </a>
     </li>
+    {% if user.is_authenticated and user.is_staff %}
+    {% url 'pending-sponsor-list' as pending_sponsor_list_url %}
+    <li class="{% if request.path == pending_sponsor_list_url %}is-active{% endif %}">
+      <a href="{{ pending_sponsor_list_url }}">
+        <i class="fas fa-user-clock mr-3"></i>
+        Pending Members
+      </a>
+    </li>
+    {% url 'future-sponsor-list' as future_sponsor_list_url %}
+    <li class="{% if request.path == future_sponsor_list_url %}is-active{% endif %}">
+      <a href="{{ future_sponsor_list_url }}">
+      <i class="fas fa-user-plus mr-3"></i>
+      Future Members
+      </a>
+    </li>
+    {% endif %}
+    {% url 'past-sponsor-list' as past_sponsor_list_url %}
+    <li class="{% if request.path == past_sponsor_list_url %}is-active{% endif %}">
+      <a href="{{ past_sponsor_list_url }}">
+      <i class="fas fa-user-clock mr-3"></i>
+      Past Members
+      </a>
+    </li>
     {% if user.is_authenticated %}
       {% url 'sponsorshiplevel-list' as level_list_url %}
       <li class="{% if request.path == level_list_url %}is-active{% endif %}">
@@ -45,20 +68,6 @@
         </a>
       </li>
     {% endif %}
-    {% url 'future-sponsor-list' as future_sponsor_list_url %}
-    <li class="{% if request.path == future_sponsor_list_url %}is-active{% endif %}">
-      <a href="{{ future_sponsor_list_url }}">
-      <i class="fas fa-user-plus mr-3"></i>
-      Future Members
-      </a>
-    </li>
-    {% url 'past-sponsor-list' as past_sponsor_list_url %}
-    <li class="{% if request.path == past_sponsor_list_url %}is-active{% endif %}">
-      <a href="{{ past_sponsor_list_url }}">
-      <i class="fas fa-user-clock mr-3"></i>
-      Past Members
-      </a>
-    </li>
     <li>
       <a href="https://qgis.org/funding/membership/" target="_blank">
         <i class="fas fa-info-circle mr-3"></i>
