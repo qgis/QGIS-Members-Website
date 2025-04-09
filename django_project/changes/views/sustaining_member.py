@@ -28,9 +28,11 @@ from crispy_bulma.widgets import FileUploadInput
 
 FileUploadInput.template_name = 'widgets/file_upload_input.html'
 
+
 class SustainingMemberForm(forms.ModelForm):
 
     logo = forms.ImageField(widget=FileUploadInput)
+
     class Meta:
         """Meta class."""
         model = Sponsor
@@ -188,6 +190,7 @@ class SustainingMembership(LoginRequiredMixin, DetailView):
         except IndexError:
             context['subscription'] = None
         just_approved = (
+                sustaining_member is not None and
                 sustaining_member.approved and
                 not SponsorshipPeriod.objects.filter(
                     sponsor=sustaining_member,

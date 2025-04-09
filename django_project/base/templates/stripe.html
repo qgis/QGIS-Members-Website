@@ -30,45 +30,39 @@
 <script>
     // Set your publishable key: remember to change this to your live publishable key in production
     // See your keys here: https://dashboard.stripe.com/account/apikeys
-    let stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
-    let elements = stripe.elements();
+    {% if STRIPE_PUBLIC_KEY %}
+        let stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+        let elements = stripe.elements();
+    {% endif %}
 </script>
 
 
-<!-- Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog"
-     aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Payment</h5>
-                <button type="button" class="close"
-                        data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"
-                          style="position: absolute; margin-top: -20px; margin-left: -10px;">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-rorm card-container" style="display: none">
-                    <label for="card-element">
-                        Credit or debit card
-                    </label>
-                    <div id="card-element">
-                        <!-- A Stripe Element will be inserted here. -->
-                    </div>
-                    <!-- Used to display form errors. -->
-                    <div id="card-errors" role="alert"></div>
+<!-- Bulma Modal -->
+<div class="modal" id="paymentModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Payment</p>
+            <button class="delete" aria-label="close" onclick="hidePaymentModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="form-rorm card-container">
+                <label for="card-element">
+                    Credit or debit card
+                </label>
+                <div id="card-element">
+                    <!-- A Stripe Element will be inserted here. -->
                 </div>
-                <div class="card-loading-view" style="display: none; text-align: center;">
-                    <img src="{% static 'gif/loading.gif' %}" width="50px"/>
-                </div>
+                <!-- Used to display form errors. -->
+                <div id="card-errors" role="alert"></div>
             </div>
-            <div class="modal-footer">
-                <button id="submit" type="button" class="btn btn-success"
-                        style="padding-left: 40px; padding-right: 40px;">Pay
-                </button>
+            <div class="card-loading-view" style="display: none; text-align: center;">
+                <img src="{% static 'gif/loading.gif' %}" width="50px"/>
             </div>
-        </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button id="submit" type="button" class="button is-success">Pay</button>
+        </footer>
     </div>
 </div>
 
@@ -81,39 +75,12 @@
 
     function showPaymentModal() {
         $('#paymentModal').addClass('is-active');
+        let $amountInput = 100 * parseInt($('#donate-amount').val());
+    }
+    function hidePaymentModal() {
+        $('#paymentModal').removeClass('is-active');
     }
 
-    $('#paymentModal').on('shown.bs.modal', function (e) {
-        const $cardContainer = $('.card-container');
-        const $cardLoadingView = $('.card-loading-view');
-        let $amountInput = 100 * parseInt($('#donate-amount').val());
-        $cardContainer.show();
-
-        /*
-        if (!clientSecret || amount !== $amountInput) {
-            amount = $amountInput;
-            $cardLoadingView.show();
-            $cardContainer.hide();
-            let stripeIntentUrl = `/stripe-intent/${amount}`;
-            $.ajax({
-                url: stripeIntentUrl,
-                type: "GET",
-                dataType: 'JSON',
-                success: function (response) {
-                    clientSecret = response['client_secret'];
-                    $cardLoadingView.hide();
-                    $cardContainer.show();
-                    $('#submit').attr('disabled', false);
-                },
-                error: function () {
-                    alert('Error');
-                }
-            })
-        } else {
-            $cardContainer.show();
-        }
-        */
-    });
 
     let style = {
         base: {
@@ -143,11 +110,6 @@
     });
 
     let submitButton = document.getElementById('submit');
-
-    function stripeSourceHandler(source) {
-        // Insert the source ID into the form so it gets submitted to the
-        // server
-    }
 
     submitButton.addEventListener('click', function (ev) {
         $(ev.target).html('Loading...');

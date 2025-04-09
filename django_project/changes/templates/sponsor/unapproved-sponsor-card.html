@@ -4,10 +4,10 @@
     <div class="
     is-parent column
     is-medium     
-    is-one-fifth"
+    is-one-third"
     > 
       <article class="is-child box notification fund-medium">
-        <a href="{{ sponsor.sponsor_url }}">
+        <a href="{% url "sponsor-detail" slug=sponsor.slug %}">
           <figure>
               <img class="is-rounded"
                   src="{{ sponsor.logo.url }}"
@@ -19,7 +19,7 @@
           </article>
         </a>
         <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
-          {% if not sponsor.approved %}
+          {% if not sponsor.approved and not rejected %}
             {% if user.is_staff or user == sponsor.project.owner or user in sponsor.project.sponsorship_managers.all %}
                 <a class="button is-success is-outlined is-small has-tooltip-arrow has-tooltip-bottom"
                   href='{% url "sponsor-approve" slug=sponsor.slug %}'
@@ -28,20 +28,18 @@
                         <i class="fas fa-thumbs-up"></i>
                     </span>
                 </a>
-                <button class="button is-danger is-outlined is-small has-tooltip-arrow has-tooltip-bottom btn-reject"
-                        data-tooltip="Reject {{ sponsor.name }}">
+                <button 
+                  class="button is-warning is-outlined is-small has-tooltip-arrow has-tooltip-bottom btn-reject"
+                  data-tooltip="Reject {{ sponsor.name }}"
+                  data-sponsor-id="{{ sponsor.id }}"
+                  data-sponsor-name="{{ sponsor.name }}"
+                  data-sponsor-logo="{{ sponsor.logo.url }}"
+                  >
                     <span class="icon">
                         <i class="fas fa-thumbs-down"></i>
                     </span>
                 </button>
             {% endif %}
-            <a class="button is-light is-small has-tooltip-arrow has-tooltip-bottom"
-              href='{% url "sponsor-detail" slug=sponsor.slug %}'
-              data-tooltip="View {{ sponsor.name }}">
-                <span class="icon">
-                    <i class="fas fa-eye"></i>
-                </span>
-            </a>
           {% endif %}
         </div>
       </article>

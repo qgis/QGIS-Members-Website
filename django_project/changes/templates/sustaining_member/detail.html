@@ -27,14 +27,14 @@
                  <div class="notification is-light is-danger">
                     <strong><span class="icon"><i class="fas fa-exclamation-triangle"></i></span></strong>
                     {% blocktrans %}Your sustaining membership has been rejected because : {% endblocktrans %} {{ sustaining_member.remarks }}.
-                     Please <strong><a href='{% url "sustaining-member-update" project_slug=sustaining_member.project.slug member_id=sustaining_member.id %}'>edit</a></strong> your data.
+                     Please <strong><a href='{% url "sustaining-member-update" member_id=sustaining_member.id %}'>edit</a></strong> your data.
                 </div>
             {% elif just_approved %}
                 <div class="notification is-light is-success">
                     <strong>Congratulations! </strong>
                     {% blocktrans %}Your sustaining membership has been approved.
                         You can now add your {% endblocktrans %}<strong><a
-                        href="{% url "sustaining-member-period-create" project_slug=sustaining_member.project.slug member_id=sustaining_member.id %}">
+                        href="{% url "sustaining-member-period-create" member_id=sustaining_member.id %}">
                     subscription</a></strong>.
                 </div>
             {% endif %}
@@ -78,17 +78,17 @@
                     </div>
                 </div>
                 {% if subscription.active_period %}
-                    <a href="{% url "sustaining-member-period-update" project_slug=sustaining_member.project.slug member_id=sustaining_member.id %}"
+                    <a href="{% url "sustaining-member-period-update" member_id=sustaining_member.id %}"
                        class="button is-fullwidth is-success"
                        style="margin-bottom: 10px; margin-top: 10px">Update Subscription</a>
                 {% else %}
-                    <a href="{% url "sustaining-member-period-create" project_slug=sustaining_member.project.slug member_id=sustaining_member.id %}"
+                    <a href="{% url "sustaining-member-period-create" member_id=sustaining_member.id %}"
                        class="button is-fullwidth is-success"
                        style="margin-bottom: 10px; margin-top: 10px">Add Subscription</a>
                 {% endif %}
             {% endif %}
             {% if sustaining_member.approved and not subscription %}
-                <a href="{% url "sustaining-member-period-create" project_slug=sustaining_member.project.slug member_id=sustaining_member.id %}" 
+                <a href="{% url "sustaining-member-period-create" member_id=sustaining_member.id %}" 
                     class="button is-fullwidth is-success"
                     style="margin-bottom: 10px; margin-top: 10px">Add Subscription</a>
             {% endif %}
@@ -102,7 +102,7 @@
                             {% blocktrans %}Sustaining Member Info{% endblocktrans %}
                         </span>
                         {% if sustaining_member.approved or sustaining_member.rejected %}
-                        <a href='{% url "sustaining-member-update" project_slug=sustaining_member.project.slug member_id=sustaining_member.id %}'
+                        <a href='{% url "sustaining-member-update" member_id=sustaining_member.id %}'
                            class="button is-pulled-right">Edit</a>
                         {% endif %}
                     </p>
@@ -161,6 +161,6 @@
         </div>
     </div>
     {% else %}
-        <h4 class="title is-4">You haven't become a sustaining member yet, <a href="{% url "sustaining-member-create" project_slug %}" class="button">sign up</a> to become one.</h4>
+        <h4 class="title is-4">You haven't become a sustaining member yet, <a href="{% url "sustaining-member-create" %}" class="button is-success">sign up</a> to become one.</h4>
     {% endif %}
 {% endblock %}

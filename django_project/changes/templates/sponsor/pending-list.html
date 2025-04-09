@@ -22,25 +22,30 @@
 {% endblock page_title %}
 
 {% block content %}
-    <div class="buttons">
+<h1 class="title">
+    Pending Sustaining Members
+</h1>
+    <div class="buttons is-right">
         {% if user.is_authenticated %}
             {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
-                <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                   href='{% url "sustaining-members-rejected-list" %}'
-                   data-tooltip="View Rejected Sustaining Members">
-                    <span class="icon">
-                        <i class="fas fa-ban"></i>
-                    </span>
-                </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "sustaining-members-rejected-list" %}'
+               data-tooltip="View Rejected Sustaining Members">
+                <span class="icon">
+                <i class="fas fa-ban"></i>
+                </span>
+                <span>Rejected Members</span>
+            </a>
             {% endif %}
             {% if not unapproved %}
-                <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                   href='{% url "pending-sponsor-list" %}'
-                   data-tooltip="View Pending Sponsors">
-                    <span class="icon">
-                        <i class="fas fa-hourglass-half"></i>
-                    </span>
-                </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "pending-sponsor-list" %}'
+               data-tooltip="View Pending Sponsors">
+                <span class="icon">
+                <i class="fas fa-hourglass-half"></i>
+                </span>
+                <span>Pending Sponsors</span>
+            </a>
             {% endif %}
         {% endif %}
     </div>
@@ -56,7 +61,7 @@
         </h3>
     {% endif %}
     
-    {% include "sponsor/pending-sponsor-card.html" %}
+    {% include "sponsor/unapproved-sponsor-card.html" %}
 
     {% include "_pagination.html" %}
 
@@ -65,18 +70,17 @@
         <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">Rejection Form</p>
+                <p class="modal-card-title">Reject <span class="text-container"></span></p>
                 <button class="delete" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
-                <p>You are going to reject this sustaining member below:</p>
-                <div class="box">
-                    <div class="columns">
-                        <div class="column is-narrow logo-container"></div>
-                        <div class="column text-container"></div>
-                    </div>
+                <div class="notification is-warning">
+                    <p class="has-text-white">
+                        Are you sure you want to reject this sustaining member?
+                    </p>
                 </div>
                 <form id="rejectionForm">
+                    {% csrf_token %}
                     <div class="field">
                         <label class="label">Reason for rejection</label>
                         <div class="control">
@@ -88,8 +92,8 @@
                 </form>
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-light" data-dismiss="modal">Cancel</button>
-                <button class="button is-primary" onclick="submitRejectionForm()">Submit</button>
+                <button class="button" data-dismiss="modal">Cancel</button>
+                <button class="button is-warning is-outlined" onclick="submitRejectionForm()">Reject</button>
             </footer>
         </div>
     </div>
@@ -99,13 +103,16 @@
 
         const submitRejectionForm = () => {
             const remark = document.querySelector('#reject-remark').value;
-            const projectSlug = document.querySelector('[name="rejected-sustaining-member-project-slug"]').value;
+            const projectSlug = '{{ project_slug }}';
             const id = document.querySelector('[name="rejected-sustaining-member-id"]').value;
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(`/{{ LANGUAGE_CODE }}/reject-member/${id}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify({ remark }),
             }).then(() => location.reload());
@@ -113,22 +120,12 @@
 
         document.querySelectorAll('.btn-reject').forEach(button => {
             button.addEventListener('click', () => {
-                const row = button.closest('.box');
-                const id = row.dataset.id;
-                const projectSlug = row.dataset.projectSlug;
-                const logo = row.querySelector('.image').cloneNode(true);
-                const texts = row.querySelector('.column:nth-child(2)').cloneNode(true);
-
-                const logoContainer = $rejectionModal.querySelector('.logo-container');
-                const textContainer = $rejectionModal.querySelector('.text-container');
-
-                logoContainer.innerHTML = '';
-                textContainer.innerHTML = '';
-                logoContainer.appendChild(logo);
-                textContainer.appendChild(texts);
-
-                document.querySelector('[name="rejected-sustaining-member-id"]').value = id;
-                document.querySelector('[name="rejected-sustaining-member-project-slug"]').value = projectSlug;
+                let sponsor_id = button.getAttribute('data-sponsor-id');
+                let sponsor_name = button.getAttribute('data-sponsor-name');
+                let text_container = document.querySelector('.text-container');
+                text_container.innerHTML = `${sponsor_name}`;
+                document.querySelector('[name="rejected-sustaining-member-id"]').value = sponsor_id;
+                
 
                 $rejectionModal.classList.add('is-active');
             });
