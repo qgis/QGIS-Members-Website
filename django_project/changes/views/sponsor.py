@@ -727,6 +727,9 @@ def generate_sponsor_cloud(request, **kwargs):
     xy_size = 100
     for sponsor in queryset:
         if sponsor.current_sponsor():
+            if sponsor.sponsor.logo.name.endswith('.svg'):
+                continue  # Skip SVG images
+
             if sponsor.sponsorship_level.name != sponsor_level:
                 if sponsor_level != '':
                     sponsor_level = sponsor.sponsorship_level.name
@@ -741,7 +744,7 @@ def generate_sponsor_cloud(request, **kwargs):
             im = Image.open(
                 sponsor.sponsor.logo).convert("RGBA")
             size = xy_size, xy_size
-            im.thumbnail(size, Image.ANTIALIAS)
+            im.thumbnail(size, Image.LANCZOS)
             width, height = im.size
             if (x + xy_size) >= 1000:
                 x = 0
