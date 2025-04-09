@@ -6,13 +6,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from changes.tests.model_factories import (
-    CategoryF,
-    EntryF,
-    VersionF,
     SponsorshipLevelF,
     SponsorF,
     SponsorshipPeriodF)
-from base.tests.model_factories import ProjectF
 
 
 class TestSponsorCRUD(TestCase):
