@@ -4,6 +4,7 @@ import 'datatables.net';
 import 'datatables.net-dt';
 import 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'moment';
 
 document.addEventListener("DOMContentLoaded", () => {
   // Get all "navbar-burger" elements
