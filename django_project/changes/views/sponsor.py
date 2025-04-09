@@ -576,7 +576,7 @@ class PendingSponsorListView(
     """List view for pending Sponsor."""
     context_object_name = 'sponsors'
     template_name = 'sponsor/pending-list.html'
-    paginate_by = 10
+    paginate_by = 12
 
     def __init__(self):
         """
@@ -633,11 +633,8 @@ class ApproveSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
     query_string = True
     pattern_name = 'pending-sponsor-list'
 
-    def get_redirect_url(self, project_slug, slug):
+    def get_redirect_url(self, slug):
         """Save Sponsor as approved and redirect
-
-        :param project_slug: The slug of the parent Sponsor's parent Project
-        :type project_slug: str
 
         :param slug: The slug of the Sponsor
         :type slug: str
@@ -674,11 +671,8 @@ class RejectSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
     query_string = True
     pattern_name = 'pending-sponsor-list'
 
-    def get_redirect_url(self, project_slug, member_id):
+    def get_redirect_url(self, member_id):
         """Save Sponsor as Rejected and redirect
-
-        :param project_slug: The slug of the parent Sponsor's parent Project
-        :type project_slug: str
 
         :param member_id: The id of the Sponsor
         :type member_id: int
@@ -699,7 +693,7 @@ class RejectSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
         sponsor.remarks = remarks
         sponsor.save()
         project = Project.objects.get(
-            slug=self.kwargs.get('project_slug')
+            slug='qgis'
         )
         sponsorship_managers = project.sponsorship_managers.all()
         send([
@@ -832,7 +826,7 @@ class RejectedSustainingMemberList(
     """List view for pending Sustaining Members."""
     context_object_name = 'sustaining_members'
     template_name = 'sponsor/rejected-list.html'
-    paginate_by = 10
+    paginate_by = 12
 
     def __init__(self):
         """
