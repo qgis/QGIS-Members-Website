@@ -17,7 +17,7 @@
         {% endif %}"
         > 
           <article class="is-child box notification fund-{{ level }}">
-            <a href="{{ sponsor.sponsor.sponsor_url }}">
+            <a href="{% url "sponsor-detail" slug=sponsor.slug %}">
               <figure>
                   <img class="is-rounded"
                       src="{{ sponsor.sponsor.logo.url }}"
@@ -31,22 +31,6 @@
                   <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
               </article>
             </a>
-            <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
-              {% if sponsor.current_sponsor %}
-                {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all or user == sponsor.sponsor.author %}
-                  <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                    data-tooltip="Edit"
-                    href='{% url "sponsor-update" slug=sponsor.slug %}'>
-                    <span class="icon"><i class="fas fa-pencil-alt"></i></span>
-                  </a>
-                {% endif %}
-              {% endif %}
-              <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-                data-tooltip="View"
-                href='{% url "sponsor-detail" slug=sponsor.slug %}'>
-                <span class="icon"><i class="fas fa-eye"></i></span>
-              </a>
-            </div>
           </article>
         </div>
       {% endif %}
@@ -57,7 +41,7 @@
       is-one-quarter"
       > 
         <article class="is-child box notification past">
-          <a href="{{ sponsor.sponsor.sponsor_url }}">
+          <a href="{% url "sponsor-detail" slug=sponsor.slug %}">
             <figure>
                 <img class="is-rounded"
                     src="{{ sponsor.sponsor.logo.url }}"
@@ -71,13 +55,6 @@
                 <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
             </article>
           </a>
-          <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
-            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-              data-tooltip="View"
-              href='{% url "sponsor-detail" slug=sponsor.slug %}'>
-              <span class="icon"><i class="fas fa-eye"></i></span>
-            </a>
-          </div>
         </article>
       </div>
     {% elif list_future_sponsors and not sponsor.current_sponsor and sponsor.future_sponsor %}
@@ -87,7 +64,7 @@
       is-one-fifth"
       > 
         <article class="is-child box notification fund-medium">
-          <a href="{{ sponsor.sponsor.sponsor_url }}">
+          <a href="{% url "sponsor-detail" slug=sponsor.slug %}">
             <figure>
                 <img class="is-rounded"
                     src="{{ sponsor.sponsor.logo.url }}"
@@ -101,13 +78,6 @@
                 <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
             </article>
           </a>
-          <div class="buttons actions-buttons is-justify-content-center mt-3 mb-0">
-            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
-              data-tooltip="View"
-              href='{% url "sponsor-detail" slug=sponsor.slug %}'>
-              <span class="icon"><i class="fas fa-eye"></i></span>
-            </a>
-          </div>
         </article>
       </div>
     {% endif %}
