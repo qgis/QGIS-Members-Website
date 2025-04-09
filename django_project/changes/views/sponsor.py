@@ -657,11 +657,11 @@ class ApproveSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
         )
         sponsorship_managers = project.sponsorship_managers.all()
         try:
-            send([
-                    self.request.user,
-                ] + list(sponsorship_managers),
+            send(
+                [self.request.user,] + list(sponsorship_managers),
                 NOTICE_SUSTAINING_MEMBER_APPROVED,
-                {'sustaining_member_name': sponsor.name})
+                {'sustaining_member_name': sponsor.name}
+            )
         except Exception as e:
             print(f"Notification send failed: {e}")
         sponsor.save()
@@ -700,11 +700,11 @@ class RejectSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
         )
         sponsorship_managers = project.sponsorship_managers.all()
         try:
-            send([
-                    self.request.user,
-                ] + list(sponsorship_managers),
+            send(
+                [self.request.user,] + list(sponsorship_managers),
                 NOTICE_SUSTAINING_MEMBER_REJECTED,
-                {'remarks': remarks, 'sustaining_member_name': sponsor.name})
+                {'remarks': remarks, 'sustaining_member_name': sponsor.name}
+            )
         except Exception as e:
             print(f"Notification send failed: {e}")
         return reverse(self.pattern_name, kwargs={})

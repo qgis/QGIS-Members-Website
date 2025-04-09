@@ -28,9 +28,11 @@ from crispy_bulma.widgets import FileUploadInput
 
 FileUploadInput.template_name = 'widgets/file_upload_input.html'
 
+
 class SustainingMemberForm(forms.ModelForm):
 
     logo = forms.ImageField(widget=FileUploadInput)
+
     class Meta:
         """Meta class."""
         model = Sponsor

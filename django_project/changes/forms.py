@@ -22,6 +22,7 @@ from crispy_bulma.widgets import FileUploadInput
 
 FileUploadInput.template_name = 'widgets/file_upload_input.html'
 
+
 class CategoryForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass
@@ -89,6 +90,7 @@ class CategoryForm(forms.ModelForm):
 class VersionForm(forms.ModelForm):
     image_file = forms.ImageField(widget=FileUploadInput)
     # noinspection PyClassicStyleClass
+
     class Meta:
         model = Version
         fields = (
@@ -154,6 +156,7 @@ class EntryForm(forms.ModelForm):
 
     # noinspection PyClassicStyleClass
     image_file = forms.ImageField(widget=FileUploadInput)
+
     class Meta:
         model = Entry
         fields = (
@@ -237,6 +240,7 @@ class SponsorForm(forms.ModelForm):
     logo = forms.ImageField(widget=FileUploadInput)
     agreement = forms.FileField(widget=FileUploadInput, required=False)
     # noinspection PyClassicStyleClass
+
     class Meta:
         model = Sponsor
         fields = (
@@ -318,6 +322,7 @@ class SponsorshipLevelForm(forms.ModelForm):
 
     logo = forms.ImageField(widget=FileUploadInput)
     # noinspection PyClassicStyleClass
+
     class Meta:
         model = SponsorshipLevel
         fields = (
@@ -391,13 +396,13 @@ class SponsorshipPeriodForm(forms.ModelForm):
         self.project = kwargs.pop('project')
         form_title = (
             '<h2 class="is-title is-size-4">'
-            f'Sponsorship Period Form for {self.project.name}'
+            'Sponsorship Period Form for {project_name}'
             '</h2>'
-        )
+        ).format(project_name=self.project.name)
         if 'instance' in kwargs and kwargs['instance']:
             form_title = (
                 '<h2 class="is-title is-size-4">'
-                f'Edit Sponsorship Period'
+                'Edit Sponsorship Period'
                 '</h2>'
             )
         self.helper = FormHelper()
