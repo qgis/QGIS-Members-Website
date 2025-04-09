@@ -656,11 +656,14 @@ class ApproveSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
             slug='qgis'
         )
         sponsorship_managers = project.sponsorship_managers.all()
-        send([
-                 self.request.user,
-             ] + list(sponsorship_managers),
-             NOTICE_SUSTAINING_MEMBER_APPROVED,
-             {'sustaining_member_name': sponsor.name})
+        try:
+            send([
+                    self.request.user,
+                ] + list(sponsorship_managers),
+                NOTICE_SUSTAINING_MEMBER_APPROVED,
+                {'sustaining_member_name': sponsor.name})
+        except Exception as e:
+            print(f"Notification send failed: {e}")
         sponsor.save()
         return reverse(self.pattern_name, kwargs={})
 
@@ -696,11 +699,14 @@ class RejectSponsorView(LoginRequiredMixin, SponsorMixin, RedirectView):
             slug='qgis'
         )
         sponsorship_managers = project.sponsorship_managers.all()
-        send([
-                 self.request.user,
-             ] + list(sponsorship_managers),
-             NOTICE_SUSTAINING_MEMBER_REJECTED,
-             {'remarks': remarks, 'sustaining_member_name': sponsor.name})
+        try:
+            send([
+                    self.request.user,
+                ] + list(sponsorship_managers),
+                NOTICE_SUSTAINING_MEMBER_REJECTED,
+                {'remarks': remarks, 'sustaining_member_name': sponsor.name})
+        except Exception as e:
+            print(f"Notification send failed: {e}")
         return reverse(self.pattern_name, kwargs={})
 
 

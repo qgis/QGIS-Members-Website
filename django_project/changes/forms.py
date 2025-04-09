@@ -303,8 +303,13 @@ class SponsorForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(SponsorForm, self).save(commit=False)
-        instance.author = self.user
-        instance.approved = False
+        if instance._state.adding:  # Check if the instance is being created
+            # Let's keep the author as the user who created the project
+            # otherwise, it will generate a conflict for sustaining membership
+            # (sustaining membership with the same author)
+            # and it won't be updatable.
+            instance.author = self.user
+            instance.approved = False
         instance.save()
         return instance
 

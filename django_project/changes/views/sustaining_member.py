@@ -188,6 +188,7 @@ class SustainingMembership(LoginRequiredMixin, DetailView):
         except IndexError:
             context['subscription'] = None
         just_approved = (
+                sustaining_member is not None and
                 sustaining_member.approved and
                 not SponsorshipPeriod.objects.filter(
                     sponsor=sustaining_member,
