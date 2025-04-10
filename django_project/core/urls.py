@@ -19,7 +19,7 @@ handler404 = 'base.views.error_views.custom_404'
 
 
 def handler500(request):
-    """500 error handler which includes ``request`` and error traceback in the context.
+    """500 error handler which includes ``request``.
 
     See http://raven.readthedocs.org/en/latest/integrations/
         django.html#message-references
@@ -27,7 +27,6 @@ def handler500(request):
     :param request: Django request object.
 
     Templates: `500.html`
-    Context: Includes the error traceback for debugging.
     """
     # You need to create a 500.html template.
     t = loader.get_template('500.html')
