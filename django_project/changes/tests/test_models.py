@@ -12,6 +12,7 @@ from changes.tests.model_factories import (
 
 from base.tests.model_factories import ProjectF
 
+
 class TestSponsorCRUD(TestCase):
     """
     Tests search models.
