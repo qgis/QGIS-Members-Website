@@ -10,6 +10,7 @@ from changes.tests.model_factories import (
     SponsorF,
     SponsorshipPeriodF)
 
+from base.tests.model_factories import ProjectF
 
 class TestSponsorCRUD(TestCase):
     """
@@ -20,13 +21,15 @@ class TestSponsorCRUD(TestCase):
         """
         Sets up before each test
         """
-        pass
+        self.project = ProjectF.create()
 
     def test_Sponsor_create(self):
         """
         Tests Sponsor model creation
         """
-        model = SponsorF.create()
+        model = SponsorF.create(
+            project=self.project,
+        )
 
         # check if PK exists
         self.assertTrue(model.pk is not None)
@@ -39,7 +42,8 @@ class TestSponsorCRUD(TestCase):
         Tests Sponsor model read
         """
         model = SponsorF.create(
-            name=u'Custom Sponsor'
+            name=u'Custom Sponsor',
+            project=self.project,
         )
 
         self.assertTrue(model.name == 'Custom Sponsor')
@@ -48,7 +52,9 @@ class TestSponsorCRUD(TestCase):
         """
         Tests Sponsor model update
         """
-        model = SponsorF.create()
+        model = SponsorF.create(
+            project=self.project,
+        )
         new_model_data = {
             'name': u'New Sponsor Name',
             'sponsor_url': u'New Sponsor URL',
@@ -66,7 +72,9 @@ class TestSponsorCRUD(TestCase):
         """
         Tests Sponsor model delete
         """
-        model = SponsorF.create()
+        model = SponsorF.create(
+            project=self.project,
+        )
 
         model.delete()
 
@@ -83,13 +91,15 @@ class TestSponsorshipLevelCRUD(TestCase):
         """
         Sets up before each test
         """
-        pass
+        self.project = ProjectF.create()
 
     def test_SponsorshipLevel_create(self):
         """
         Tests Sponsorship Level model creation
         """
-        model = SponsorshipLevelF.create()
+        model = SponsorshipLevelF.create(
+            project=self.project,
+        )
 
         # check if PK exists
         self.assertTrue(model.pk is not None)
@@ -102,6 +112,7 @@ class TestSponsorshipLevelCRUD(TestCase):
         Tests Sponsorship Level model read
         """
         model = SponsorshipLevelF.create(
+            project=self.project,
             name=u'Custom SponsorshipLevel'
         )
 
@@ -111,7 +122,9 @@ class TestSponsorshipLevelCRUD(TestCase):
         """
         Tests Sponsorship Level model update
         """
-        model = SponsorshipLevelF.create()
+        model = SponsorshipLevelF.create(
+            project=self.project,
+        )
         new_model_data = {
             'name': u'New Sponsorship Level Name',
             'currency': u'IDR',
@@ -131,7 +144,9 @@ class TestSponsorshipLevelCRUD(TestCase):
         """
         Tests SponsorshipLevel model delete
         """
-        model = SponsorshipLevelF.create()
+        model = SponsorshipLevelF.create(
+            project=self.project,
+        )
 
         model.delete()
 
@@ -148,13 +163,26 @@ class TestSponsorshipPeriodCRUD(TestCase):
         """
         Sets up before each test
         """
-        pass
+        self.project = ProjectF.create()
+
+        self.sponsorship_level = SponsorshipLevelF.create(
+            project=self.project,
+            name='Gold')
+
+        # Current sponsor
+        self.current_sponsor = SponsorF.create(
+            project=self.project,
+            name='Current Sponsor')
 
     def test_SponsorshipPeriod_create(self):
         """
         Tests Sponsorship Period model creation
         """
-        model = SponsorshipPeriodF.create()
+        model = SponsorshipPeriodF.create(
+            sponsorship_level=self.sponsorship_level,
+            sponsor=self.current_sponsor,
+            project=self.project,
+        )
 
         # check if PK exists
         self.assertTrue(model.pk is not None)
@@ -167,6 +195,9 @@ class TestSponsorshipPeriodCRUD(TestCase):
         Tests Sponsorship Period model read
         """
         model = SponsorshipPeriodF.create(
+            sponsorship_level=self.sponsorship_level,
+            sponsor=self.current_sponsor,
+            project=self.project,
             start_date=datetime(2016, 1, 1)
         )
 
@@ -176,7 +207,11 @@ class TestSponsorshipPeriodCRUD(TestCase):
         """
         Tests Sponsorship Period model update
         """
-        model = SponsorshipPeriodF.create()
+        model = SponsorshipPeriodF.create(
+            sponsorship_level=self.sponsorship_level,
+            sponsor=self.current_sponsor,
+            project=self.project,
+        )
         new_model_data = {
             'start_date': datetime(2016, 1, 1),
             'approved': False,
@@ -193,7 +228,11 @@ class TestSponsorshipPeriodCRUD(TestCase):
         """
         Tests SponsorshipPeriod model delete
         """
-        model = SponsorshipPeriodF.create()
+        model = SponsorshipPeriodF.create(
+            sponsorship_level=self.sponsorship_level,
+            sponsor=self.current_sponsor,
+            project=self.project,
+        )
 
         model.delete()
 

@@ -237,7 +237,7 @@ class EntryForm(forms.ModelForm):
 
 
 class SponsorForm(forms.ModelForm):
-    logo = forms.ImageField(widget=FileUploadInput)
+    logo = SVGAndImageFormField(widget=FileUploadInput)
     agreement = forms.FileField(widget=FileUploadInput, required=False)
     # noinspection PyClassicStyleClass
 
@@ -256,9 +256,6 @@ class SponsorForm(forms.ModelForm):
             'invoice_number',
             'project',
         )
-        field_classes = {
-            'logo': SVGAndImageFormField
-        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')

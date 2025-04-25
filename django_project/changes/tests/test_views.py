@@ -4,17 +4,12 @@
 import datetime
 import json
 from datetime import timedelta
-from mock import mock
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.test.client import Client
 from base.tests.model_factories import ProjectF
 from changes.tests.model_factories import (
-    CategoryF,
-    EntryF,
-    VersionF,
     SponsorshipLevelF,
     SponsorF,
     SponsorshipPeriodF)
@@ -69,9 +64,7 @@ class TestSponsorshipLevelViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorshipLevelListView(self):
 
-        response = self.client.get(reverse('sponsorshiplevel-list', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsorshiplevel-list'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'sponsorship_level/list.html',
@@ -85,9 +78,7 @@ class TestSponsorshipLevelViews(TestCase):
     def test_SponsorshipLevelCreateView_with_login(self):
 
         self.client.login(username='timlinux', password='password')
-        response = self.client.get(reverse('sponsorshiplevel-create', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsorshiplevel-create'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'sponsorship_level/create.html'
@@ -97,9 +88,7 @@ class TestSponsorshipLevelViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorshipLevelCreateView_no_login(self):
 
-        response = self.client.get(reverse('sponsorshiplevel-create', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsorshiplevel-create'))
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -111,9 +100,7 @@ class TestSponsorshipLevelViews(TestCase):
             'project': self.project.id,
             'sort_number': 0
         }
-        response = self.client.post(reverse('sponsorshiplevel-create', kwargs={
-            'project_slug': self.project.slug
-        }), post_data)
+        response = self.client.post(reverse('sponsorshiplevel-create'), post_data)
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -122,17 +109,14 @@ class TestSponsorshipLevelViews(TestCase):
         post_data = {
             'name': u'New Test Sponsorship Level'
         }
-        response = self.client.post(reverse('sponsorshiplevel-create', kwargs={
-            'project_slug': self.project.slug
-        }), post_data)
+        response = self.client.post(reverse('sponsorshiplevel-create'), post_data)
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorshipLevelDetailView(self):
 
         response = self.client.get(reverse('sponsorshiplevel-detail', kwargs={
-            'slug': self.sponsorship_level.slug,
-            'project_slug': self.sponsorship_level.project.slug
+            'slug': self.sponsorship_level.slug
         }))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
@@ -145,8 +129,7 @@ class TestSponsorshipLevelViews(TestCase):
 
         self.client.login(username='timlinux', password='password')
         response = self.client.get(reverse('sponsorshiplevel-delete', kwargs={
-            'slug': self.sponsorship_level.slug,
-            'project_slug': self.sponsorship_level.project.slug
+            'slug': self.sponsorship_level.slug
         }))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
@@ -158,8 +141,7 @@ class TestSponsorshipLevelViews(TestCase):
     def test_SponsorshipLevelDeleteView_no_login(self):
 
         response = self.client.get(reverse('sponsorshiplevel-delete', kwargs={
-            'slug': self.sponsorship_level.slug,
-            'project_slug': self.sponsorship_level.project.slug
+            'slug': self.sponsorship_level.slug
         }))
         self.assertEqual(response.status_code, 302)
 
@@ -170,20 +152,19 @@ class TestSponsorshipLevelViews(TestCase):
                 project=self.project)
         self.client.login(username='timlinux', password='password')
         response = self.client.post(reverse('sponsorshiplevel-delete', kwargs={
-            'slug': sponsorship_level_to_delete.slug,
-            'project_slug': sponsorship_level_to_delete.project.slug
+            'slug': sponsorship_level_to_delete.slug
         }), {})
         self.assertRedirects(
-            response, reverse('sponsorshiplevel-list', kwargs={
-                'project_slug': self.project.slug}))
+            response, reverse('sponsorshiplevel-list'))
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorshipLevelDelete_no_login(self):
 
-        sponsorshiplevel_to_delete = SponsorshipLevelF.create()
+        sponsorshiplevel_to_delete = SponsorshipLevelF.create(
+            project=self.project
+        )
         response = self.client.post(reverse('sponsorshiplevel-delete', kwargs={
-            'slug': sponsorshiplevel_to_delete.slug,
-            'project_slug': self.sponsorship_level.project.slug
+            'slug': sponsorshiplevel_to_delete.slug
         }))
         self.assertEqual(response.status_code, 302)
 
@@ -269,54 +250,32 @@ class TestSponsorViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorListView(self):
 
-        response = self.client.get(reverse('sponsor-list', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsor-list'))
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_FutureSponsorListView_no_login(self):
-        response = self.client.get(reverse('future-sponsor-list', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('future-sponsor-list'))
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_FutureSponsorListView_with_staff_login(self):
         self.client.login(username='timlinux', password='password')
-        response = self.client.get(reverse('future-sponsor-list', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('future-sponsor-list'))
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_FutureSponsorListView_with_non_staff_login(self):
         self.client.login(username='non-staff', password='password')
-        response = self.client.get(reverse('future-sponsor-list', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('future-sponsor-list'))
         self.assertEqual(response.status_code, 404)
 
-    @override_settings(VALID_DOMAIN=['testserver', ])
-    def test_SponsorWorldMapView(self):
-
-        response = self.client.get(reverse('sponsor-world-map', kwargs={
-            'project_slug': self.project.slug
-        }))
-        self.assertEqual(response.status_code, 200)
-        expected_templates = [
-            'sponsor/world-map.html',
-            u'changes/sponsorshipperiod_list.html'
-        ]
-        self.assertEqual(expected_templates, response.template_name)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorCreateView_with_login(self):
 
         self.client.login(username='timlinux', password='password')
-        response = self.client.get(reverse('sponsor-create', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsor-create'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'sponsor/create.html'
@@ -326,9 +285,7 @@ class TestSponsorViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorCreateView_no_login(self):
 
-        response = self.client.get(reverse('sponsor-create', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsor-create'))
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -340,9 +297,7 @@ class TestSponsorViews(TestCase):
             'project': self.project.id,
             'sort_number': 0
         }
-        response = self.client.post(reverse('sponsor-create', kwargs={
-            'project_slug': self.project.slug
-        }), post_data)
+        response = self.client.post(reverse('sponsor-create'), post_data)
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -351,9 +306,7 @@ class TestSponsorViews(TestCase):
         post_data = {
             'name': u'New Test Sponsor'
         }
-        response = self.client.post(reverse('sponsor-create', kwargs={
-            'project_slug': self.project.slug
-        }), post_data)
+        response = self.client.post(reverse('sponsor-create'), post_data)
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -392,9 +345,7 @@ class TestSponsorViews(TestCase):
             'sort_number': 0,
             'logo': logo
         }
-        response = self.client.post(reverse('sponsor-create', kwargs={
-            'project_slug': self.project.slug
-        }), post_data)
+        response = self.client.post(reverse('sponsor-create'), post_data)
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -402,8 +353,7 @@ class TestSponsorViews(TestCase):
 
         self.client.login(username='timlinux', password='password')
         response = self.client.get(reverse('sponsor-delete', kwargs={
-            'slug': self.sponsor.slug,
-            'project_slug': self.sponsor.project.slug
+            'slug': self.sponsor.slug
         }))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
@@ -415,8 +365,7 @@ class TestSponsorViews(TestCase):
     def test_SponsorDeleteView_no_login(self):
 
         response = self.client.get(reverse('sponsor-delete', kwargs={
-            'slug': self.sponsor.slug,
-            'project_slug': self.sponsor.project.slug
+            'slug': self.sponsor.slug
         }))
         self.assertEqual(response.status_code, 302)
 
@@ -426,20 +375,18 @@ class TestSponsorViews(TestCase):
         sponsor_to_delete = SponsorF.create(project=self.project)
         self.client.login(username='timlinux', password='password')
         response = self.client.post(reverse('sponsor-delete', kwargs={
-            'slug': sponsor_to_delete.slug,
-            'project_slug': sponsor_to_delete.project.slug
+            'slug': sponsor_to_delete.slug
         }), {})
-        self.assertRedirects(response, reverse('sponsor-list', kwargs={
-            'project_slug': self.project.slug
-        }))
+        self.assertRedirects(response, reverse('sponsor-list'))
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorDelete_no_login(self):
 
-        sponsor_to_delete = SponsorF.create()
+        sponsor_to_delete = SponsorF.create(
+            project=self.project
+        )
         response = self.client.post(reverse('sponsor-delete', kwargs={
-            'slug': sponsor_to_delete.slug,
-            'project_slug': self.sponsor.project.slug
+            'slug': sponsor_to_delete.slug
         }))
         self.assertEqual(response.status_code, 302)
 
@@ -461,8 +408,7 @@ class TestSponsorshipPeriodViews(TestCase):
         self.client.post(
                 '/set_language/', data={'language': 'en'})
         logging.disable(logging.CRITICAL)
-        self.project = ProjectF.create(
-                name='testproject')
+        self.project = ProjectF.create()
         self.sponsor = SponsorF.create(
                 project=self.project,
                 name='Kartoza')
@@ -470,6 +416,7 @@ class TestSponsorshipPeriodViews(TestCase):
                 project=self.project,
                 name='Gold')
         self.sponsorship_period = SponsorshipPeriodF.create(
+            project=self.project,
             sponsor=self.sponsor,
             sponsorship_level=self.sponsorship_level,
             approved=True)
@@ -502,9 +449,7 @@ class TestSponsorshipPeriodViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorshipPeriodListView(self):
         """Test SponsorshipPeriod list view."""
-        response = self.client.get(reverse('sponsorshipperiod-list', kwargs={
-            'project_slug': self.project.slug,
-        }))
+        response = self.client.get(reverse('sponsorshipperiod-list'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'sponsorship_period/list.html',
@@ -516,9 +461,7 @@ class TestSponsorshipPeriodViews(TestCase):
     def test_SponsorshipPeriodCreateView_with_login(self):
 
         self.client.login(username='timlinux', password='password')
-        response = self.client.get(reverse('sponsorshipperiod-create', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sponsorshipperiod-create'))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
             'sponsorship_period/create.html'
@@ -528,9 +471,7 @@ class TestSponsorshipPeriodViews(TestCase):
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SponsorshipPeriodCreateView_no_login(self):
 
-        response = self.client.get(reverse('sponsorshipperiod-create', kwargs={
-            'project_slug': self.project.slug,
-        }))
+        response = self.client.get(reverse('sponsorshipperiod-create'))
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -544,8 +485,7 @@ class TestSponsorshipPeriodViews(TestCase):
         }
         response = self.client.post(
             reverse(
-                'sponsorshipperiod-create', kwargs={
-                    'project_slug': self.project.slug}), post_data)
+                'sponsorshipperiod-create'), post_data)
         self.assertEqual(response.status_code, 200)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -556,9 +496,7 @@ class TestSponsorshipPeriodViews(TestCase):
             'sponsorship_level': self.sponsorship_level.id
         }
         response = self.client.post(
-            reverse('sponsorshipperiod-create', kwargs={
-                'project_slug': self.project.slug
-            }), post_data)
+            reverse('sponsorshipperiod-create'), post_data)
         self.assertEqual(response.status_code, 302)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
@@ -567,8 +505,7 @@ class TestSponsorshipPeriodViews(TestCase):
         self.client.login(username='timlinux', password='password')
         response = self.client.get(
             reverse('sponsorshipperiod-update', kwargs={
-                'slug': self.sponsorship_period.slug,
-                'project_slug': self.project.slug
+                'slug': self.sponsorship_period.slug
             }))
         self.assertEqual(response.status_code, 200)
         expected_templates = [
@@ -580,8 +517,7 @@ class TestSponsorshipPeriodViews(TestCase):
     def test_SponsorshipPeriodUpdateView_no_login(self):
 
         response = self.client.get(reverse('sponsorshipperiod-update', kwargs={
-            'slug': self.sponsorship_period.slug,
-            'project_slug': self.project.slug
+            'slug': self.sponsorship_period.slug
         }))
         self.assertEqual(response.status_code, 302)
 
@@ -596,7 +532,6 @@ class TestSponsorshipPeriodViews(TestCase):
         }
         response = self.client.post(
             reverse('sponsorshipperiod-update', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.sponsorship_period.slug
             }), post_data)
         self.assertEqual(response.status_code, 200)
@@ -610,8 +545,7 @@ class TestSponsorshipPeriodViews(TestCase):
         }
         response = self.client.post(
             reverse('sponsorshipperiod-update', kwargs={
-                'slug': self.sponsorship_period.slug,
-                'project_slug': self.project.slug
+                'slug': self.sponsorship_period.slug
             }), post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -619,7 +553,6 @@ class TestSponsorshipPeriodViews(TestCase):
     def test_SponsorshipPeriodDeleteView_no_login(self):
 
         response = self.client.get(reverse('sponsorshipperiod-delete', kwargs={
-            'project_slug': self.project.slug,
             'slug': self.sponsorship_period.slug
         }))
         self.assertEqual(response.status_code, 302)
@@ -629,7 +562,6 @@ class TestSponsorshipPeriodViews(TestCase):
 
         response = self.client.post(
             reverse('sponsorshipperiod-delete', kwargs={
-                'project_slug': self.project.slug,
                 'slug': self.sponsorship_period.slug
             }))
         self.assertEqual(response.status_code, 302)
