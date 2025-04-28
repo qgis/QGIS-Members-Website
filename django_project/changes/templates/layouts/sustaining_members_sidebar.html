@@ -11,11 +11,10 @@
         </a>
       </li>
       {% else %}
-        {% url 'sustaining-member-create' as create_url %}
         <li>
           <a class="button is-success is-medium has-tooltip-bottom has-tooltip-arrow"
           data-tooltip="Become a sustaining member!"
-          href="{{ create_url }}">
+          href="mailto:finance@qgis.org?subject=QGIS%20Sustaining%20Membership">
             <i class="fas fa-award mr-3"></i>
             Sign up!
           </a>

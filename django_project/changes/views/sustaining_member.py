@@ -5,7 +5,7 @@ import djstripe.models
 import djstripe.settings
 from braces.views import LoginRequiredMixin
 from django.urls import reverse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -15,10 +15,8 @@ from django.db.models import Q, Case, When, BooleanField
 from django.http import HttpResponseRedirect, Http404
 from changes.models import Sponsor, SponsorshipPeriod, SponsorshipLevel
 from base.models import Project
-from changes.models import active_sustaining_membership
 from changes.forms import SustainingMemberPeriodForm
 from changes import (
-    NOTICE_SUSTAINING_MEMBER_CREATED,
     NOTICE_SUSTAINING_MEMBER_UPDATED,
     NOTICE_SUBSCRIPTION_UPDATED,
     NOTICE_SUBSCRIPTION_CREATED
@@ -64,90 +62,6 @@ class SustainingMemberPeriodStripeMixin(object):
             'recurring': self.object.recurring,
             'server_time': datetime.now().ctime()
         }
-
-
-class SustainingMemberCreateView(LoginRequiredMixin, CreateView):
-    """Create view for sustaining member"""
-    template_name = 'sustaining_member/add.html'
-    model = Sponsor
-    form_class = SustainingMemberForm
-    form_object = None
-
-    def get(self, request, *args, **kwargs):
-        project = Project.objects.get(
-            slug='qgis'
-        )
-        active_memberships = active_sustaining_membership(
-            self.request.user,
-            project
-        )
-        if active_memberships.exists():
-            return redirect(reverse(
-                'sustaining-membership', kwargs={}
-            ))
-        return super(SustainingMemberCreateView, self).get(
-            request, *args, **kwargs
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super(SustainingMemberCreateView, self).get_context_data(
-            **kwargs
-        )
-        context['the_project'] = Project.objects.get(
-            slug='qgis'
-        )
-        return context
-
-    def get_success_url(self):
-        return reverse('sustaining-membership', kwargs={})
-
-    def post(self, request, *args, **kwargs):
-        """
-        Handles POST requests, instantiating a form instance with the passed
-        POST variables and then checked for validity.
-        """
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def send_notification(self, sustaining_member, sponsorship_managers):
-        """Send a notification to author and managers"""
-        send_notification(
-            users=[
-                      self.request.user,
-                  ] + list(sponsorship_managers),
-            label=NOTICE_SUSTAINING_MEMBER_CREATED,
-            extra_context={
-                'sustaining_member': sustaining_member,
-                'sustaining_member_manager': sponsorship_managers[0],
-                'active_site': self.request.get_host()
-            },
-            request_user=self.request.user
-        )
-
-    def form_valid(self, form):
-        """Check if form is valid."""
-        if form.is_valid():
-            project = Project.objects.get(
-                slug='qgis'
-            )
-            self.form_object = form.save(commit=False)
-            self.form_object.author = self.request.user
-            self.form_object.project = project
-            self.form_object.sustaining_membership = True
-            self.form_object.save()
-            sponsorship_managers = project.sponsorship_managers.all().exclude(
-                id=self.request.user.id
-            )
-            # Send a notification
-            self.send_notification(self.form_object,
-                                   list(sponsorship_managers))
-
-            return super(SustainingMemberCreateView, self).form_valid(form)
-        else:
-            return self.render_to_response(self.get_context_data(form=form))
 
 
 class SustainingMembership(LoginRequiredMixin, DetailView):

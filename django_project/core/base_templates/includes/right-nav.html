@@ -9,10 +9,9 @@
         <span>Membership</span>
     </a>
 {% else %}
-    {% url 'sustaining-member-create' as create_url %}
     <a 
     class="button is-small is-success mr-3 has-tooltip-bottom has-tooltip-arrow" 
-    data-tooltip="Sign up for Membership!" href="{{ create_url }}">
+    data-tooltip="Sign up for Membership!" href="mailto:finance@qgis.org?subject=QGIS%20Sustaining%20Membership">
         <i class="fas fa-award mr-3"></i>
         <span>Sign Up</span>
     </a>
