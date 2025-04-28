@@ -98,8 +98,6 @@ PIPELINE = {
             ),
             'output_filename': 'js/contrib.js',
         }
-    },
-    'STYLESHEETS': {
     }
 }
 

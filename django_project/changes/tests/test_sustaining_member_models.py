@@ -6,7 +6,8 @@ from django.test import TestCase, override_settings
 from base.tests.model_factories import ProjectF
 from changes.tests.model_factories import (
     SponsorF,
-    SponsorshipPeriodF
+    SponsorshipPeriodF,
+    SponsorshipLevelF
 )
 from core.model_factories import UserF
 from changes.models import active_sustaining_membership
@@ -32,6 +33,10 @@ class TestSustainingMemberModel(TestCase):
             project=self.project,
             author=self.user
         )
+        self.sponsorship_level = SponsorshipLevelF.create(
+            project=self.project,
+            name='Gold'
+        )
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     def test_SustainingMember_inactive(self):
@@ -42,6 +47,7 @@ class TestSustainingMemberModel(TestCase):
         SponsorshipPeriodF.create(
             sponsor=self.sustaining_member,
             project=self.project,
+            sponsorship_level=self.sponsorship_level,
             start_date=datetime(2014, 1, 1),
         )
         self.sustaining_member.active = False
@@ -58,6 +64,7 @@ class TestSustainingMemberModel(TestCase):
         SponsorshipPeriodF.create(
             sponsor=self.sustaining_member,
             project=self.project,
+            sponsorship_level=self.sponsorship_level,
             start_date=datetime(2014, 1, 1),
         )
 

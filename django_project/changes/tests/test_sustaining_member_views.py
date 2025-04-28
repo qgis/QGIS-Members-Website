@@ -2,7 +2,7 @@
 # flake8: noqa
 
 from unittest.mock import patch
-from mock import mock
+from unittest import mock
 from django.urls import reverse
 from django.test import TestCase, override_settings
 from django.test.client import Client
@@ -65,9 +65,7 @@ class TestSustainingMemberCreateView(TestCase):
         """
         self.client.login(username='user', password='password')
 
-        response = self.client.get(reverse('sustaining-member-create', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sustaining-member-create'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['is_sustaining_member'], False)
         expected_template = [
@@ -98,17 +96,12 @@ class TestSustainingMemberCreateView(TestCase):
             'logo': logo,
             'country': 'US',
         }
-        response = self.client.post(reverse('sustaining-member-create', kwargs={
-           'project_slug': self.project.slug
-        }), post_data)
+        response = self.client.post(reverse('sustaining-member-create'), post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url,
-                         reverse('sustaining-membership',
-                                 kwargs={'project_slug': self.project.slug}))
+                         reverse('sustaining-membership'))
 
-        response = self.client.get(reverse('sustaining-membership', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sustaining-membership'))
         self.assertEqual(response.context['is_sustaining_member'], True)
 
 
@@ -164,7 +157,6 @@ class TestSustainingMemberUpdateView(TestCase):
         self.client.login(username='user', password='password')
 
         response = self.client.get(reverse('sustaining-member-update', kwargs={
-            'project_slug': self.project.slug,
             'member_id': self.sustaining_member.id
         }))
         self.assertEqual(response.status_code, 200)
@@ -198,15 +190,11 @@ class TestSustainingMemberUpdateView(TestCase):
             'country': 'US',
         }
         response = self.client.post(reverse('sustaining-member-update', kwargs={
-            'project_slug': self.project.slug,
             'member_id': self.sustaining_member.id
         }), post_data)
         self.assertEqual(response.url,
-                         reverse('sustaining-membership',
-                                 kwargs={'project_slug': self.project.slug}))
+                         reverse('sustaining-membership'))
         self.assertEqual(response.status_code, 302)
-        response = self.client.get(reverse('sustaining-membership', kwargs={
-            'project_slug': self.project.slug
-        }))
+        response = self.client.get(reverse('sustaining-membership'))
         self.assertEqual(response.context['is_sustaining_member'], True)
         self.assertTrue(mock_send_notification.called)

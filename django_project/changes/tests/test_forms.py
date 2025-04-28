@@ -54,6 +54,8 @@ class TestSponsorForm(TestCase):
             user=self.user,
             project=self.project
         )
+        if not form.is_valid():
+            print(form.errors)
         self.assertTrue(form.is_valid())
 
     def test_upload_webp_file(self):
