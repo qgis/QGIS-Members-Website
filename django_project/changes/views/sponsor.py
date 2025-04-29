@@ -39,6 +39,8 @@ from changes import (
     NOTICE_SUSTAINING_MEMBER_APPROVED,
     NOTICE_SUSTAINING_MEMBER_REJECTED
 )
+import json
+from django.db.models import Sum, Count
 
 logger = logging.getLogger(__name__)
 
@@ -168,6 +170,7 @@ class SponsorListView(SponsorMixin, PaginationMixin, ListView):
                 "json",
                 levels
             )
+            context['sponsors_geojson'] = self.enrich_geojson()
             context['is_sustaining_member'] = active_sustaining_membership(
                 self.request.user,
                 project
@@ -196,6 +199,66 @@ class SponsorListView(SponsorMixin, PaginationMixin, ListView):
             else:
                 raise Http404('Sorry! We could not find your Sponsor!')
         return self.queryset
+
+    def enrich_geojson(self):
+        """Enrich the geojson with data."""
+        def get_amounts_by_country(sponsorship_period):
+            """Get the total sponsorship amount for all sponsors."""
+            raw_values = sponsorship_period.values('sponsor__country').annotate(
+                total_sponsorship=Sum('sponsorship_level__value')
+            )
+            amount_by_country = {entry['sponsor__country']: entry['total_sponsorship'] for entry in raw_values}
+            return amount_by_country
+        
+        def get_sponsors_count_by_country(sponsorship_period):
+            """Get the total sponsor count for all sponsors."""
+            raw_values = sponsorship_period.values('sponsor__country').annotate(
+                total_sponsor=Count('sponsor')
+            )
+            sponsors_count_by_country = {entry['sponsor__country']: entry['total_sponsor'] for entry in raw_values}
+            return sponsors_count_by_country
+        
+        def load_geojson():
+            """Get the country geojson."""
+            geojson_file = os.path.join(
+                settings.STATIC_ROOT,
+                'json',
+                'geo.json'
+            )
+            with open(geojson_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        
+        def load_gdp_data():
+            """Get the GDP data."""
+            gdp_data_file = os.path.join(
+                settings.STATIC_ROOT,
+                'json',
+                'worldbank_gdp.json'
+            )
+            with open(gdp_data_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+
+        geojson_data = load_geojson()
+        gdp_data = load_gdp_data()
+        sponsorship_period = self.get_queryset()
+        amounts_by_country = get_amounts_by_country(sponsorship_period)
+        sponsors_count_by_country = get_sponsors_count_by_country(sponsorship_period)
+
+        for feature in geojson_data['features']:
+            props = feature['properties']
+            country_code = props.get('ISO2') or props.get('ISO3')
+            # population = props.get('POP2005')
+            gdp_value = gdp_data.get(country_code, 0)
+            amount = amounts_by_country.get(country_code.upper(), 0)
+        
+            if gdp_value and gdp_value > 0:
+                props['normalized_membership_value'] = round(amount / gdp_value, 10)
+                print(props['normalized_membership_value'])
+            else:
+                props['normalized_membership_value'] = 0
+    
+            props['sponsor_count'] = sponsors_count_by_country.get(country_code.upper(), 0)
+        return json.dumps(geojson_data)
 
 
 class PastSponsorListView(SponsorListView):

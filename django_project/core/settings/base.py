@@ -215,3 +215,8 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(SITE_ROOT, 'webpack-stats.json'),
     }
 }
+
+# Define the year for which you want to fetch GDP data
+# Please check the Data Source before changing this value
+# The World Bank API may not have data for the current year
+GDP_YEAR = os.environ.get("GDP_YEAR", "2023")
