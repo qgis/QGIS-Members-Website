@@ -25,10 +25,7 @@
               </figure>
               <h3 class="title is-5">{{ sponsor.sponsor }}</h3>
               <article class="subtitle is-7 mb-1">
-                  {{ sponsor.start_date }} - {{ sponsor.end_date }}
-              </article>
-              <article class="subtitle is-7">
-                  <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
+                  {{ sponsor.sponsor.country.name }}
               </article>
             </a>
           </article>
@@ -49,10 +46,10 @@
             </figure>
             <h3 class="title is-5">{{ sponsor.sponsor }}</h3>
             <article class="subtitle is-7 mb-1">
-                {{ sponsor.start_date }} - {{ sponsor.end_date }}
+                {{ sponsor.sponsor.country.name }}
             </article>
             <article class="subtitle is-7">
-                <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
+                {{ sponsor.start_date }} - {{ sponsor.end_date }}
             </article>
           </a>
         </article>
@@ -72,10 +69,10 @@
             </figure>
             <h3 class="title is-5">{{ sponsor.sponsor }}</h3>
             <article class="subtitle is-7 mb-1">
-                {{ sponsor.start_date }} - {{ sponsor.end_date }}
+              {{ sponsor.sponsor.country.name }}
             </article>
             <article class="subtitle is-7">
-                <strong>Amount contributed: {{ sponsor.amount_sponsored }} {{ sponsor.currency }}</strong>
+                {{ sponsor.start_date }} - {{ sponsor.end_date }}
             </article>
           </a>
         </article>
