@@ -63,13 +63,6 @@ from .views import (
     ApproveSponsorshipPeriodView,
 
     generate_sponsor_cloud,
-    FetchGithubPRs,
-    FetchRepoLabels,
-    FetchCategory,
-    download_all_referenced_images,
-)
-from changes.views.sustaining_member import (
-    SustainingMemberCreateView
 )
 
 urlpatterns = [
@@ -203,10 +196,6 @@ urlpatterns = [
         name='sponsor-cloud'),
 
     # Sustaining member
-    url(
-        r'^sustaining-member/add/$',
-        view=SustainingMemberCreateView.as_view(),
-        name='sustaining-member-create'),
     url(
         r'^membership/$',
         view=SustainingMembership.as_view(),
