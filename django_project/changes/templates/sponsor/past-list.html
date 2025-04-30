@@ -22,29 +22,17 @@
     <h1 class="title">
         Past Sustaining Members
     </h1>
-    <p>
-        We thank our sustaining members and donors 
-        who support the QGIS project, often regularly, 
-        and enable us to pay for our infrastructure 
-        and important development work, as well as 
-        finance developer meetings and promotion of 
-        QGIS in workshops and conferences.
-    </p>
-    <div class="container rich tips">
-        <div class="icon">💁</div>
-        <div class="cont coloring-2">
-            <h5 id="how-become-a-sustaining-member">How to become a sustaining member?
-            </h5>
-            <p>
-                For information on becoming a sustaining member, 
-                please visit 
-                <a href="https://qgis.org/funding/membership/" target="_blank">
-                    Sustaining Membership Program Overview</a>.
-            </p>
-        </div>
-    </div>
-
     <div class="buttons">
+        {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all %}
+            <a class="button is-outlined is-success has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "sponsor-create" %}'
+               data-tooltip="Create New Sustaining Member">
+                <span class="icon">
+                    <i class="fas fa-plus-circle"></i>
+                </span>
+                <span>Create New</span>
+            </a>
+        {% endif %}
         {% if not is_sustaining_member %}
             <a class="button is-success has-tooltip-arrow has-tooltip-bottom"
                href='mailto:finance@qgis.org?subject=QGIS%20Sustaining%20Membership'
@@ -55,7 +43,7 @@
             <span>Sign Up!</span>
             </a>
         {% else %}
-            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+            <a class="button is-warning is-outlined has-tooltip-arrow has-tooltip-bottom"
                href='{% url "sustaining-membership" %}'
                data-tooltip="Your sustaining membership">
             <span class="icon">
@@ -69,13 +57,8 @@
             {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all %}
                 <a class="button is-light has-tooltip-arrow has-tooltip-bottom icon"
                    href='{% url "future-sponsor-list" %}'
-                   data-tooltip="Future Sponsor List">
+                   data-tooltip="Future Sustaining Member List">
                     <i class="fas fa-money-bill-wave"></i>
-                </a>
-                <a class="button is-outlined is-success has-tooltip-arrow has-tooltip-bottom icon"
-                   href='{% url "sponsor-create" %}'
-                   data-tooltip="Create New Sustaining Member">
-                    <i class="fas fa-plus-circle"></i>
                 </a>
             {% endif %}
             {% if not unapproved %}
@@ -116,6 +99,28 @@
            data-tooltip="RSS Feed for Past Sustaining Members">
             <i class="fas fa-rss-square" style="font-weight: bold"></i>
         </a>
+    </div>
+
+    <p>
+        We thank our sustaining members and donors 
+        who support the QGIS project, often regularly, 
+        and enable us to pay for our infrastructure 
+        and important development work, as well as 
+        finance developer meetings and promotion of 
+        QGIS in workshops and conferences.
+    </p>
+    <div class="container rich tips">
+        <div class="icon">💁</div>
+        <div class="cont coloring-2">
+            <h5 id="how-become-a-sustaining-member">How to become a sustaining member?
+            </h5>
+            <p>
+                For information on becoming a sustaining member, 
+                please visit 
+                <a href="https://qgis.org/funding/membership/" target="_blank">
+                    Sustaining Membership Program Overview</a>.
+            </p>
+        </div>
     </div>
 
     {% if num_sponsors == 0 %}

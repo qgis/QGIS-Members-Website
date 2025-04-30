@@ -131,7 +131,7 @@ class Sponsor(models.Model):
     )
 
     agreement = models.FileField(
-        help_text='Attach sponsor agreement',
+        help_text='Attach sustaining member agreement',
         upload_to=os.path.join(MEDIA_ROOT, 'docs'),
         blank=True)
 
@@ -145,7 +145,7 @@ class Sponsor(models.Model):
 
     approved = models.BooleanField(
         help_text=_(
-            'Whether this sponsor has been approved for use by the '
+            'Whether this sustaining member has been approved for use by the '
             'project owner.'),
         default=False
     )
@@ -167,11 +167,11 @@ class Sponsor(models.Model):
     )
 
     invoice_number = models.CharField(
-        _("Sponsorship invoice number"),
+        _("Sustaining membership invoice number"),
         max_length=255,
         null=True,
         blank=True,
-        help_text=_("Invoice number for the sponsor.")
+        help_text=_("Invoice number for the sustaining member.")
     )
 
     sustaining_membership = models.BooleanField(
