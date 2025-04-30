@@ -99,15 +99,21 @@
                     </div>
 
                     {% if user_can_edit %}
-                    <footer class="card-footer p-3">
-                        <a href="/member/{{ slug }}/update" class="button is-success is-outlined card-footer-item">
-                            <span class="icon">
-                                <i class="fas fa-edit"></i>
-                            </span>
-                            <span>Update</span>
-                        </a>
-                    </footer>
-                {% endif %}
+                        <footer class="card-footer p-3 buttons">
+                            <a href="{% url "sponsor-delete" slug %}" class="button is-danger is-outlined card-footer-item">
+                                <span class="icon">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                <span>Delete</span>
+                            </a>
+                            <a href="{% url "sponsor-update" slug %}" class="button is-success is-outlined card-footer-item">
+                                <span class="icon">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                                <span>Update</span>
+                            </a>
+                        </footer>
+                    {% endif %}
                 </div>
             {% else %}
                 <p>No description available.</p>
