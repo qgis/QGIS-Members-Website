@@ -334,13 +334,13 @@ class SponsorshipLevelForm(forms.ModelForm):
         self.project = kwargs.pop('project')
         form_title = (
             '<h2 class="is-title is-size-4">'
-            f'Sponsorship Level Form for {self.project.name}'
+            f'Sustaining Member Level Form for {self.project.name}'
             '</h2>'
         )
         if 'instance' in kwargs and kwargs['instance']:
             form_title = (
                 '<h2 class="is-title is-size-4">'
-                f'Edit Sponsorship Level {kwargs["instance"].name}'
+                f'Edit Sustaining Member Level {kwargs["instance"].name}'
                 '</h2>'
             )
         self.helper = FormHelper()

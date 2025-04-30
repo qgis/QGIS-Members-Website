@@ -1,12 +1,11 @@
-# Projecta
+# QGIS Sustaining Members Website
 
-[![Projecta Screenshot](https://cloud.githubusercontent.com/assets/178003/12607822/8cdb225c-c4e0-11e5-8ab0-ba51bb6f4e93.png)](http://changelog.kartoza.com)
+![image](https://github.com/user-attachments/assets/cfd5b563-0cb3-443f-b243-70a953b81180)
 
 
-A django app for creating 'visual changelogs' for software releases, and for 
-managing a software project at a high level.
+A django app for managing QGIS' sustaining members.
 
-View a running instance at [http://changelog.kartoza.com](http://changelog.kartoza.com)
+View a running instance at [https://members.qgis.org](https://members.qgis.org)
 
 
 Note that whilst usable, Projecta is under continual development and not
@@ -18,6 +17,7 @@ The latest source code is available at
 * **Developers:** See our [developer guide](README-dev.md)
 * **For production:** See our [deployment guide](README-docker.md)
 
+## TODO: Update this README
 
 ## Key features
 

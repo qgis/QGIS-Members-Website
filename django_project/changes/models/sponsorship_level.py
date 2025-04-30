@@ -36,14 +36,14 @@ class SponsorshipLevel(models.Model):
     """A sponsor model e.g. gui, backend, web site etc."""
 
     name = models.CharField(
-        help_text='Name of sponsorship level. e.g. Gold, Bronze, etc',
+        help_text='Name of sustaining membership level. e.g. Gold, Bronze, etc',
         max_length=255,
         null=False,
         blank=False,
         unique=False)
 
     value = models.IntegerField(
-        help_text='Amount of money associated with this sponsorship level.',
+        help_text='Amount of money associated with this sustaining membership level.',
         blank=False,
         null=False,
         unique=False
@@ -51,7 +51,7 @@ class SponsorshipLevel(models.Model):
 
     currency = models.CharField(
         help_text='The currency which associated with '
-                  'this sponsorship level.',
+                  'this sustaining membership level.',
         max_length=255,
         null=False,
         blank=False,
@@ -59,7 +59,7 @@ class SponsorshipLevel(models.Model):
 
     logo = models.ImageField(
         help_text=(
-            'An image of sponsorship level logo e.g. a bronze medal.'
+            'An image of sustaining membership level logo e.g. a bronze medal.'
             'Most browsers support dragging the image directly on to the '
             '"Choose File" button above.'),
         upload_to=os.path.join(MEDIA_ROOT, 'images/projects'),
@@ -85,7 +85,7 @@ class SponsorshipLevel(models.Model):
 
     approved = models.BooleanField(
         help_text=_(
-            'Whether this sponsorship level has been approved for use by '
+            'Whether this sustaining membership level has been approved for use by '
             'the project owner.'),
         default=False
     )

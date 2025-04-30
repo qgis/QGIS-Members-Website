@@ -24,7 +24,7 @@
                     {% if user.is_staff or user == project.owner or user in project.sponsorship_managers.all %}
                         <a class="button is-success has-tooltip-bottom has-tooltip-arrow"
                            href='{% url "sponsorshiplevel-create" %}'
-                           data-tooltip="Create New Sponsorship Level">
+                           data-tooltip="Create New Sustaining Membership Level">
                             <span class="icon">
                                 <i class="fas fa-plus"></i>
                             </span>
@@ -33,7 +33,7 @@
                     {% if not unapproved %}
                         <a class="button is-warning is-outlined has-tooltip-bottom has-tooltip-arrow"
                            href='{% url "pending-sponsorshiplevel-list" %}'
-                           data-tooltip="View Pending Sponsorship level">
+                           data-tooltip="View Sustaining Membership level">
                             <span class="icon">
                                 <i class="fas fa-clock"></i>
                             </span>
