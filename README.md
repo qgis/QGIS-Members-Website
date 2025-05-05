@@ -12,7 +12,7 @@ Note that whilst usable, Projecta is under continual development and not
 yet feature complete.
 
 The latest source code is available at 
-[https://github.com/kartoza/prj.app](https://github.com/kartoza/prj.app).
+[https://github.com/qgis/QGIS-Members-Website](https://github.com/qgis/QGIS-Members-Website).
 
 * **Developers:** See our [developer guide](README-dev.md)
 * **For production:** See our [deployment guide](README-docker.md)
