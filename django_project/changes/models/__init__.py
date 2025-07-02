@@ -4,3 +4,4 @@ from changes.models.version import *
 from changes.models.sponsor import *
 from changes.models.sponsorship_level import *
 from changes.models.sponsorship_period import *
+from changes.models.sponsor_email import *

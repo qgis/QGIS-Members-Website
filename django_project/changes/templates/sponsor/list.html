@@ -12,17 +12,6 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-        .rss-icon:hover {
-            color: darkorange;
-        }
-        .icon:hover {
-            color: #2a62bc;
-        }
-        .json-feed:hover {
-            color: limegreen;
-        }
-    </style>
     
     <h1 class="title">
         {% if unapproved %}Unapproved {% endif %}Sustaining Members
@@ -38,6 +27,14 @@
                 </span>
                 <span>Add New</span>
             </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "sponsor-email-list" %}'
+               data-tooltip="Send Email to Sustaining Members">
+                <span class="icon">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                <span>Email</span>
+            </a>
         {% endif %}
         {% if not is_sustaining_member %}
             <a class="button is-success has-tooltip-arrow has-tooltip-bottom"
@@ -49,13 +46,13 @@
             <span>Sign Up!</span>
             </a>
         {% else %}
-            <a class="button is-outlined is-warning has-tooltip-arrow has-tooltip-bottom"
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
                href='{% url "sustaining-membership" %}'
                data-tooltip="Your sustaining membership">
             <span class="icon">
                 <i class="fas fa-id-card"></i>
             </span>
-            <span>Your Membership</span>
+            <span>Membership</span>
             </a>
         {% endif %}
 

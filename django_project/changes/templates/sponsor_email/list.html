@@ -1,0 +1,56 @@
+{% extends "base_with_sidebar.html" %}
+{% load thumbnail %}
+{% load custom_markup %}
+{% load static %}
+
+{% block content %}
+    <h1 class="title">
+        Sustaining Members Emails
+    </h1>
+    <div class="buttons">
+        {% if user.is_staff or user == the_project.owner or user in the_project.sponsorship_managers.all %}
+            <a class="button is-success has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "sponsor-email-create" %}'
+               data-tooltip="Send New Email to Sustaining Members">
+                <span class="icon">
+                    <i class="fas fa-plus-circle"></i>
+                </span>
+                <span>New Email</span>
+            </a>
+        {% endif %}
+    </div>
+    {% if not sponsoremails %}
+      <div class="notification is-primary3 is-light">
+        No emails have been sent to sustaining members yet.
+        To get started, click the <strong>New Email</strong> button above to compose and send your first message.
+      </div>
+    {% else %}
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Sent At</th>
+            <th>Sent By</th>
+            <th>Recipients</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for email in sponsoremails %}
+          <tr>
+            <td>{{ email.subject }}</td>
+            <td>{{ email.sent_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ email.sender.get_full_name|default:email.sender.username }}</td>
+            <td>{{ email.recipients.count }}</td>
+            <td>
+              <a class="button is-small is-link" href="">
+                View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+{% endblock content %}

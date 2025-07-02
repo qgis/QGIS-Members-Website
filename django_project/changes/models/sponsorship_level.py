@@ -34,7 +34,13 @@ class UnapprovedSponsorshipLevelManager(models.Manager):
 
 class SponsorshipLevel(models.Model):
     """A sponsor model e.g. gui, backend, web site etc."""
-
+    id = models.AutoField(
+        help_text='Unique ID for this sustaining membership level.',
+        primary_key=True,
+        unique=True,
+        null=False,
+        blank=False
+    )
     name = models.CharField(
         help_text='Name of sustaining membership level. e.g. Gold, Bronze, etc',
         max_length=255,
@@ -110,6 +116,9 @@ class SponsorshipLevel(models.Model):
     # noinspection PyClassicStyleClass
     class Meta:
         """Meta options for the sponsor class."""
+        constraints = [
+            models.UniqueConstraint(fields=['id'], name='unique_sponsorshiplevel_id')
+        ]
         unique_together = (
             ('name', 'project'),
             ('project', 'slug')

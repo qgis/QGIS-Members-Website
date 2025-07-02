@@ -15,7 +15,8 @@ from .models import (
     Entry,
     Sponsor,
     SponsorshipPeriod,
-    SponsorshipLevel
+    SponsorshipLevel,
+    SponsorEmail
 )
 from changes.utils.svgimagefile import SVGAndImageFormField
 from crispy_bulma.widgets import FileUploadInput
@@ -251,6 +252,8 @@ class SponsorForm(forms.ModelForm):
             'sponsor_url',
             'contact_person',
             'sponsor_email',
+            'tech_email',
+            'receive_news',
             'agreement',
             'logo',
             'invoice_number',
@@ -282,6 +285,8 @@ class SponsorForm(forms.ModelForm):
                 Field('sponsor_url', css_class='form-control'),
                 Field('contact_person', css_class='form-control'),
                 Field('sponsor_email', css_class='form-control'),
+                Field('tech_email', css_class='form-control'),
+                Field('receive_news', css_class='form-control'),
                 Field('agreement', css_class='form-control'),
                 Field('logo', css_class='form-control'),
                 Field('invoice_number', css_class='form-control'),
@@ -451,3 +456,53 @@ class SustainingMemberPeriodForm(forms.ModelForm):
         fields = (
             'sponsorship_level',
         )
+
+
+class SponsorEmailForm(forms.ModelForm):
+    cc = forms.CharField(
+        widget=forms.TextInput(attrs={'placeholder': 'CC emails, comma separated'}),
+        required=False,
+        help_text="Comma separated list of CC emails"
+    )
+
+    class Meta:
+        model = SponsorEmail
+        fields = (
+            'subject',
+            'body',
+            'sponsor_levels',
+            'email_type',
+            'cc'
+        )
+
+    def __init__(self, *args, **kwargs):
+        print(kwargs)
+        self.user = kwargs.pop('user')
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Fieldset(
+                'Sponsor Email Form',
+                'subject',
+                'body',
+                'sponsor_levels',
+                'email_type',
+                'cc'
+            )
+        )
+        self.helper.html5_required = False
+        super(SponsorEmailForm, self).__init__(*args, **kwargs)
+        self.helper.add_input(
+            HTML(
+                '<button type="submit" class="button is-success mt-5" name="submit">'
+                '  <span class="icon"><i class="fas fa-check"></i></span>'
+                '  <span>Send Email</span>'
+                '</button>'
+            )
+        )
+    
+    def save(self, commit=True):
+        instance = super(SponsorEmailForm, self).save(commit=False)
+        instance.sender = self.user
+        instance.save()
+        return instance

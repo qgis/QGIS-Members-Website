@@ -63,6 +63,10 @@ from .views import (
     ApproveSponsorshipPeriodView,
 
     generate_sponsor_cloud,
+
+    # Sponsor Email
+    SponsorEmailListView,
+    SponsorEmailCreateView,
 )
 
 urlpatterns = [
@@ -212,6 +216,14 @@ urlpatterns = [
         r'^sustaining-member-period/update/(?P<member_id>\d+)/$',
         view=SustainingMemberPeriodUpdateView.as_view(),
         name='sustaining-member-period-update'),
+    
+    # Sponsor Email
+    url(r'^email/list/$',
+        view=SponsorEmailListView.as_view(),
+        name='sponsor-email-list'),
+    url(r'^email/create/$',
+        view=SponsorEmailCreateView.as_view(),
+        name='sponsor-email-create'),
 ]
 
 

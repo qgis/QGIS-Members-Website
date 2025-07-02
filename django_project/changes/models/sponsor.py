@@ -122,12 +122,28 @@ class Sponsor(models.Model):
         blank=True)
 
     sponsor_email = models.CharField(
-        _('Contact Email'),
-        help_text=_('Enter the email of the contact person.'),
+        _('Administrative Contact Email'),
+        help_text=_('Enter the email address of the administrative contact person.'),
         max_length=255,
         null=True,
         blank=True,
         validators=[validate_email_address],
+    )
+
+    tech_email = models.CharField(
+        _('Technical Contact Email'),
+        help_text=_('Enter the email address of the technical contact person.'),
+        max_length=255,
+        null=True,
+        blank=True,
+        validators=[validate_email_address],
+    )
+
+    receive_news = models.BooleanField(
+        _('Receive News and Crowdfunding Information'),
+        help_text=_(
+            'Check this box if you would like to receive news and crowdfunding information.'),
+        default=False
     )
 
     agreement = models.FileField(
