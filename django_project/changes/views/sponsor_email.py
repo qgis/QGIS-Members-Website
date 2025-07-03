@@ -77,6 +77,20 @@ class SponsorEmailCreateView(
         recipients = self.object.get_all_recipients()
         if recipients["to"]:
             self.object.send_email(recipients)
+            messages.success(
+                self.request,
+                "Sponsor email saved successfully. It should be sent shortly.",
+            )
+        else:
+            messages.warning(
+                self.request,
+                (
+                    "No recipients found. Email was not sent.<br>"
+                    "Please ensure that at least one sustaining member in the selected levels "
+                    "has the option <strong>'Receive News and Crowdfunding Information'</strong> checked."
+                    "You can update this setting in the sustaining member's profile."
+                ),
+            )
         return response
 
 
@@ -106,7 +120,15 @@ class SponsorEmailResendView(CustomStaffuserRequiredMixin, View):
                 request, "Sponsor email saved successfully. It should be sent shortly."
             )
         else:
-            messages.warning(request, "No recipients found. Email not sent.")
+            messages.warning(
+                request,
+                (
+                    "No recipients found. Email was not sent.<br>"
+                    "Please ensure that at least one sustaining member in the selected levels "
+                    "has the option <strong>'Receive News and Crowdfunding Information'</strong> checked."
+                    "You can update this setting in the sustaining member's profile."
+                ),
+            )
         return redirect("sponsor-email-detail", pk=sponsor_email.pk)
 
 
