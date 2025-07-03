@@ -137,7 +137,7 @@ class SponsorEmail(models.Model):
                 to=recipients["to"],
                 cc=recipients["cc"],
             )
-            if settings.DEBUG == False:
+            if not settings.DEBUG:
                 email.send()
             self.status = "sent"
             self.sent_at = timezone.now()

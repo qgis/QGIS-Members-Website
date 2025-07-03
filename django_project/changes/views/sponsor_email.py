@@ -10,7 +10,6 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
-    UpdateView,
     View,
 )
 from pure_pagination.mixins import PaginationMixin
