@@ -7,23 +7,41 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('changes', '0012_alter_sponsor_agreement_alter_sponsor_approved_and_more'),
+        ("changes", "0012_alter_sponsor_agreement_alter_sponsor_approved_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sponsor',
-            name='receive_news',
-            field=models.BooleanField(default=False, help_text='Check this box if you would like to receive news and crowdfunding information.', verbose_name='Receive News and Crowdfunding Information'),
+            model_name="sponsor",
+            name="receive_news",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check this box if you would like to receive news and crowdfunding information.",
+                verbose_name="Receive News and Crowdfunding Information",
+            ),
         ),
         migrations.AddField(
-            model_name='sponsor',
-            name='tech_email',
-            field=models.CharField(blank=True, help_text='Enter the email address of the technical contact person.', max_length=255, null=True, validators=[changes.models.sponsor.validate_email_address], verbose_name='Technical Contact Email'),
+            model_name="sponsor",
+            name="tech_email",
+            field=models.CharField(
+                blank=True,
+                help_text="Enter the email address of the technical contact person.",
+                max_length=255,
+                null=True,
+                validators=[changes.models.sponsor.validate_email_address],
+                verbose_name="Technical Contact Email",
+            ),
         ),
         migrations.AlterField(
-            model_name='sponsor',
-            name='sponsor_email',
-            field=models.CharField(blank=True, help_text='Enter the email address of the administrative contact person.', max_length=255, null=True, validators=[changes.models.sponsor.validate_email_address], verbose_name='Administrative Contact Email'),
+            model_name="sponsor",
+            name="sponsor_email",
+            field=models.CharField(
+                blank=True,
+                help_text="Enter the email address of the administrative contact person.",
+                max_length=255,
+                null=True,
+                validators=[changes.models.sponsor.validate_email_address],
+                verbose_name="Administrative Contact Email",
+            ),
         ),
     ]
