@@ -134,7 +134,7 @@ class SponsorEmail(models.Model):
                 subject=self.subject,
                 body=self.body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                to=recipients["to"],
+                bcc=recipients["to"],
                 cc=recipients["cc"],
             )
             if not settings.DEBUG:
