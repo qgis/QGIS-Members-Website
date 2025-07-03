@@ -95,13 +95,13 @@ class SponsorEmail(models.Model):
             admin_emails = sponsors.exclude(sponsor_email__exact="").values_list(
                 "sponsor_email", flat=True
             )
-            emails.extend(admin_emails)
+            emails.extend([e for e in admin_emails if e])
 
         if self.email_type in ["tech", "both"]:
             tech_emails = sponsors.exclude(tech_email__exact="").values_list(
                 "tech_email", flat=True
             )
-            emails.extend(tech_emails)
+            emails.extend([e for e in tech_emails if e])
 
         return list(set(emails))  # Remove duplicates
 
@@ -130,17 +130,21 @@ class SponsorEmail(models.Model):
         from django.core.mail import BadHeaderError, EmailMessage
 
         try:
-            print(f"Sending email to: {recipients['to']} with CC: {recipients['cc']}")
-            # email = EmailMessage(
-            #     subject=self.subject,
-            #     body=self.body,
-            #     from_email=settings.DEFAULT_FROM_EMAIL,
-            #     to=recipients['to'],
-            #     cc=recipients['cc']
-            # )
-            # email.send()
+            email = EmailMessage(
+                subject=self.subject,
+                body=self.body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=recipients["to"],
+                cc=recipients["cc"],
+            )
+            if settings.DEBUG == False:
+                email.send()
             self.status = "sent"
             self.sent_at = timezone.now()
         except (BadHeaderError, SMTPException, Exception):
             self.status = "failed"
         self.save()
+
+    def get_type_display(self):
+        """Get a human-readable display of the email type."""
+        return dict(self.EMAIL_TYPE_CHOICES).get(self.email_type, "Unknown")

@@ -37,7 +37,10 @@ from .views import (  # Sponsor; Sponsorship Level; Sponsorship Period; Sponsor 
     SponsorDeleteView,
     SponsorDetailView,
     SponsorEmailCreateView,
+    SponsorEmailDeleteView,
+    SponsorEmailDetailView,
     SponsorEmailListView,
+    SponsorEmailResendView,
     SponsorListView,
     SponsorshipLevelCreateView,
     SponsorshipLevelDeleteView,
@@ -253,6 +256,21 @@ urlpatterns = [
         r"^email/create/$",
         view=SponsorEmailCreateView.as_view(),
         name="sponsor-email-create",
+    ),
+    url(
+        r"^email/(?P<pk>\d+)/$",
+        view=SponsorEmailDetailView.as_view(),
+        name="sponsor-email-detail",
+    ),
+    url(
+        r"^email/(?P<pk>\d+)/delete/$",
+        view=SponsorEmailDeleteView.as_view(),
+        name="sponsor-email-delete",
+    ),
+    url(
+        r"^email/(?P<pk>\d+)/resend/$",
+        view=SponsorEmailResendView.as_view(),
+        name="sponsor-email-resend",
     ),
 ]
 

@@ -465,7 +465,6 @@ class SponsorEmailForm(forms.ModelForm):
         fields = ("subject", "body", "sponsor_levels", "email_type", "cc")
 
     def __init__(self, *args, **kwargs):
-        print(kwargs)
         self.user = kwargs.pop("user")
         self.helper = FormHelper()
         self.helper.form_method = "post"
@@ -493,5 +492,10 @@ class SponsorEmailForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super(SponsorEmailForm, self).save(commit=False)
         instance.sender = self.user
+        sponsor_levels = self.cleaned_data.get("sponsor_levels")
         instance.save()
+        if sponsor_levels:
+            instance.sponsor_levels.set(sponsor_levels)
+        else:
+            instance.sponsor_levels.clear()
         return instance

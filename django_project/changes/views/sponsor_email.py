@@ -1,7 +1,18 @@
 from changes.forms import SponsorEmailForm
 from changes.models import SponsorEmail
 from changes.permissions import CustomStaffuserRequiredMixin
-from django.views.generic import CreateView, ListView
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+    View,
+)
 from pure_pagination.mixins import PaginationMixin
 
 
@@ -43,7 +54,7 @@ class SponsorEmailCreateView(
 
     def get_success_url(self):
         """Redirect to the list of SponsorEmail objects after creation."""
-        return self.request.path_info
+        return reverse("sponsor-email-list")
 
     def get_context_data(self, **kwargs):
         """Add additional context to the template."""
@@ -65,6 +76,74 @@ class SponsorEmailCreateView(
         """Handle valid form submission for creating a new SponsorEmail."""
         response = super().form_valid(form)
         recipients = self.object.get_all_recipients()
-        if recipients:
+        if recipients["to"]:
             self.object.send_email(recipients)
         return response
+
+
+class SponsorEmailResendView(CustomStaffuserRequiredMixin, View):
+    """View to confirm and resend a SponsorEmail."""
+
+    template_name = "sponsor_email/resend.html"
+
+    def get(self, request, *args, **kwargs):
+        sponsor_email = get_object_or_404(
+            SponsorEmail, pk=kwargs["pk"], is_deleted=False
+        )
+        context = {
+            "sponsor_email": sponsor_email,
+            "title": "Resend Sponsor Email",
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        sponsor_email = get_object_or_404(
+            SponsorEmail, pk=kwargs["pk"], is_deleted=False
+        )
+        recipients = sponsor_email.get_all_recipients()
+        if recipients["to"]:
+            sponsor_email.send_email(recipients)
+            messages.success(
+                request, "Sponsor email saved successfully. It should be sent shortly."
+            )
+        else:
+            messages.warning(request, "No recipients found. Email not sent.")
+        return redirect("sponsor-email-detail", pk=sponsor_email.pk)
+
+
+class SponsorEmailDetailView(CustomStaffuserRequiredMixin, DetailView):
+    """View to display details of a specific SponsorEmail object."""
+
+    template_name = "sponsor_email/details.html"
+    context_object_name = "sponsor_email"
+    model = SponsorEmail
+
+    def get_context_data(self, **kwargs):
+        """Add additional context to the template."""
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Sponsor Email Detail"
+        context["sender_email"] = settings.DEFAULT_FROM_EMAIL
+        return context
+
+    def get_object(self, queryset=None):
+        """Get the SponsorEmail object for the detail view."""
+        return SponsorEmail.objects.get(pk=self.kwargs["pk"], is_deleted=False)
+
+
+class SponsorEmailDeleteView(CustomStaffuserRequiredMixin, DeleteView):
+    """View to soft delete a SponsorEmail object."""
+
+    model = SponsorEmail
+    template_name = "sponsor_email/delete.html"
+    context_object_name = "sponsor_email"
+
+    def get_success_url(self):
+        return reverse("sponsor-email-list")
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.soft_delete()
+        return super(DeleteView, self).delete(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return SponsorEmail.objects.get(pk=self.kwargs["pk"], is_deleted=False)

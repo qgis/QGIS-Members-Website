@@ -13,9 +13,9 @@
                href='{% url "sponsor-email-create" %}'
                data-tooltip="Send New Email to Sustaining Members">
                 <span class="icon">
-                    <i class="fas fa-plus-circle"></i>
+                    <i class="fas fa-pencil"></i>
                 </span>
-                <span>New Email</span>
+                <span>Compose</span>
             </a>
         {% endif %}
     </div>
@@ -25,32 +25,55 @@
         To get started, click the <strong>New Email</strong> button above to compose and send your first message.
       </div>
     {% else %}
-      <table class="table is-striped is-fullwidth">
+      <table class="table is-fullwidth is-hoverable">
         <thead>
           <tr>
-            <th>Subject</th>
+            <th>Recipients Level</th>
+            <th>Content Preview</th>
+            <th>Status</th>
             <th>Sent At</th>
-            <th>Sent By</th>
-            <th>Recipients</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {% for email in sponsoremails %}
           <tr>
-            <td>{{ email.subject }}</td>
-            <td>{{ email.sent_at|date:"Y-m-d H:i" }}</td>
-            <td>{{ email.sender.get_full_name|default:email.sender.username }}</td>
-            <td>{{ email.recipients.count }}</td>
             <td>
-              <a class="button is-small is-link" href="">
-                View
+              {% for level in email.sponsor_levels.all %}
+              <span>{{ level.name }}</span>{% if not forloop.last %}, {% endif %}
+              {% empty %}
+              <span class="has-text-grey-light">No sponsor levels</span>
+              {% endfor %}
+            </td>
+            <td><strong>{{ email.subject }}</strong> - {{ email.body|truncatewords_html:10|safe }}</td>
+            <td class="has-text-centered">
+              {% if email.status == "sent" %}
+              <span class="icon has-text-success" title="Sent">
+                <i class="fas fa-check-circle"></i>
+              </span>
+              {% elif email.status == "failed" %}
+              <span class="icon has-text-danger" title="Failed">
+                <i class="fas fa-times-circle"></i>
+              </span>
+              {% else %}
+              <span class="icon has-text-warning" title="Draft">
+                <i class="fas fa-triangle-exclamation"></i>
+              </span>
+              {% endif %}
+            </td>
+            <td>{{ email.sent_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                <a class="button is-small is-light" href="{% url 'sponsor-email-detail' email.pk %}" title="View">
+              <span class="icon">
+                <i class="fas fa-eye"></i>
+              </span>
               </a>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      {% include "_pagination.html" %}
     {% endif %}
 
 {% endblock content %}
