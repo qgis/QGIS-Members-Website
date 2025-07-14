@@ -214,16 +214,6 @@ class Project(models.Model):
         help_text=_("Whether this Project has Sustaining Members."), default=True
     )
 
-    external_reviewer_invitation = models.TextField(
-        help_text=_(
-            "Standard text for external reviewer of what " "they are expected to do."
-        ),
-        default="You have been invited to review this organisation.",
-        max_length=10000,
-        blank=True,
-        null=True,
-    )
-
     # noinspection PyClassicStyleClass
     class Meta:
         """Meta class for project."""
