@@ -80,10 +80,6 @@ def get_default_organisation():
 class Project(models.Model):
     """A project model e.g. QGIS, InaSAFE etc."""
 
-    EUR = "EUR"
-    USD = "USD"
-    CURRENCY_CHOICES = [(USD, "$"), (EUR, "€")]
-
     name = models.CharField(
         help_text=_("Name of this project."),
         max_length=255,
