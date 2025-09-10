@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import (
     CreateView,
-    DeleteView,
     DetailView,
     ListView,
     View,
@@ -151,20 +150,25 @@ class SponsorEmailDetailView(CustomStaffuserRequiredMixin, DetailView):
         return SponsorEmail.objects.get(pk=self.kwargs["pk"], is_deleted=False)
 
 
-class SponsorEmailDeleteView(CustomStaffuserRequiredMixin, DeleteView):
-    """View to soft delete a SponsorEmail object."""
+class SponsorEmailDeleteView(CustomStaffuserRequiredMixin, View):
+    """View to soft delete a SponsorEmail object (does not really delete the entry)."""
 
-    model = SponsorEmail
     template_name = "sponsor_email/delete.html"
-    context_object_name = "sponsor_email"
 
-    def get_success_url(self):
-        return reverse("sponsor-email-list")
+    def get(self, request, *args, **kwargs):
+        sponsor_email = get_object_or_404(
+            SponsorEmail, pk=kwargs["pk"], is_deleted=False
+        )
+        context = {
+            "sponsor_email": sponsor_email,
+            "title": "Delete Sponsor Email",
+        }
+        return render(request, self.template_name, context)
 
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.soft_delete()
-        return super(DeleteView, self).delete(request, *args, **kwargs)
-
-    def get_object(self, queryset=None):
-        return SponsorEmail.objects.get(pk=self.kwargs["pk"], is_deleted=False)
+    def post(self, request, *args, **kwargs):
+        sponsor_email = get_object_or_404(
+            SponsorEmail, pk=kwargs["pk"], is_deleted=False
+        )
+        sponsor_email.soft_delete()
+        messages.success(request, "Sponsor email deleted (soft delete) successfully.")
+        return redirect("sponsor-email-list")
