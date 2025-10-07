@@ -1,0 +1,77 @@
+{% extends "base_with_sidebar.html" %}
+{% load thumbnail %}
+{% load static %}
+
+{% block content %}
+<div class="container is-max-desktop mt-5">
+  <div class="box-content" style="border-radius: 8px;">
+    <div class="columns mb-2">
+      <div class="column is-flex is-flex-direction-column">
+        <span class="has-text-weight-bold mb-0">{{ sponsor_email.sender.get_full_name }}</span>
+        <span class="is-size-7 has-text-grey mt-1">{{ sender_email }}</span>
+        <span class="is-size-7 has-text-grey">{{ sponsor_email.sent_at|date:"D, d M Y H:i" }}</span>
+      </div>
+      <div class="column is-narrow">
+        <div class="buttons is-right mb-1">
+          <div class="buttons">
+            <a href="{% url 'sponsor-email-resend' sponsor_email.id %}" class="button is-primary3 is-small">
+              <span class="icon"><i class="fas fa-redo"></i></span>
+              <span>Resend</span>
+            </a>
+            <a href="{% url 'sponsor-email-delete' sponsor_email.id %}" class="button is-danger is-outlined is-small">
+              <span class="icon"><i class="fas fa-trash"></i></span>
+            </a>
+            <a href="{% url 'sponsor-email-list' %}" class="button is-light is-small">
+              <span class="icon"><i class="fas fa-arrow-left"></i></span>
+              <span>Back to List</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr class="my-2">
+    <div class="mb-2">
+      <span class="has-text-weight-semibold">To:</span>
+        {% for level in sponsor_email.sponsor_levels.all %}
+        <span>{{ level.name }}</span>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+        <span class="has-text-grey-light">No sponsor levels</span>
+        {% endfor %}
+    </div>
+    <div class="mb-2">
+      <span class="has-text-weight-semibold">Recipents Type:</span>
+      <span>{{ sponsor_email.get_type_display }}</span>
+    </div>
+    {% if sponsor_email.cc.all %}
+    <div class="mb-2">
+      <span class="has-text-weight-semibold">Cc:</span>
+      {% for cc in sponsor_email.cc.all %}
+        <span class="tag is-light">{{ cc.get_full_name }} &lt;{{ cc.email }}&gt;</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="mb-4">
+      <span class="has-text-weight-semibold">Subject:</span>
+      <span>{{ sponsor_email.subject }}</span>
+    </div>
+    <div class="content" style="min-height: 200px;">
+      {{ sponsor_email.body|safe }}
+    </div>
+    {% if sponsor_email.attachments.exists %}
+    <div class="mt-4">
+      <span class="has-text-weight-semibold">Attachments:</span>
+      <ul>
+        {% for attachment in sponsor_email.attachments.all %}
+          <li>
+            <a href="{{ attachment.file.url }}" target="_blank">
+              <span class="icon"><i class="fas fa-paperclip"></i></span>
+              {{ attachment.filename }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
