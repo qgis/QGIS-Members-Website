@@ -8,17 +8,6 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-        .rss-icon:hover {
-            color: darkorange;
-        }
-        .icon:hover {
-            color: #2a62bc;
-        }
-        .json-feed:hover {
-            color: limegreen;
-        }
-    </style>
     <h1 class="title">
         Future Sustaining Members
     </h1>
@@ -94,8 +83,8 @@
         </a>
     </div>
     <p>
-        We appreciate the commitment of our future sustaining members who will support the QGIS project. 
-        Their contributions will help us maintain our infrastructure, fund development work, 
+        We appreciate the commitment of our future sustaining members who will support the QGIS project.
+        Their contributions will help us maintain our infrastructure, fund development work,
         and promote QGIS through workshops and conferences.
     </p>
     <div class="container rich tips">
@@ -103,7 +92,7 @@
         <div class="cont coloring-2">
             <h5>How to become a sustaining member?</h5>
             <p>
-                For information on becoming a sustaining member, please visit 
+                For information on becoming a sustaining member, please visit
                 <a href="https://qgis.org/funding/membership/" target="_blank">
                     Sustaining membership program</a>.
             </p>
@@ -123,9 +112,9 @@
         <hr/>
         <h2 class="subtitle">List of Future Sustaining Members</h2>
     {% endif %}
-  
+
     {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_future_sponsors=True %}
-{% comment %} 
+{% comment %}
     <hr>
     {% include "_pagination.html" %} {% endcomment %}
 {% endblock %}

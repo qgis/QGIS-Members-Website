@@ -66,6 +66,15 @@
           Periods
         </a>
       </li>
+      {% if user.is_staff %}
+      {% url 'sponsor-email-list' as email_list_url %}
+      <li class="{% if request.path == email_list_url %}is-active{% endif %}">
+        <a href="{{ email_list_url }}">
+          <i class="fas fa-envelope mr-3"></i>
+          Emails
+        </a>
+      </li>
+      {% endif %}
     {% endif %}
     <li>
       <a href="https://qgis.org/funding/membership/" target="_blank">
