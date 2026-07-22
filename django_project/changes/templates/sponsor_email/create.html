@@ -1,0 +1,25 @@
+{% extends "base_with_sidebar.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    New Email
+{% endblock title %}
+
+{% block content %}
+
+    <section id="forms">
+        <h1>New Email</h1>
+        <form method="post" class="box-content" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="vertical-space"></div>
+            <div class="field is-grouped">
+                <div class="control">
+                    <button type="submit" name="submit" class="button is-success" id="submit-save">Submit</button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+{% endblock %}
