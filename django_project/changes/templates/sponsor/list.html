@@ -12,18 +12,7 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-        .rss-icon:hover {
-            color: darkorange;
-        }
-        .icon:hover {
-            color: #2a62bc;
-        }
-        .json-feed:hover {
-            color: limegreen;
-        }
-    </style>
-    
+
     <h1 class="title">
         {% if unapproved %}Unapproved {% endif %}Sustaining Members
     </h1>
@@ -38,6 +27,14 @@
                 </span>
                 <span>Add New</span>
             </a>
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
+               href='{% url "sponsor-email-list" %}'
+               data-tooltip="Send Email to Sustaining Members">
+                <span class="icon">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                <span>Email</span>
+            </a>
         {% endif %}
         {% if not is_sustaining_member %}
             <a class="button is-success has-tooltip-arrow has-tooltip-bottom"
@@ -49,13 +46,13 @@
             <span>Sign Up!</span>
             </a>
         {% else %}
-            <a class="button is-outlined is-warning has-tooltip-arrow has-tooltip-bottom"
+            <a class="button is-light has-tooltip-arrow has-tooltip-bottom"
                href='{% url "sustaining-membership" %}'
                data-tooltip="Your sustaining membership">
             <span class="icon">
                 <i class="fas fa-id-card"></i>
             </span>
-            <span>Your Membership</span>
+            <span>Membership</span>
             </a>
         {% endif %}
 
@@ -109,11 +106,11 @@
 
 
     <p>
-        We thank our sustaining members and donors 
-        who support the QGIS project, often regularly, 
-        and enable us to pay for our infrastructure 
-        and important development work, as well as 
-        finance developer meetings and promotion of 
+        We thank our sustaining members and donors
+        who support the QGIS project, often regularly,
+        and enable us to pay for our infrastructure
+        and important development work, as well as
+        finance developer meetings and promotion of
         QGIS in workshops and conferences.
     </p>
     <div class="container rich tips">
@@ -122,15 +119,15 @@
             <h5 id="how-become-a-sustaining-member">How to become a sustaining member?
             </h5>
             <p>
-                You can reach out to the treasurer at 
+                You can reach out to the treasurer at
                 <a href="mailto:finance@qgis.org?subject=QGIS%20Sustaining%20Membership" target="_blank">
-                    finance@qgis.org 
+                    finance@qgis.org
                 </a>
-                or any other Project Steering Committee (PSC) member 
+                or any other Project Steering Committee (PSC) member
                 to express your interest in becoming a sustaining member.
 
-                For information on becoming a sustaining member, 
-                please visit 
+                For information on becoming a sustaining member,
+                please visit
                 <a href="https://qgis.org/funding/membership/" target="_blank">
                     Sustaining Membership Program Overview</a>.
             </p>
@@ -166,13 +163,13 @@
       Medium
     </h3>
     {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=True level="medium" %}
-    
+
     <h3 class="subtitle">
       Small
     </h3>
     {% include "sponsor/sponsor-card.html" with sponsors=sponsors list_current_sponsors=True level="small" %}
 
-{% comment %} 
+{% comment %}
     <hr>
     {% include "_pagination.html" %} {% endcomment %}
 {% endblock %}

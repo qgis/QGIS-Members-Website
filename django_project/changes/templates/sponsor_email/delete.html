@@ -1,0 +1,34 @@
+{% extends "base_with_sidebar.html" %}
+{% load custom_markup %}
+
+{% block title %}Email Deleted - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block page_title %}
+    <h1 class="title">Email Deleted</h1>
+{% endblock page_title %}
+
+{% block content %}
+    <div class="box box-content">
+        <form action="" id="delete-confirmation" method="post">{% csrf_token %}
+            <div class="notification is-light is-danger">
+                <p class="is-size-5">Please confirm you wish to delete the Email below!</p>
+            </div>
+            <div class="content">
+                <h3 class="subtitle">Email: {{ sponsor_email.subject }}</h3>
+            </div>
+            <div class="buttons is-right">
+                <button class="button is-danger" type="submit" title="Delete {{ sponsor_email.subject }}">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                    <span>Delete</span>
+                </button>
+                <a class="button is-light" href='{% url "sponsor-email-list" %}' title="Cancel">
+                    <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                    <span>Cancel</span>
+                </a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
